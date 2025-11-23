@@ -8,6 +8,7 @@ abstract class Routes {
   static const ONBOARDING = _Paths.ONBOARDING;
   static const CHOOSE_ROLE = _Paths.CHOOSE_ROLE;
   static const AUTH = _Paths.AUTH;
+  static const FORGET = _Paths.FORGET;
 }
 
 abstract class _Paths {
@@ -17,4 +18,5 @@ abstract class _Paths {
   static const ONBOARDING = '/onboarding';
   static const CHOOSE_ROLE = '/choose-role';
   static const AUTH = '/auth';
+  static const FORGET = '/forget';
 }

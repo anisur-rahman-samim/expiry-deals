@@ -4,6 +4,8 @@ import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/auth_view.dart';
 import '../modules/choose_role/bindings/choose_role_binding.dart';
 import '../modules/choose_role/views/choose_role_view.dart';
+import '../modules/forget/bindings/forget_binding.dart';
+import '../modules/forget/views/forget_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/onboarding/bindings/onboarding_binding.dart';
@@ -43,6 +45,11 @@ class AppPages {
       name: _Paths.AUTH,
       page: () => const AuthView(),
       binding: AuthBinding(),
+    ),
+    GetPage(
+      name: _Paths.FORGET,
+      page: () => const ForgetView(),
+      binding: ForgetBinding(),
     ),
   ];
 }

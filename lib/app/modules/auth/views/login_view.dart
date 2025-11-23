@@ -1,5 +1,6 @@
 // app/modules/auth/login/views/login_view.dart
 import 'package:expiry_deals/app/modules/auth/views/signup_view.dart';
+import 'package:expiry_deals/app/modules/forget/views/forget_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_sizes/app_sizes.dart';
@@ -98,7 +99,13 @@ class LoginView extends StatelessWidget {
                   Text("Password", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   CustomTextField(hintText: "Enter Your Email",width: Get.width,obscureText: true,),
-
+                  sh10,
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: GestureDetector(
+                        onTap: () => Get.to(() => ForgetView()),
+                        child: Text("Forget Password?",style: h3.copyWith(color: AppColors.gray),)),
+                  ),
                   sh30,
 
                   // Login Button
