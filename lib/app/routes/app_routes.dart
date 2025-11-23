@@ -9,6 +9,10 @@ abstract class Routes {
   static const CHOOSE_ROLE = _Paths.CHOOSE_ROLE;
   static const AUTH = _Paths.AUTH;
   static const FORGET = _Paths.FORGET;
+  static const DASHBOARD = _Paths.DASHBOARD;
+  static const CART = _Paths.CART;
+  static const NOTIFICATIONS = _Paths.NOTIFICATIONS;
+  static const PROFILE = _Paths.PROFILE;
 }
 
 abstract class _Paths {
@@ -19,4 +23,8 @@ abstract class _Paths {
   static const CHOOSE_ROLE = '/choose-role';
   static const AUTH = '/auth';
   static const FORGET = '/forget';
+  static const DASHBOARD = '/dashboard';
+  static const CART = '/cart';
+  static const NOTIFICATIONS = '/notifications';
+  static const PROFILE = '/profile';
 }

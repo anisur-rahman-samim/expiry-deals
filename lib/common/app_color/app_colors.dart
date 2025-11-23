@@ -16,6 +16,7 @@ class AppColors{
   static const gray = Color(0xffa5a5a5);
   static const white = Color(0xffffffff);
   static const black = Color(0xff000000);
+  static const blackNav = Color(0xff292526);
   static const green = Color(0xff259027);
   static const greenLive = Color(0xff13E398);
   static const borderTextColor = Color(0xff595959);           

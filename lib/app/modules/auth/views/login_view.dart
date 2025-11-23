@@ -1,5 +1,6 @@
 // app/modules/auth/login/views/login_view.dart
 import 'package:expiry_deals/app/modules/auth/views/signup_view.dart';
+import 'package:expiry_deals/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:expiry_deals/app/modules/forget/views/forget_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
@@ -113,7 +114,7 @@ class LoginView extends StatelessWidget {
                     title: "Login",
                     width: double.infinity,
                     onTap: () {
-                      // Get.toNamed('/home');
+                    Get.offAll(() => DashboardView());
                     },
                   ),
 
