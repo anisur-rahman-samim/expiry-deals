@@ -7,69 +7,61 @@ import '../app_sizes/app_sizes.dart';
 import '../helper/theme_controller.dart';
 
 
-
-
-// final h1 = TextStyle(
-//     fontFamily: 'impact',
-//     fontSize: 16,
-//     fontWeight: FontWeight.w400
-//   );
-
-final h1 = GoogleFonts.poppins(
+final h1 = GoogleFonts.dmSans(
   color: AppColors.black,
   fontWeight: FontWeight.w900,
   fontSize: AppSizes.fontLarge,
 
 );
-final h2 = GoogleFonts.poppins(
+final h2 = GoogleFonts.dmSans(
   color: AppColors.black,
   fontWeight: FontWeight.w700,
   fontSize: AppSizes.fontLarge,
 
 );
 
-final h3 = GoogleFonts.poppins(
+final h3 = GoogleFonts.dmSans(
   color: AppColors.black,
   fontWeight: FontWeight.w400,
   fontSize: AppSizes.fontDefault,
 
 );
 
-final h4 = GoogleFonts.poppins(
+final h4 = GoogleFonts.dmSans(
   color: AppColors.black,
   fontWeight: FontWeight.w400,
   fontSize: AppSizes.fontSmall,
 
 );
 
-final h5 = GoogleFonts.poppins(
+final h5 = GoogleFonts.dmSans(
   color: AppColors.black,
   fontWeight: FontWeight.w400,
   fontSize: AppSizes.fontExtraSmall,
 
 );
 
-final h6 = GoogleFonts.poppins(
+final h6 = GoogleFonts.dmSans(
   color: AppColors.black,
   fontWeight: FontWeight.w400,
   fontSize: AppSizes.fontDoubleExtraSmall,
 
 );
 
-final titleStyle = GoogleFonts.poppins(
+final titleStyle = GoogleFonts.dmSans(
   color: AppColors.black,
   fontWeight: FontWeight.w400,
   fontSize: AppSizes.fontDefault,
 
 );
 
-final subTitleStyle = GoogleFonts.poppins(
+final subTitleStyle = GoogleFonts.dmSans(
   color: AppColors.black,
   fontWeight: FontWeight.w400,
   fontSize: AppSizes.fontSmall,
 
 );
-final appBarStyle = GoogleFonts.poppins(
+final appBarStyle = GoogleFonts.dmSans(
   color: AppColors.black,
   fontWeight: FontWeight.w700,
   fontSize: 24,
