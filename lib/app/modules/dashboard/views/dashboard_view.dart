@@ -17,7 +17,7 @@ class DashboardView extends GetView<DashboardController> {
     const HomeView(),
     const CartView(),
     const NotificationsView(),
-    const ProfileView(),
+     ProfileView(),
   ];
 
   // Icons for the bar

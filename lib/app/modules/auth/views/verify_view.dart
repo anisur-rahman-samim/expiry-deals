@@ -176,7 +176,15 @@ class _VerifyViewState extends State<VerifyView> {
 
 
                       } else {
-                        Get.snackbar("Error", "Please enter 6-digit code");
+
+                        Get.showSnackbar(
+                          GetSnackBar(
+                            title: "Error",
+                            message: "Please enter 6-digit code",
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+
                       }
                     },
                   ),

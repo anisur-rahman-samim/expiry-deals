@@ -13,6 +13,10 @@ abstract class Routes {
   static const CART = _Paths.CART;
   static const NOTIFICATIONS = _Paths.NOTIFICATIONS;
   static const PROFILE = _Paths.PROFILE;
+  static const PRIVACY_POLICY = _Paths.PRIVACY_POLICY;
+  static const TERMS_CONDITIONS = _Paths.TERMS_CONDITIONS;
+  static const CHANGE_PASSWORD = _Paths.CHANGE_PASSWORD;
+  static const EDIT_PROFILE = _Paths.EDIT_PROFILE;
 }
 
 abstract class _Paths {
@@ -27,4 +31,8 @@ abstract class _Paths {
   static const CART = '/cart';
   static const NOTIFICATIONS = '/notifications';
   static const PROFILE = '/profile';
+  static const PRIVACY_POLICY = '/privacy-policy';
+  static const TERMS_CONDITIONS = '/terms-conditions';
+  static const CHANGE_PASSWORD = '/change-password';
+  static const EDIT_PROFILE = '/edit-profile';
 }

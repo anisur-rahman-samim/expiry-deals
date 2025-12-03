@@ -12,6 +12,14 @@ class AppImages{
   static const onboarding3 =  "assets/images/onboarding3.png";
   static const roleSelect =  "assets/images/role-select.png";
 
+  //icons
+  static const profile =  "assets/icon/Profile.png";
+  static const password =  "assets/icon/Password.png";
+  static const folder =  "assets/icon/folder.png";
+  static const policy =  "assets/icon/policy.png";
+  static const logoutTag =  "assets/images/logout-tag.png";
+  static const logout =  "assets/icon/logout.png";
+
 
 
 
