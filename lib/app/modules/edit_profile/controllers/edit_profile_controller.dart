@@ -1,23 +1,26 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfileController extends GetxController {
-  //TODO: Implement EditProfileController
+  // Rx variable to store the selected image file
+  Rx<File?> selectedImage = Rx<File?>(null);
 
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
+  // Instance of ImagePicker
+  final ImagePicker _picker = ImagePicker();
+
+  // Function to pick an image from gallery or camera
+  Future<void> pickImage(ImageSource source) async {
+    try {
+      final XFile? image = await _picker.pickImage(source: source);
+      if (image != null) {
+        selectedImage.value = File(image.path);
+      } else {
+        Get.snackbar('No Image Selected', 'Please select an image.');
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to pick image: $e');
+    }
   }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }

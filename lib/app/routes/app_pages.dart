@@ -16,6 +16,8 @@ import '../modules/forget/bindings/forget_binding.dart';
 import '../modules/forget/views/forget_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/my_orders/bindings/my_orders_binding.dart';
+import '../modules/my_orders/views/my_orders_view.dart';
 import '../modules/notifications/bindings/notifications_binding.dart';
 import '../modules/notifications/views/notifications_view.dart';
 import '../modules/onboarding/bindings/onboarding_binding.dart';
@@ -34,7 +36,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.SPLASH;
+  static const INITIAL = Routes.DASHBOARD;
 
   static final routes = [
     GetPage(
@@ -94,7 +96,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.TERMS_CONDITIONS,
-      page: () => const TermsConditionsView(),
+      page: () =>  TermsConditionsView(),
       binding: TermsConditionsBinding(),
     ),
     GetPage(
@@ -104,8 +106,13 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.EDIT_PROFILE,
-      page: () => const EditProfileView(),
+      page: () =>  EditProfileView(),
       binding: EditProfileBinding(),
+    ),
+    GetPage(
+      name: _Paths.MY_ORDERS,
+      page: () => const MyOrdersView(),
+      binding: MyOrdersBinding(),
     ),
   ];
 }

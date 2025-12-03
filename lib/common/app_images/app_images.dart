@@ -19,6 +19,8 @@ class AppImages{
   static const policy =  "assets/icon/policy.png";
   static const logoutTag =  "assets/images/logout-tag.png";
   static const logout =  "assets/icon/logout.png";
+  static const order =  "assets/icon/order.png";
+  static const lock =  "assets/icon/lock.png";
 
 
 

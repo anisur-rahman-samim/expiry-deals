@@ -2,6 +2,7 @@
 import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/app/modules/change_password/views/change_password_view.dart';
 import 'package:expiry_deals/app/modules/edit_profile/views/edit_profile_view.dart';
+import 'package:expiry_deals/app/modules/my_orders/views/my_orders_view.dart';
 import 'package:expiry_deals/app/modules/privacy_policy/views/privacy_policy_view.dart';
 import 'package:expiry_deals/app/modules/terms_conditions/views/terms_conditions_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
@@ -120,13 +121,51 @@ class ProfileView extends GetView {
                     child: ListTile(
 
                       onTap: () {
-                           Get.to(() => ChangePasswordView());
+                           Get.to(() => MyOrdersView());
+                      },
+                      leading: Image.asset(AppImages.order, scale: 3,color: AppColors.mainColor),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      title: Text(
+                        "My Orders",
+                        style: h2
+                      ),
+                      subtitle: Text(
+                        "Here is your orders",
+                        style: h3.copyWith(color: AppColors.gray, fontSize: 12),
+                      ),
+                    ).animate().fadeIn(
+                      duration: 600.ms,
+                      delay: 200.ms,
+                      curve: Curves.easeInOut,
+                    ).slideY(
+                      begin: 0.3,
+                      end: 0.0,
+                      duration: 600.ms,
+                      delay: 200.ms,
+                      curve: Curves.easeInOut,
+                    ).shake(
+                      duration: 800.ms,
+                      delay: 200.ms,
+                      hz: 2,
+                      rotation: 0.05,
+                    ),
+                  ),
+                  sh16,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+
+                      onTap: () {
+                        Get.to(() => ChangePasswordView());
                       },
                       leading: Image.asset(AppImages.password, scale: 4,color: AppColors.mainColor),
                       trailing: Icon(Icons.arrow_forward_ios),
                       title: Text(
-                        "Change Password",
-                        style: h2
+                          "Change Password",
+                          style: h2
                       ),
                       subtitle: Text(
                         "Update and strengthen account security",
@@ -339,6 +378,7 @@ class ProfileView extends GetView {
                       rotation: 0.05,
                     ),
                   ),
+                  sh50,
                 ],
               ),
             ],

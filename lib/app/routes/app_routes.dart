@@ -17,6 +17,7 @@ abstract class Routes {
   static const TERMS_CONDITIONS = _Paths.TERMS_CONDITIONS;
   static const CHANGE_PASSWORD = _Paths.CHANGE_PASSWORD;
   static const EDIT_PROFILE = _Paths.EDIT_PROFILE;
+  static const MY_ORDERS = _Paths.MY_ORDERS;
 }
 
 abstract class _Paths {
@@ -35,4 +36,5 @@ abstract class _Paths {
   static const TERMS_CONDITIONS = '/terms-conditions';
   static const CHANGE_PASSWORD = '/change-password';
   static const EDIT_PROFILE = '/edit-profile';
+  static const MY_ORDERS = '/my-orders';
 }
