@@ -1,5 +1,8 @@
+import 'package:expiry_deals/app/modules/category/views/category_product_view.dart';
+import 'package:expiry_deals/app/modules/category/views/category_view.dart';
 import 'package:expiry_deals/app/modules/product_details/views/product_details_view.dart';
 import 'package:expiry_deals/app/modules/search_page/views/search_page_view.dart';
+import 'package:expiry_deals/app/modules/store/views/store_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:flutter/material.dart';
@@ -111,7 +114,9 @@ class HomeView extends GetView<HomeController> {
               ),
 
               const SizedBox(height: 24),
-
+              _sectionHeader('Categories', () {
+               Get.to(() => CategoryView());
+              }),
               // === Category Chips ===
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -122,7 +127,7 @@ class HomeView extends GetView<HomeController> {
                     _categoryChip('T-Shirt'),
                     _categoryChip('Jeans'),
                     _categoryChip('Shoes'),
-                    _categoryChip('Beg'),
+                    _categoryChip('Bag'),
                   ],
                 ),
               ),
@@ -131,12 +136,29 @@ class HomeView extends GetView<HomeController> {
               // === Special Offer Section ===
               _sectionHeader('Special Offer', () {}),
               const SizedBox(height: 12),
+
               SizedBox(
                 height: 200,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: 4,
                   itemBuilder: (ctx, i) => _specialOfferCard(index: i),
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              // === Near Me Stores Section ===
+              _sectionHeader('Near Me Stores', () {
+                // Navigate to all stores near me
+              }),
+              const SizedBox(height: 16),
+
+              SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 6,
+                  itemBuilder: (context, index) => _nearMeStoreCard(),
                 ),
               ),
               const SizedBox(height: 32),
@@ -165,19 +187,24 @@ class HomeView extends GetView<HomeController> {
   }
 
   Widget _categoryChip(String title, {bool isSelected = false}) {
-    return Container(
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        color: isSelected ? AppColors.mainColor : AppColors.white,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: isSelected ? AppColors.mainColor : AppColors.grayLight),
-      ),
-      child: Text(
-        title,
-        style: GoogleFonts.dmSans(
-          color: isSelected ? Colors.white : AppColors.textColor,
-          fontWeight: FontWeight.w600,
+    return GestureDetector(
+      onTap: () {
+        Get.to(() =>  CategoryProductView(), arguments: title);
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.mainColor : AppColors.white,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: isSelected ? AppColors.mainColor : AppColors.grayLight),
+        ),
+        child: Text(
+          title,
+          style: GoogleFonts.dmSans(
+            color: isSelected ? Colors.white : AppColors.textColor,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -192,6 +219,91 @@ class HomeView extends GetView<HomeController> {
       ],
     );
   }
+
+   Widget _nearMeStoreCard() {
+     return GestureDetector(
+       onTap: (){
+         Get.to(() => StoreView());
+       },
+       child: Container(
+         width: 300,
+         margin: const EdgeInsets.only(right: 16),
+         padding: const EdgeInsets.all(16),
+         decoration: BoxDecoration(
+           color: AppColors.white,
+           borderRadius: BorderRadius.circular(20),
+           border: Border.all(color: AppColors.grayLight),
+           boxShadow: [
+             BoxShadow(
+               color: Colors.black.withOpacity(0.06),
+               blurRadius: 12,
+               offset: const Offset(0, 6),
+             ),
+           ],
+         ),
+         child: Row(
+           children: [
+             // Store Logo
+             Container(
+               width: 80,
+               height: 80,
+               decoration: BoxDecoration(
+                 borderRadius: BorderRadius.circular(16),
+                 image: const DecorationImage(
+                   image: NetworkImage('https://i.pravatar.cc/300?img=12'),
+                   fit: BoxFit.cover,
+                 ),
+               ),
+             ),
+             const SizedBox(width: 16),
+
+             // Store Details
+             Expanded(
+               child: Column(
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                 mainAxisAlignment: MainAxisAlignment.center,
+                 children: [
+                   Text(
+                     'Fashion Hub Outlet',
+                     style: h3.copyWith(fontWeight: FontWeight.w600),
+                     maxLines: 1,
+                     overflow: TextOverflow.ellipsis,
+                   ),
+                   const SizedBox(height: 6),
+                   Row(
+                     children: [
+                       Icon(Icons.location_on, size: 16, color: AppColors.hintColor),
+                       const SizedBox(width: 4),
+                       Text('2.4 km away', style: h5.copyWith(color: AppColors.hintColor)),
+                     ],
+                   ),
+                   const SizedBox(height: 8),
+
+                 ],
+               ),
+             ),
+
+             // Visit Button
+             Container(
+               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+               decoration: BoxDecoration(
+                 color: AppColors.mainColor,
+                 borderRadius: BorderRadius.circular(30),
+               ),
+               child: Text(
+                 'Visit',
+                 style: GoogleFonts.dmSans(
+                   color: Colors.white,
+                   fontWeight: FontWeight.w600,
+                   fontSize: 14,
+                 ),
+               ),
+             ),
+           ],
+         ),
+       ),
+     );
+   }
 
   Widget _specialOfferCard({required index}) {
     return GestureDetector(
