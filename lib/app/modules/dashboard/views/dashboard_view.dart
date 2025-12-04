@@ -16,7 +16,7 @@ class DashboardView extends GetView<DashboardController> {
   static final List<Widget> _pages = [
     const HomeView(),
     const CartView(),
-    const NotificationsView(),
+     NotificationsView(),
      ProfileView(),
   ];
 

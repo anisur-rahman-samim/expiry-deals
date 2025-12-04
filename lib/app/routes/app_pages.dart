@@ -81,7 +81,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.NOTIFICATIONS,
-      page: () => const NotificationsView(),
+      page: () =>  NotificationsView(),
       binding: NotificationsBinding(),
     ),
     GetPage(
