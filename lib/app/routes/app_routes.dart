@@ -20,6 +20,8 @@ abstract class Routes {
   static const MY_ORDERS = _Paths.MY_ORDERS;
   static const PRODUCT_DETAILS = _Paths.PRODUCT_DETAILS;
   static const STORE = _Paths.STORE;
+  static const ORDER_SUCCESS = _Paths.ORDER_SUCCESS;
+  static const SEARCH_PAGE = _Paths.SEARCH_PAGE;
 }
 
 abstract class _Paths {
@@ -41,4 +43,6 @@ abstract class _Paths {
   static const MY_ORDERS = '/my-orders';
   static const PRODUCT_DETAILS = '/product-details';
   static const STORE = '/store';
+  static const ORDER_SUCCESS = '/order-success';
+  static const SEARCH_PAGE = '/search-page';
 }

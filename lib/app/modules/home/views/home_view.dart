@@ -1,4 +1,5 @@
 import 'package:expiry_deals/app/modules/product_details/views/product_details_view.dart';
+import 'package:expiry_deals/app/modules/search_page/views/search_page_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:flutter/material.dart';
@@ -70,37 +71,42 @@ class HomeView extends GetView<HomeController> {
               const SizedBox(height: 24),
 
               // === Search Bar ===
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                height: 56, // approximate height of TextField
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Search clothes ...',
-                        style: h4.copyWith(color: AppColors.hintColor),
+              GestureDetector(
+                onTap: (){
+                  Get.to(() => SearchPageView());
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                  height: 56, // approximate height of TextField
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.mainColor,
-                        borderRadius: BorderRadius.circular(12),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Search clothes ...',
+                          style: h4.copyWith(color: AppColors.hintColor),
+                        ),
                       ),
-                      child: const Icon(Icons.search, color: Colors.white),
-                    ),
-                  ],
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.mainColor,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.search, color: Colors.white),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 

@@ -28,6 +28,7 @@ class ProfileView extends GetView {
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: AppColors.bgColor,
         title: Text('Profile', style: h2.copyWith(fontSize: 18)),
         centerTitle: true,
