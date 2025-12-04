@@ -188,30 +188,7 @@ class CartView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Promo Code
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Enter promo code',
-                    hintStyle: h5,
-                    filled: true,
-                    fillColor: AppColors.grayLight.withOpacity(0.3),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: AppColors.mainColor, borderRadius: BorderRadius.circular(16)),
-                child: const Icon(Icons.arrow_forward, color: Colors.white),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
+
 
           // Price Breakdown
           _priceRow('Subtotal', controller.subtotal.value),

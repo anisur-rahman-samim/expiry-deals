@@ -24,6 +24,9 @@ class StoreView extends StatelessWidget {
               pinned: true,
               backgroundColor: AppColors.bgColor,
               elevation: 0,
+              iconTheme: const IconThemeData(
+                color: Colors.white, // Back arrow color
+              ),
               flexibleSpace: FlexibleSpaceBar(
                 collapseMode: CollapseMode.parallax,
                 background: _buildStoreHeader(),

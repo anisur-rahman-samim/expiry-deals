@@ -380,6 +380,8 @@ class ProfileView extends GetView {
                     ),
                   ),
                   sh50,
+                  sh50,
+                  sh50,
                 ],
               ),
             ],
