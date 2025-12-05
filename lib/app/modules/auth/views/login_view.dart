@@ -2,10 +2,13 @@
 import 'package:expiry_deals/app/modules/auth/views/signup_view.dart';
 import 'package:expiry_deals/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:expiry_deals/app/modules/forget/views/forget_view.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/views/vendor_dashboard_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_sizes/app_sizes.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
+import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
@@ -15,7 +18,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginView extends StatelessWidget {
-  const LoginView({super.key});
+  final String role;
+  const LoginView({super.key, required this.role});
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +107,7 @@ class LoginView extends StatelessWidget {
                   sh10,
                   Align(
                     alignment: Alignment.topRight,
+                    
                     child: GestureDetector(
                         onTap: () => Get.to(() => ForgetView()),
                         child: Text("Forget Password?",style: h3.copyWith(color: AppColors.gray),)),
@@ -114,7 +119,15 @@ class LoginView extends StatelessWidget {
                     title: "Login",
                     width: double.infinity,
                     onTap: () {
-                    Get.offAll(() => DashboardView());
+                      String? role =     LocalStorage.getData(key: AppConstant.role);
+                      debugPrint("Role:::::::::::: $role");
+                      if(role == "User"){
+                         Get.offAll(() => DashboardView());
+
+                      }else{
+                        Get.offAll(() => VendorDashboardView());
+                      }
+                   
                     },
                   ),
 

@@ -40,13 +40,15 @@ import '../modules/store/bindings/store_binding.dart';
 import '../modules/store/views/store_view.dart';
 import '../modules/terms_conditions/bindings/terms_conditions_binding.dart';
 import '../modules/terms_conditions/views/terms_conditions_view.dart';
+import '../modules/vendor_dashboard/bindings/vendor_dashboard_binding.dart';
+import '../modules/vendor_dashboard/views/vendor_dashboard_view.dart';
 
 part 'app_routes.dart';
 
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.DASHBOARD;
+  static const INITIAL = Routes.VENDOR_DASHBOARD;
 
   static final routes = [
     GetPage(
@@ -148,6 +150,11 @@ class AppPages {
       name: _Paths.CATEGORY,
       page: () => const CategoryView(),
       binding: CategoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.VENDOR_DASHBOARD,
+      page: () =>  VendorDashboardView(),
+      binding: VendorDashboardBinding(),
     ),
   ];
 }

@@ -3,9 +3,11 @@ import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/app/modules/auth/views/signup_view.dart';
 import 'package:expiry_deals/app/modules/forget/views/reset_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_sizes/app_sizes.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
+import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
@@ -169,7 +171,7 @@ class _VerifyViewState extends State<VerifyView> {
                       if (pinController.text.length == 6) {
                         kSnackBar(message: "OTP Verify Successfully", bgColor: AppColors.green);
                         if(widget.isSignUp == true){
-                          Get.to(() => LoginView());
+                            Get.to(() => LoginView(role: LocalStorage.getData(key: AppConstant.role),));
                         }else{
                           Get.to(() => ResetView());
                         }

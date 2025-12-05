@@ -1,9 +1,11 @@
 // app/modules/choose_role/views/choose_role_view.dart
 import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_sizes/app_sizes.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
+import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 
@@ -85,7 +87,8 @@ class ChooseRoleView extends StatelessWidget {
                 title: "User",
                 width: double.infinity,
                 onTap: () {
-                  Get.to(() => LoginView());
+                             LocalStorage.saveData(key: AppConstant.role, data: "User");
+                  Get.to(() => LoginView(role: "User",));
                 },
               ),
             ),
@@ -101,7 +104,8 @@ class ChooseRoleView extends StatelessWidget {
                 bgColor: Colors.white,
                 textColor: AppColors.mainColor,
                 onTap: () {
-
+                  LocalStorage.saveData(key: AppConstant.role, data: "Vendor");
+                   Get.to(() => LoginView(role: "Vendor",));
                 },
               ),
             ),

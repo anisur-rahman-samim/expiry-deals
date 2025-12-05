@@ -23,6 +23,7 @@ abstract class Routes {
   static const ORDER_SUCCESS = _Paths.ORDER_SUCCESS;
   static const SEARCH_PAGE = _Paths.SEARCH_PAGE;
   static const CATEGORY = _Paths.CATEGORY;
+  static const VENDOR_DASHBOARD = _Paths.VENDOR_DASHBOARD;
 }
 
 abstract class _Paths {
@@ -47,4 +48,5 @@ abstract class _Paths {
   static const ORDER_SUCCESS = '/order-success';
   static const SEARCH_PAGE = '/search-page';
   static const CATEGORY = '/category';
+  static const VENDOR_DASHBOARD = '/vendor-dashboard';
 }
