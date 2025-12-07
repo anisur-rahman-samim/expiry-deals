@@ -24,6 +24,12 @@ abstract class Routes {
   static const SEARCH_PAGE = _Paths.SEARCH_PAGE;
   static const CATEGORY = _Paths.CATEGORY;
   static const VENDOR_DASHBOARD = _Paths.VENDOR_DASHBOARD;
+  static const VENDOR_HOME = _Paths.VENDOR_DASHBOARD + _Paths.VENDOR_HOME;
+  static const VENDOR_PRODUCT = _Paths.VENDOR_DASHBOARD + _Paths.VENDOR_PRODUCT;
+  static const VENDOR_ORDER = _Paths.VENDOR_DASHBOARD + _Paths.VENDOR_ORDER;
+  static const VENDOR_WITHDRAW =
+      _Paths.VENDOR_DASHBOARD + _Paths.VENDOR_WITHDRAW;
+  static const VENDOR_PROFILE = _Paths.VENDOR_DASHBOARD + _Paths.VENDOR_PROFILE;
 }
 
 abstract class _Paths {
@@ -49,4 +55,9 @@ abstract class _Paths {
   static const SEARCH_PAGE = '/search-page';
   static const CATEGORY = '/category';
   static const VENDOR_DASHBOARD = '/vendor-dashboard';
+  static const VENDOR_HOME = '/vendor-home';
+  static const VENDOR_PRODUCT = '/vendor-product';
+  static const VENDOR_ORDER = '/vendor-order';
+  static const VENDOR_WITHDRAW = '/vendor-withdraw';
+  static const VENDOR_PROFILE = '/vendor-profile';
 }

@@ -3,6 +3,10 @@ import 'package:expiry_deals/app/modules/home/views/home_view.dart';
 import 'package:expiry_deals/app/modules/notifications/views/notifications_view.dart';
 import 'package:expiry_deals/app/modules/profile/views/profile_view.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/controllers/vendor_dashboard_controller.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_home/views/vendor_home_view.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_order/views/vendor_order_view.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/views/vendor_product_view.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/views/vendor_profile_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,10 +18,10 @@ class VendorDashboardView extends GetView<VendorDashboardController> {
 
   // List of pages
   static final List<Widget> _pages = [
-    ProfileView(),
-     HomeView(),
-     CartView(),
-     NotificationsView(),
+    VendorHomeView(),
+     VendorProductView(),
+     VendorOrderView(),
+     VendorProfileView(),
      
   ];
 

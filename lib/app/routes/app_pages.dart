@@ -41,6 +41,16 @@ import '../modules/store/views/store_view.dart';
 import '../modules/terms_conditions/bindings/terms_conditions_binding.dart';
 import '../modules/terms_conditions/views/terms_conditions_view.dart';
 import '../modules/vendor_dashboard/bindings/vendor_dashboard_binding.dart';
+import '../modules/vendor_dashboard/vendor_home/bindings/vendor_home_binding.dart';
+import '../modules/vendor_dashboard/vendor_home/views/vendor_home_view.dart';
+import '../modules/vendor_dashboard/vendor_order/bindings/vendor_order_binding.dart';
+import '../modules/vendor_dashboard/vendor_order/views/vendor_order_view.dart';
+import '../modules/vendor_dashboard/vendor_product/bindings/vendor_product_binding.dart';
+import '../modules/vendor_dashboard/vendor_product/views/vendor_product_view.dart';
+import '../modules/vendor_dashboard/vendor_profile/bindings/vendor_profile_binding.dart';
+import '../modules/vendor_dashboard/vendor_profile/views/vendor_profile_view.dart';
+import '../modules/vendor_dashboard/vendor_withdraw/bindings/vendor_withdraw_binding.dart';
+import '../modules/vendor_dashboard/vendor_withdraw/views/vendor_withdraw_view.dart';
 import '../modules/vendor_dashboard/views/vendor_dashboard_view.dart';
 
 part 'app_routes.dart';
@@ -153,8 +163,35 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.VENDOR_DASHBOARD,
-      page: () =>  VendorDashboardView(),
+      page: () => VendorDashboardView(),
       binding: VendorDashboardBinding(),
+      children: [
+        GetPage(
+          name: _Paths.VENDOR_HOME,
+          page: () => const VendorHomeView(),
+          binding: VendorHomeBinding(),
+        ),
+        GetPage(
+          name: _Paths.VENDOR_PRODUCT,
+          page: () => const VendorProductView(),
+          binding: VendorProductBinding(),
+        ),
+        GetPage(
+          name: _Paths.VENDOR_ORDER,
+          page: () => const VendorOrderView(),
+          binding: VendorOrderBinding(),
+        ),
+        GetPage(
+          name: _Paths.VENDOR_WITHDRAW,
+          page: () => const VendorWithdrawView(),
+          binding: VendorWithdrawBinding(),
+        ),
+        GetPage(
+          name: _Paths.VENDOR_PROFILE,
+          page: () =>  VendorProfileView(),
+          binding: VendorProfileBinding(),
+        ),
+      ],
     ),
   ];
 }
