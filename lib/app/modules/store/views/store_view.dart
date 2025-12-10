@@ -68,7 +68,7 @@ class StoreView extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.black.withOpacity(0.6), Colors.transparent, Colors.black.withOpacity(0.8)],
+              colors: [Colors.black.withValues(alpha: 0.6), Colors.transparent, Colors.black.withValues(alpha: 0.8),],
             ),
           ),
         ),
@@ -167,7 +167,7 @@ class StoreView extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 6))],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 6))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,7 +214,7 @@ class StoreView extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Fashion Elite Store has been providing premium quality fashion items since 2018. We specialize in leather jackets, designer wear, and trendy accessories. Trusted by over 45k+ happy customers worldwide.',
-            style: h4.copyWith(height: 1.7, color: AppColors.textColor.withOpacity(0.9)),
+            style: h4.copyWith(height: 1.7, color: AppColors.textColor.withValues(alpha: 0.9),),
           ),
           const SizedBox(height: 24),
           _infoRow(Icons.location_on, 'Lagos, Nigeria'),
@@ -235,40 +235,6 @@ class StoreView extends StatelessWidget {
           const SizedBox(width: 16),
           Text(text, style: h4),
         ],
-      ),
-    );
-  }
-
-  Widget _buildReviewsTab() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(20),
-      itemCount: 5,
-      itemBuilder: (context, index) => Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.grayLight),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const CircleAvatar(radius: 20, backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=${10}')),
-                const SizedBox(width: 12),
-                Text('Sarah Johnson', style: h3.copyWith(fontWeight: FontWeight.w600)),
-                const Spacer(),
-                Row(children: List.generate(5, (_) => const Icon(Icons.star, color: Colors.amber, size: 16))),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text('Amazing quality! The jacket fits perfectly and looks even better in person. Fast shipping too!', style: h4),
-            const SizedBox(height: 8),
-            Text('2 days ago', style: h5.copyWith(color: AppColors.hintColor)),
-          ],
-        ),
       ),
     );
   }

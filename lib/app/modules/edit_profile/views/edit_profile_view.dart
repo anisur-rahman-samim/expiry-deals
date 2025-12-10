@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:expiry_deals/app/modules/edit_profile/controllers/edit_profile_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';

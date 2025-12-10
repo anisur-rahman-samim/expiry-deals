@@ -1,13 +1,11 @@
 // vendor_add_product_view.dart
 
-import 'dart:io';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/controllers/vendor_add_product_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
 
 class VendorAddProductView extends GetView<VendorAddProductController> {
@@ -55,7 +53,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
                     ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.add_a_photo_outlined, size: 48, color: AppColors.mainColor.withOpacity(0.6)),
+                    Icon(Icons.add_a_photo_outlined, size: 48, color: AppColors.mainColor.withValues(alpha: 0.6),),
                     sh10,
                     Text('Upload', style: TextStyle(color: AppColors.mainColor, fontWeight: FontWeight.w600)),
                     Text('Upload', style: TextStyle(color: AppColors.hintColor)),

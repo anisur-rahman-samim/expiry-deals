@@ -6,7 +6,7 @@ import 'package:flutter_html/flutter_html.dart';
 class HTMLView extends StatelessWidget {
   final String htmlData;
 
-  const HTMLView({Key? key, required this.htmlData}) : super(key: key);
+  const HTMLView({super.key, required this.htmlData});
   
 
   @override

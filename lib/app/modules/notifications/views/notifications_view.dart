@@ -10,7 +10,8 @@ import '../controllers/notifications_controller.dart';
 
 class NotificationsView extends GetView {
    NotificationsView({super.key});
-final NotificationsController controller = Get.put(NotificationsController());
+@override
+  final NotificationsController controller = Get.put(NotificationsController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +68,7 @@ final NotificationsController controller = Get.put(NotificationsController());
                       : Border.all(color: AppColors.grayLight),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -104,7 +105,7 @@ final NotificationsController controller = Get.put(NotificationsController());
                       const SizedBox(height: 4),
                       Text(
                         notification.body,
-                        style: h4.copyWith(color: AppColors.textColor.withOpacity(0.8)),
+                        style: h4.copyWith(color: AppColors.textColor.withValues(alpha: 0.8),),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),

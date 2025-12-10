@@ -21,6 +21,7 @@ import '../controllers/profile_controller.dart';
 class ProfileView extends GetView {
   ProfileView({super.key});
 
+  @override
   final ProfileController controller = Get.put(ProfileController());
 
   @override
@@ -291,7 +292,7 @@ class ProfileView extends GetView {
                                     sh20,
                                     Text(
                                       "Are you sure you want to log out of your account?",
-                                      style: h2.copyWith(color: AppColors.black.withOpacity(0.6)),
+                                      style: h2.copyWith(color: AppColors.black.withValues(alpha: 0.6),),
                                       textAlign: TextAlign.center,
                                     ),
                                     sh10,

@@ -41,13 +41,13 @@ class VendorAddProductController extends GetxController {
   void saveProduct() {
     if (itemName.value.isEmpty || price.value.isEmpty || selectedImage.value == null) {
       Get.snackbar('Error', 'Please fill all required fields and upload an image',
-          backgroundColor: AppColors.red.withOpacity(0.2), colorText: AppColors.red);
+          backgroundColor: AppColors.red.withValues(alpha: 0.2), colorText: AppColors.red);
       return;
     }
 
     // Your save logic here (API call, etc.)
     Get.snackbar('Success', 'Product added successfully!',
-        backgroundColor: AppColors.green.withOpacity(0.2), colorText: AppColors.green);
+        backgroundColor: AppColors.green.withValues(alpha: 0.2), colorText: AppColors.green);
     Get.back();
   }
 }

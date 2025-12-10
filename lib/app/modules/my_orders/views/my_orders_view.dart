@@ -30,7 +30,7 @@ class MyOrdersView extends GetView<MyOrdersController> {
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.grayLight.withOpacity(0.3),
+                color: AppColors.grayLight.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: TabBar(
@@ -114,7 +114,7 @@ class MyOrdersView extends GetView<MyOrdersController> {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.grayLight),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -130,7 +130,7 @@ class MyOrdersView extends GetView<MyOrdersController> {
                   Text('Order #${order.id}', style: h3.copyWith(fontWeight: FontWeight.w600)),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(20), ),
+                    decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(20), ),
                     child: Text(order.status.capitalizeFirst!, style: GoogleFonts.dmSans(color: color, fontWeight: FontWeight.w600, fontSize: 12)),
                   ),
                 ],

@@ -61,7 +61,7 @@ class OrderDetailsView extends StatelessWidget {
             Text('Order #${order.id}', style: h2),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(20), ),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(20), ),
               child: Text(order.status.capitalizeFirst!, style: GoogleFonts.dmSans(color: color, fontWeight: FontWeight.w600)),
             ),
           ]),
@@ -132,12 +132,10 @@ class OrderDetailsView extends StatelessWidget {
     width: double.infinity,
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.grayLight), boxShadow: [
-      BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4)),
+      BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4)),
     ]),
     child: child,
   );
-
-  Widget _section(String title, Widget child) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: h2.copyWith(fontSize: 18)), const SizedBox(height: 8), child]);
 
   Widget _priceRow(String label, double amount, {bool bold = false, Color? color}) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 6),
@@ -158,7 +156,7 @@ class OrderDetailsView extends StatelessWidget {
           onPressed: () {
             Get.back();
             Get.back();
-            Get.snackbar('Order Cancelled', 'Your order has been cancelled successfully', backgroundColor: AppColors.red.withOpacity(0.1), colorText: AppColors.red);
+            Get.snackbar('Order Cancelled', 'Your order has been cancelled successfully', backgroundColor: AppColors.red.withValues(alpha: 0.1), colorText: AppColors.red);
           },
           style: ElevatedButton.styleFrom(backgroundColor: AppColors.red),
           child: Text('Yes, Cancel', style: GoogleFonts.dmSans(color: Colors.white)),

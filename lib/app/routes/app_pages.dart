@@ -1,9 +1,12 @@
+// ignore_for_file: constant_identifier_names
 import 'package:get/get.dart';
 
 import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/auth_view.dart';
 import '../modules/cart/bindings/cart_binding.dart';
+
 import '../modules/cart/views/cart_view.dart';
+
 import '../modules/category/bindings/category_binding.dart';
 import '../modules/category/views/category_view.dart';
 import '../modules/change_password/bindings/change_password_binding.dart';
