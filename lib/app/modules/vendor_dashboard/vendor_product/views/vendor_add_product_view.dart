@@ -76,7 +76,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
             sh16,
             _buildTextField('Category'),
             Obx(() => DropdownButtonFormField<String>(
-              value: controller.categories.contains(controller.selectedCategory.value)
+              initialValue: controller.categories.contains(controller.selectedCategory.value)
                   ? controller.selectedCategory.value
                   : controller.categories.first, // fallback to first item if invalid
               decoration: InputDecoration(

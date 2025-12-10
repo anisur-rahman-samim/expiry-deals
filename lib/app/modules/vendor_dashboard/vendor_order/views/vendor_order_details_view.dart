@@ -214,7 +214,7 @@ class VendorOrderDetailsView extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () async {
-              Get.back(); // close dialog
+          Navigator.pop(context);
               await controller.updateOrderStatus(order.id, newStatus.toLowerCase());
               // Get.snackbar(
               //   'Status Updated',

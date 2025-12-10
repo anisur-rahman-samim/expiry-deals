@@ -189,7 +189,7 @@ class NotificationsView extends GetView {
               Align(
                 alignment: Alignment.centerRight,
                 child: ElevatedButton(
-                  onPressed: () => Get.back(),
+                  onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.mainColor,
                     foregroundColor: Colors.white,

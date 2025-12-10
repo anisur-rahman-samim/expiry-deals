@@ -66,7 +66,7 @@ class EditProfileView extends GetView<EditProfileController> {
                                   title: const Text('Camera'),
                                   onTap: () {
                                     editProfileController.pickImage(ImageSource.camera);
-                                    Get.back();
+                                   Navigator.pop(context);
                                   },
                                 ),
                                 ListTile(
@@ -74,7 +74,7 @@ class EditProfileView extends GetView<EditProfileController> {
                                   title: const Text('Gallery'),
                                   onTap: () {
                                     editProfileController.pickImage(ImageSource.gallery);
-                                    Get.back();
+                                    Navigator.pop(context);
                                   },
                                 ),
                               ],
@@ -127,8 +127,7 @@ class EditProfileView extends GetView<EditProfileController> {
               title: "Save Changes",
               width: Get.width,
               onTap: () {
-                // Handle save changes logic here
-                Get.back();
+               Navigator.pop(context);
                 Get.snackbar(
                   'Profile Updated',
                   'Name: ${nameController.text}, Email: ${emailController.text}, Phone: ${phoneController.text}',

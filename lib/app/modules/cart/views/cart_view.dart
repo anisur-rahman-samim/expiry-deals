@@ -26,7 +26,7 @@ class CartView extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.cartItems.isEmpty) {
-          return _buildEmptyCart();
+          return _buildEmptyCart(context);
         }
 
         return Stack(
@@ -59,7 +59,7 @@ class CartView extends StatelessWidget {
   }
 
   // Empty Cart State
-  Widget _buildEmptyCart() {
+  Widget _buildEmptyCart(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {},
       child: ListView(
@@ -76,7 +76,7 @@ class CartView extends StatelessWidget {
                 Text('Add items to get started!', style: h4.copyWith(color: AppColors.hintColor)),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () => Get.back(),
+                  onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.mainColor,
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),

@@ -151,11 +151,11 @@ class OrderDetailsView extends StatelessWidget {
       title: Text('Cancel Order?', style: h2),
       content: Text('This action cannot be undone.', style: h4),
       actions: [
-        TextButton(onPressed: () => Get.back(), child: Text('Keep Order', style: GoogleFonts.dmSans(color: AppColors.hintColor))),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Keep Order', style: GoogleFonts.dmSans(color: AppColors.hintColor))),
         ElevatedButton(
           onPressed: () {
-            Get.back();
-            Get.back();
+            Navigator.pop(context);
+            Navigator.pop(context);
             Get.snackbar('Order Cancelled', 'Your order has been cancelled successfully', backgroundColor: AppColors.red.withValues(alpha: 0.1), colorText: AppColors.red);
           },
           style: ElevatedButton.styleFrom(backgroundColor: AppColors.red),
