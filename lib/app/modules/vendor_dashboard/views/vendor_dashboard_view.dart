@@ -33,12 +33,12 @@ class VendorDashboardView extends GetView<VendorDashboardController> {
 
     ),
     CrystalNavigationBarItem(
-      unselectedIcon: Icons.shopping_cart_outlined,
-      icon: Icons.shopping_cart,
+      unselectedIcon: Icons.add,
+      icon: Icons.add,
     ),
     CrystalNavigationBarItem(
-      unselectedIcon: Icons.notifications_outlined,
-      icon: Icons.notifications,
+      unselectedIcon: Icons.list_alt,
+      icon: Icons.list_alt,
     ),
     CrystalNavigationBarItem(
       unselectedIcon: Icons.person_outline,
