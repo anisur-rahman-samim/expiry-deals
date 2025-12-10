@@ -1,8 +1,6 @@
 // vendor_add_product_controller.dart
 
 import 'dart:io';
-import 'package:expiry_deals/common/app_color/app_colors.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
