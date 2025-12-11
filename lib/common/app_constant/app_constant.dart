@@ -11,6 +11,7 @@ class AppConstant {
   static const signUpToken = 'signUpToken';
   static const forgotToken = 'forgotToken';
   static const fcmToken = 'fcmToken';
+  static const onboarding = 'onboarding';
 
 
 }

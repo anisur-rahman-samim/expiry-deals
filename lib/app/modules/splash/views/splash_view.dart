@@ -1,5 +1,8 @@
+import 'package:expiry_deals/app/modules/choose_role/views/choose_role_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
+import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../onboarding/views/onboarding_view.dart';
@@ -12,7 +15,12 @@ class SplashView extends GetView<SplashController> {
   Widget build(BuildContext context) {
     // Auto navigate after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
-      Get.offAll(() =>  OnboardingView());
+      if(LocalStorage.getData(key: AppConstant.onboarding) != null){
+        Get.offAll(() =>  OnboardingView());
+      }else{
+        Get.offAll(() => const ChooseRoleView());
+      }
+
     });
 
     return Scaffold(

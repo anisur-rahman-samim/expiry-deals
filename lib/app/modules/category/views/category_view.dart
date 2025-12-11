@@ -78,7 +78,7 @@ class CategoryView extends StatelessWidget {
           border: Border.all(color: AppColors.grayLight.withValues(alpha: 0.5),),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.6),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
