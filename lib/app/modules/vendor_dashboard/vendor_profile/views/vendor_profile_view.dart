@@ -4,6 +4,7 @@ import 'package:expiry_deals/app/modules/change_password/views/change_password_v
 import 'package:expiry_deals/app/modules/edit_profile/views/edit_profile_view.dart';
 import 'package:expiry_deals/app/modules/privacy_policy/views/privacy_policy_view.dart';
 import 'package:expiry_deals/app/modules/terms_conditions/views/terms_conditions_view.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/views/edit_shop_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
@@ -88,7 +89,45 @@ class VendorProfileView extends GetView {
                           style: h2
                       ),
                       subtitle: Text(
-                        "Change profile picture, number, email",
+                        "Change profile picture, number",
+                        style: h3.copyWith(color: AppColors.gray, fontSize: 12),
+                      ),
+                    ).animate().fadeIn(
+                      duration: 600.ms,
+                      delay: 100.ms,
+                      curve: Curves.easeInOut,
+                    ).slideY(
+                      begin: 0.3,
+                      end: 0.0,
+                      duration: 600.ms,
+                      delay: 100.ms,
+                      curve: Curves.easeInOut,
+                    ).shake(
+                      duration: 800.ms,
+                      delay: 100.ms,
+                      hz: 2,
+                      rotation: 0.05,
+                    ),
+                  ),
+
+                  sh16,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      onTap: () {
+                        Get.to(() => EditShopView());
+                      },
+                      leading: Image.asset(AppImages.profile, scale: 4,color: AppColors.mainColor,),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      title: Text(
+                          "Edit Shop",
+                          style: h2
+                      ),
+                      subtitle: Text(
+                        "Change shop picture, number, email",
                         style: h3.copyWith(color: AppColors.gray, fontSize: 12),
                       ),
                     ).animate().fadeIn(
