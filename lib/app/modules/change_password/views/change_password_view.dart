@@ -51,7 +51,7 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
               CustomTextField(width: Get.width, hintText: "Password",obscureText: true),
               sh20,
               CustomCenterButton(onTap: (){
-                Get.back();
+               Navigator.pop(context);
               },title: "Save Changes", width: Get.width)
 
             ],

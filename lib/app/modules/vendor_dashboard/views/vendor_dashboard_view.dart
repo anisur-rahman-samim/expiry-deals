@@ -1,7 +1,3 @@
-import 'package:expiry_deals/app/modules/cart/views/cart_view.dart';
-import 'package:expiry_deals/app/modules/home/views/home_view.dart';
-import 'package:expiry_deals/app/modules/notifications/views/notifications_view.dart';
-import 'package:expiry_deals/app/modules/profile/views/profile_view.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/controllers/vendor_dashboard_controller.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_home/views/vendor_home_view.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_order/views/vendor_order_view.dart';

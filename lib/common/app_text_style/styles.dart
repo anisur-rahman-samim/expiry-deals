@@ -1,10 +1,8 @@
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../app_color/app_colors.dart';
 import '../app_sizes/app_sizes.dart';
-import '../helper/theme_controller.dart';
 
 
 final h1 = GoogleFonts.dmSans(

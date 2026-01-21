@@ -1,9 +1,11 @@
 // onboarding_view.dart
 import 'package:expiry_deals/app/modules/choose_role/views/choose_role_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_sizes/app_sizes.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
+import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 
@@ -136,6 +138,7 @@ class OnboardingView extends GetView<OnboardingController> {
                             );
                           } else {
                             // Last page → Go to Choose Role
+                            LocalStorage.saveData(key: AppConstant.onboarding, data: "onboarding");
                             Get.offAll(() => const ChooseRoleView());
                           }
                         },
@@ -148,7 +151,10 @@ class OnboardingView extends GetView<OnboardingController> {
                 // Skip Button (only show on first two pages)
                 Obx(() => controller.currentIndex.value < 2
                     ? TextButton(
-                  onPressed: () => Get.offAll(() => const ChooseRoleView()),
+                  onPressed: () {
+                    LocalStorage.saveData(key: AppConstant.onboarding, data: "onboarding");
+                    Get.offAll(() => const ChooseRoleView());
+                  },
                   child: Text(
                     "Skip",
                     style: h3.copyWith(color: Colors.black54),

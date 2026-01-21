@@ -1,4 +1,5 @@
-// lib/common/widgets/custom_textfelid.dart
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../app_color/app_colors.dart';
@@ -67,14 +68,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 _obscureText
                     ? CupertinoIcons.eye
                     : CupertinoIcons.eye_slash,
-                color: AppColors.black.withOpacity(0.7),
+                color: AppColors.black.withValues(alpha: 0.7),
+
 
               ),
             )
                 : null, // Only show suffixIcon for obscureText fields
             prefixIcon: widget.preIcon,
             hintText: widget.hintText,
-            hintStyle:  h3.copyWith(color: AppColors.black.withOpacity(0.5))
+            hintStyle:  h3.copyWith(color: AppColors.black.withValues(alpha: 0.5),)
           ),
           maxLines: widget.maxLines ?? 1,
           style: h3,

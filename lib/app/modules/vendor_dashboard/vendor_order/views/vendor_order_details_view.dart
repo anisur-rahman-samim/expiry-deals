@@ -106,7 +106,7 @@ class VendorOrderDetailsView extends StatelessWidget {
             border: Border.all(color: AppColors.grayLight),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               )
@@ -126,7 +126,7 @@ class VendorOrderDetailsView extends StatelessWidget {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.grayLight),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 12, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 12, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,9 +166,9 @@ class VendorOrderDetailsView extends StatelessWidget {
       //  width: 120,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: _getStatusColor(currentStatus).withOpacity(0.12),
+          color: _getStatusColor(currentStatus).withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: _getStatusColor(currentStatus).withOpacity(0.4)),
+          border: Border.all(color: _getStatusColor(currentStatus).withValues(alpha: 0.4),),
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
@@ -214,7 +214,7 @@ class VendorOrderDetailsView extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () async {
-              Get.back(); // close dialog
+          Navigator.pop(context);
               await controller.updateOrderStatus(order.id, newStatus.toLowerCase());
               // Get.snackbar(
               //   'Status Updated',
@@ -303,26 +303,6 @@ class VendorOrderDetailsView extends StatelessWidget {
     ],
   );
 
-  Widget _section(String title, Widget child) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: GoogleFonts.dmSans(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textColor)),
-        sh10,
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.grayLight),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10)],
-          ),
-          child: child,
-        ),
-      ],
-    );
-  }
 
   Widget _priceRow(String label, double amount, {bool bold = false, Color? color}) {
     return Padding(

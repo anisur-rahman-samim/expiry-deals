@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:expiry_deals/app/modules/edit_profile/controllers/edit_profile_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
@@ -68,7 +66,7 @@ class EditProfileView extends GetView<EditProfileController> {
                                   title: const Text('Camera'),
                                   onTap: () {
                                     editProfileController.pickImage(ImageSource.camera);
-                                    Get.back();
+                                   Navigator.pop(context);
                                   },
                                 ),
                                 ListTile(
@@ -76,7 +74,7 @@ class EditProfileView extends GetView<EditProfileController> {
                                   title: const Text('Gallery'),
                                   onTap: () {
                                     editProfileController.pickImage(ImageSource.gallery);
-                                    Get.back();
+                                    Navigator.pop(context);
                                   },
                                 ),
                               ],
@@ -129,8 +127,7 @@ class EditProfileView extends GetView<EditProfileController> {
               title: "Save Changes",
               width: Get.width,
               onTap: () {
-                // Handle save changes logic here
-                Get.back();
+               Navigator.pop(context);
                 Get.snackbar(
                   'Profile Updated',
                   'Name: ${nameController.text}, Email: ${emailController.text}, Phone: ${phoneController.text}',

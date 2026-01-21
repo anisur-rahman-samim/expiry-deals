@@ -1,5 +1,10 @@
+import 'package:expiry_deals/app/modules/choose_role/views/choose_role_view.dart';
+import 'package:expiry_deals/app/modules/dashboard/views/dashboard_view.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/views/vendor_dashboard_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
+import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../onboarding/views/onboarding_view.dart';
@@ -10,9 +15,25 @@ class SplashView extends GetView<SplashController> {
 
   @override
   Widget build(BuildContext context) {
+
     // Auto navigate after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
-      Get.offAll(() =>  OnboardingView());
+      final hasSeenOnboarding = LocalStorage.getData(key: AppConstant.onboarding) != null;
+      final token = LocalStorage.getData(key: AppConstant.token);
+      final role = LocalStorage.getData(key: AppConstant.role);
+      print(token);
+      print(role);
+      print(hasSeenOnboarding);
+
+      if (!hasSeenOnboarding) {
+        Get.offAll(() => const OnboardingView());
+      } else if (token == null) {
+        Get.offAll(() => const ChooseRoleView());
+      } else if (role == 'vendor') {
+        Get.offAll(() =>  VendorDashboardView());
+      } else {
+        Get.offAll(() =>  DashboardView());
+      }
     });
 
     return Scaffold(

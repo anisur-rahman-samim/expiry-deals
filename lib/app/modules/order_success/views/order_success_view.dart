@@ -34,7 +34,7 @@ class OrderSuccessView extends StatelessWidget {
                     height: 160,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.mainColor.withOpacity(0.15),
+                      color: AppColors.mainColor.withValues(alpha: 0.15),
                     ),
                   ),
                   Container(
@@ -72,7 +72,7 @@ class OrderSuccessView extends StatelessWidget {
             Text(
               'Thank you for shopping with us. Your order has been confirmed.',
               style: h4.copyWith(
-                color: AppColors.textColor.withOpacity(0.8),
+                color: AppColors.textColor.withValues(alpha: 0.8),
                 height: 1.6,
               ),
               textAlign: TextAlign.center,
@@ -90,7 +90,7 @@ class OrderSuccessView extends StatelessWidget {
                 border: Border.all(color: AppColors.grayLight),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),

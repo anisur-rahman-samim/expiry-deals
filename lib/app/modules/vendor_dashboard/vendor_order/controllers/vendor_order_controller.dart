@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class OrderItem {
   final String name;
@@ -160,7 +159,7 @@ class VendorOrderController extends GetxController {
   // Optional: Refresh orders (for pull-to-refresh)
   Future<void> refreshOrders() async {
     await fetchOrders();
-    Get.snackbar('Refreshed', 'Order list updated', backgroundColor: Colors.green.withOpacity(0.2));
+    Get.snackbar('Refreshed', 'Order list updated', backgroundColor: Colors.green.withValues(alpha: 0.2),);
   }
 
   // Optional: Update status via API (call this from details view)

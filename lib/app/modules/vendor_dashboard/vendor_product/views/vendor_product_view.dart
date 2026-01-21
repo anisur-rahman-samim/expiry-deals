@@ -1,18 +1,19 @@
-// vendor_product_view.dart
-
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/views/vendor_add_product_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
+import 'package:flutter/material.dart' as Image;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/vendor_product_controller.dart';
+import '../model/my_product_model.dart';
 
 class VendorProductView extends GetView<VendorProductController> {
   const VendorProductView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Get.put(VendorProductController());
+    // Get the VendorProductController instance
+    final VendorProductController controller = Get.put(VendorProductController());
 
     return Scaffold(
       backgroundColor: AppColors.bgColor,
@@ -23,7 +24,6 @@ class VendorProductView extends GetView<VendorProductController> {
         foregroundColor: AppColors.white,
         elevation: 0,
       ),
-      // Use Stack to custom-position the FAB
       body: Stack(
         children: [
           // Main Content
@@ -88,7 +88,7 @@ class VendorProductView extends GetView<VendorProductController> {
     );
   }
 
-  Widget _buildProductCard(dynamic product) {
+  Widget _buildProductCard(MyProduct product) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -112,8 +112,8 @@ class VendorProductView extends GetView<VendorProductController> {
                 SizedBox(
                   height: 140,
                   width: double.infinity,
-                  child: Image.network(
-                    product.imageUrl ?? '',
+                  child: Image.Image.network(
+                    product.images.isNotEmpty ? product.images[0].url ?? '' : '',
                     fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
@@ -130,7 +130,9 @@ class VendorProductView extends GetView<VendorProductController> {
                   top: 8,
                   right: 8,
                   child: GestureDetector(
-                    onTap: () => Get.toNamed('/vendor/edit-product', arguments: product),
+                    onTap: () {
+                   //   Get.to(() => )
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
@@ -146,7 +148,7 @@ class VendorProductView extends GetView<VendorProductController> {
             ),
           ),
 
-          // Details
+          // Product Details
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
             child: Column(

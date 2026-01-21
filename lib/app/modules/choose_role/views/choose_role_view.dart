@@ -88,7 +88,7 @@ class ChooseRoleView extends StatelessWidget {
                 width: double.infinity,
                 onTap: () {
                              LocalStorage.saveData(key: AppConstant.role, data: "User");
-                  Get.to(() => LoginView(role: "User",));
+                  Get.to(() => LoginView());
                 },
               ),
             ),
@@ -105,7 +105,7 @@ class ChooseRoleView extends StatelessWidget {
                 textColor: AppColors.mainColor,
                 onTap: () {
                   LocalStorage.saveData(key: AppConstant.role, data: "Vendor");
-                   Get.to(() => LoginView(role: "Vendor",));
+                   Get.to(() => LoginView());
                 },
               ),
             ),

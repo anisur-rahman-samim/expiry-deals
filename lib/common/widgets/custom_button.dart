@@ -45,7 +45,7 @@ class CustomCenterButton extends StatelessWidget {
               ? null
               : [
             BoxShadow(
-              color: AppColors.mainColor.withOpacity(0.3),
+              color: AppColors.mainColor.withValues(alpha: 0.3),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),

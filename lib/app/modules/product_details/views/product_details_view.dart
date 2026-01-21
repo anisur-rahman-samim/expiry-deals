@@ -4,8 +4,6 @@ import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import '../controllers/product_details_controller.dart';
 
 class ProductDetailsView extends StatelessWidget {
   ProductDetailsView({super.key});
@@ -114,7 +112,7 @@ class ProductDetailsView extends StatelessWidget {
                       const SizedBox(height: 12),
                       Text(
                         'Elevate your style with this premium genuine leather jacket. Crafted from 100% cowhide leather with a soft inner lining for maximum comfort. Features include zippered pockets, adjustable waist belt, and a detachable hood. Perfect for winter, casual outings, and making a bold fashion statement.',
-                        style: h4.copyWith(height: 1.8, color: AppColors.textColor.withOpacity(0.9)),
+                        style: h4.copyWith(height: 1.8, color: AppColors.textColor.withValues(alpha: 0.9),),
                       ),
                       const SizedBox(height: 32),
 
@@ -154,7 +152,7 @@ class ProductDetailsView extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.12),
+                    color: Colors.black.withValues(alpha: 0.12),
                     blurRadius: 20,
                     offset: const Offset(0, -5),
                   ),
@@ -280,7 +278,7 @@ class ProductDetailsView extends StatelessWidget {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.grayLight),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10)],
       ),
       child: Row(
         children: [
@@ -331,7 +329,7 @@ class ProductDetailsView extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 6))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 6))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

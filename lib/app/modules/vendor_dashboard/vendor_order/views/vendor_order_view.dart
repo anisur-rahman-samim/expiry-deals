@@ -66,7 +66,7 @@ class VendorOrderView extends GetView<VendorOrderController> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.grayLight),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 12, offset: const Offset(0, 4))
+          BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 4))
         ],
       ),
       child: InkWell(
@@ -84,7 +84,7 @@ class VendorOrderView extends GetView<VendorOrderController> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.12),
+                      color: color.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(

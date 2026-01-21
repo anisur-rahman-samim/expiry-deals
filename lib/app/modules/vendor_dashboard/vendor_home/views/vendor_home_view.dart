@@ -106,7 +106,7 @@ class VendorHomeView extends GetView<VendorHomeController> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           )
@@ -136,7 +136,7 @@ class VendorHomeView extends GetView<VendorHomeController> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.grayLight),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))
         ],
       ),
       child: DropdownButtonHideUnderline(
@@ -168,7 +168,7 @@ class VendorHomeView extends GetView<VendorHomeController> {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, 6))
+          BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 16, offset: const Offset(0, 6))
         ],
       ),
       child: Column(
@@ -188,7 +188,7 @@ class VendorHomeView extends GetView<VendorHomeController> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: AppColors.green.withOpacity(0.15),
+                  color: AppColors.green.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -254,7 +254,7 @@ class VendorHomeView extends GetView<VendorHomeController> {
                     dotData: const FlDotData(show: true),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: AppColors.mainColor.withOpacity(0.15),
+                      color: AppColors.mainColor.withValues(alpha: 0.15),
                     ),
                   ),
                 ],
