@@ -6,7 +6,7 @@ import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class CategoryController extends GetxController {
+class CategoryDataController extends GetxController {
   final isLoading = false.obs;
   final categories = <Category>[].obs;
 

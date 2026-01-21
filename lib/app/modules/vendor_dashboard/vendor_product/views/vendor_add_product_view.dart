@@ -54,15 +54,15 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
                     color: AppColors.grayLight,
                     width: 2,
                   ),
-                  image: controller.selectedImage.value != null
+                  image: controller.selectedImage.isNotEmpty
                       ? DecorationImage(
                     image:
-                    FileImage(controller.selectedImage.value!),
+                    FileImage(controller.selectedImage.first),
                     fit: BoxFit.cover,
                   )
                       : null,
                 ),
-                child: controller.selectedImage.value == null
+                child: controller.selectedImage.isEmpty
                     ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -177,7 +177,6 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
               );
             }),
 
-
             sh16,
 
             /// PRICE
@@ -278,10 +277,15 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
             sh40,
 
             /// SAVE BUTTON
-            CustomCenterButton(
-              title: "Save Product",
-              width: Get.width,
-            ),
+           Obx(() =>  controller.isLoading.value == true? CircularProgressIndicator() :   CustomCenterButton(
+             title: "Save Product",
+             width: Get.width,
+             onTap: () {
+               print(":ATappppp");
+               // Call the API to save the product with image
+               controller.addProduct();
+             },
+           ),),
 
             sh30,
           ],
