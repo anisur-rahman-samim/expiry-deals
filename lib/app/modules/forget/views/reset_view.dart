@@ -110,7 +110,7 @@ class ResetView extends StatelessWidget {
                     width: double.infinity,
                     onTap: () {
                       kSnackBar(message: "Set New Password Successfully", bgColor: AppColors.green);
-                        Get.to(() => LoginView(role: LocalStorage.getData(key: AppConstant.role),));
+                        Get.to(() => LoginView());
                     },
                   ),
                   sh50,

@@ -137,8 +137,4 @@ class BaseClient {
     }
   }
 
-  static void logout() {
-    //  LocalStorage.removeData(key: AppConstant.token);
-    //  Get.offAllNamed(AppRoute.signInScreen);
-  }
 }

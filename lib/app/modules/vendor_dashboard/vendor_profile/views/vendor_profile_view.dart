@@ -256,7 +256,7 @@ class VendorProfileView extends GetView {
                                     GestureDetector(
                                       onTap: () {
                                         LocalStorage.removeData(key: AppConstant.token);
-                                        Get.to(() => LoginView(role: LocalStorage.getData(key: AppConstant.role),));
+                                        Get.to(() => LoginView());
                                       },
                                       child: Container(
                                         height: 50,

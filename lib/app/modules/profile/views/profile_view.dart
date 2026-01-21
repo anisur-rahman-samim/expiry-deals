@@ -299,8 +299,12 @@ class ProfileView extends GetView {
                                     GestureDetector(
                                       onTap: () {
                                         LocalStorage.removeData(key: AppConstant.token);
-                                          Get.to(() => LoginView(role: LocalStorage.getData(key: AppConstant.role),));
+                                        LocalStorage.removeData(key: AppConstant.role);
+
+                                        // Navigate to the Login screen
+                                        Get.offAll(() => LoginView());
                                       },
+
                                       child: Container(
                                         height: 50,
                                         width: Get.width,

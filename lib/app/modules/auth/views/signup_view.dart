@@ -142,7 +142,7 @@ class SignupView extends StatelessWidget {
                   Center(
                     child: TextButton(
                       onPressed: () {
-                      Get.to(() => LoginView(role: LocalStorage.getData(key: AppConstant.role),));
+                      Get.to(() => LoginView());
                       },
                       child: RichText(
                         text: TextSpan(

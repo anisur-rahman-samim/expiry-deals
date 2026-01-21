@@ -169,7 +169,7 @@ class _VerifyViewState extends State<VerifyView> {
                       if (pinController.text.length == 6) {
                         kSnackBar(message: "OTP Verify Successfully", bgColor: AppColors.green);
                         if(widget.isSignUp == true){
-                            Get.to(() => LoginView(role: LocalStorage.getData(key: AppConstant.role),));
+                            Get.to(() => LoginView());
                         }else{
                           Get.to(() => ResetView());
                         }

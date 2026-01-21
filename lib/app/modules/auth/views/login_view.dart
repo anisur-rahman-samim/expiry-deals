@@ -1,29 +1,35 @@
-// app/modules/auth/login/views/login_view.dart
+import 'package:expiry_deals/app/modules/auth/controllers/auth_controller.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
 import 'package:expiry_deals/app/modules/auth/views/signup_view.dart';
-import 'package:expiry_deals/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:expiry_deals/app/modules/forget/views/forget_view.dart';
+import 'package:expiry_deals/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/views/vendor_dashboard_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
-import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-
 
 class LoginView extends StatelessWidget {
-  final String role;
-  const LoginView({super.key, required this.role});
+
+  const LoginView({super.key,});
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final height = size.height;
     final width = size.width;
+
+    // Get the AuthController instance
+    final AuthController authController = Get.put(AuthController());
+
+    // Define TextEditingControllers for email and password
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -69,14 +75,14 @@ class LoginView extends StatelessWidget {
                       // Title
                       Text(
                         "Welcome Back!",
-                        style: h1.copyWith(color: AppColors.white, fontSize: 34)
+                        style: h1.copyWith(color: AppColors.white, fontSize: 34),
                       ),
                       sh10,
 
                       // Subtitle
                       Text(
                         "Sign in to continue your journey with Trusten.",
-                          style: h2.copyWith(color: AppColors.white, fontSize: 14)
+                        style: h2.copyWith(color: AppColors.white, fontSize: 14),
                       ),
                     ],
                   ),
@@ -95,39 +101,54 @@ class LoginView extends StatelessWidget {
                   // Email Field
                   Text("Email Address", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
-                  CustomTextField(hintText: "Enter Your Email",width: Get.width),
+                  CustomTextField(
+                    controller: emailController,
+                    hintText: "Enter Your Email",
+                    width: Get.width,
+                  ),
                   sh20,
 
                   // Password Field
                   Text("Password", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
-                  CustomTextField(hintText: "Enter Your Email",width: Get.width,obscureText: true,),
+                  CustomTextField(
+                    controller: passwordController,
+                    hintText: "Enter Your Password",
+                    width: Get.width,
+                    obscureText: true,
+                  ),
                   sh10,
                   Align(
                     alignment: Alignment.topRight,
-                    
                     child: GestureDetector(
-                        onTap: () => Get.to(() => ForgetView()),
-                        child: Text("Forget Password?",style: h3.copyWith(color: AppColors.gray),)),
+                      onTap: () => Get.to(() => ForgetView()),
+                      child: Text(
+                        "Forget Password?",
+                        style: h3.copyWith(color: AppColors.gray),
+                      ),
+                    ),
                   ),
                   sh30,
 
                   // Login Button
-                  CustomCenterButton(
-                    title: "Login",
-                    width: double.infinity,
-                    onTap: () {
-                      String? role =     LocalStorage.getData(key: AppConstant.role);
-                      debugPrint("Role:::::::::::: $role");
-                      if(role == "User"){
-                         Get.offAll(() => DashboardView());
+                  Obx(() {
+                    return CustomCenterButton(
+                      title: authController.isLoading.value ? "Logging in..." : "Login",
+                      width: double.infinity,
+                      onTap: () {
+                        // Call the login function when the login button is pressed
+                        String email = emailController.text;
+                        String password = passwordController.text;
 
-                      }else{
-                        Get.offAll(() => VendorDashboardView());
-                      }
-                   
-                    },
-                  ),
+                        if (email.isEmpty || password.isEmpty) {
+                          // Show an error if the fields are empty
+                          Get.snackbar('Error', 'Please fill in all fields', snackPosition: SnackPosition.BOTTOM);
+                        } else {
+                          authController.login(email: email, password: password,);
+                        }
+                      },
+                    );
+                  }),
 
                   sh30,
 
