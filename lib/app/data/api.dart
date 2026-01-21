@@ -32,7 +32,7 @@ class Api {
 
   //Vendor
   static const addProduct = "$baseUrl/products";
-  static const myProduct = "$baseUrl/products/my-products";
+  static const myProduct = "$baseUrl/products/my-products?limit=1000000000000";
   static  updateProduct({required productId}) => "$baseUrl/products/$productId";
   static  vendorOrder({required authorId}) => "$baseUrl/orders?author=$authorId";
   static  deleteOrder({required orderId}) => "$baseUrl/orders/$orderId";

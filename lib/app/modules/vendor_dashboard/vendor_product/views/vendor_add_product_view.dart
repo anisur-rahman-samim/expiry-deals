@@ -1,7 +1,4 @@
-// vendor_add_product_view.dart
-
 import 'dart:io';
-
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/controllers/vendor_add_product_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
@@ -117,26 +114,69 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
 
             /// CATEGORY
             _buildLabel('Category'),
-            Obx(() => DropdownButtonFormField<String>(
-              value: controller.categories
-                  .contains(controller.selectedCategory.value)
-                  ? controller.selectedCategory.value
-                  : controller.categories.first,
-              decoration: _inputDecoration('Select category'),
-              items: controller.categories
-                  .map(
-                    (cat) => DropdownMenuItem(
-                  value: cat,
-                  child: Text(cat),
-                ),
-              )
-                  .toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  controller.selectedCategory.value = value;
-                }
-              },
-            )),
+            Obx(() {
+              final catCtrl = controller.categoryController;
+
+              // ✅ show loader only while loading
+              if (catCtrl.isLoading.value) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Center(
+                    child: CircularProgressIndicator(color: AppColors.mainColor),
+                  ),
+                );
+              }
+
+              // ✅ if not loading but empty → show retry UI (NOT loader)
+              if (catCtrl.categories.isEmpty) {
+                return Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.grayLight),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          "No categories found",
+                          style: TextStyle(color: AppColors.textColor),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => catCtrl.fetchCategories(),
+                        child: const Text("Retry"),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              // ✅ make sure selectedCategoryId is valid
+              final validSelected = catCtrl.categories.any((c) => c.id == controller.selectedCategoryId.value);
+              final dropdownValue = validSelected ? controller.selectedCategoryId.value : (catCtrl.categories.first.id ?? '');
+
+              return DropdownButtonFormField<String>(
+                value: dropdownValue.isEmpty ? null : dropdownValue,
+                decoration: _inputDecoration('Select category'),
+                items: catCtrl.categories.map((cat) {
+                  return DropdownMenuItem<String>(
+                    value: cat.id ?? '',
+                    child: Text(cat.name ?? 'Unnamed'),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value == null) return;
+
+                  controller.selectedCategoryId.value = value;
+
+                  final selected = catCtrl.categories.firstWhereOrNull((c) => c.id == value);
+                  controller.selectedCategoryName.value = selected?.name ?? '';
+                },
+              );
+            }),
+
 
             sh16,
 
