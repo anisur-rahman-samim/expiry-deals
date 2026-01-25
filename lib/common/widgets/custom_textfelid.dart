@@ -13,7 +13,8 @@ class CustomTextField extends StatefulWidget {
   final String? hintText;
   final Widget? preIcon;
   final int? maxLines;
-  final bool obscureText; // Initial obscureText value
+  final bool obscureText; 
+    final bool enabled; 
 
   const CustomTextField({
     super.key,
@@ -24,6 +25,7 @@ class CustomTextField extends StatefulWidget {
     this.preIcon,
     this.maxLines,
     this.obscureText = false,
+    this.enabled = true,
   });
 
   @override
@@ -80,6 +82,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           ),
           maxLines: widget.maxLines ?? 1,
           style: h3,
+          enabled: widget.enabled,
         ),
       ),
     );
