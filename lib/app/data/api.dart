@@ -31,9 +31,10 @@ class Api {
   static  deleteCart({required cartId}) => "$baseUrl/add-to-card/$cartId";
 
   //Vendor
-  static const addProduct = "$baseUrl/products";
+  static const addProduct = "$baseUrl/products"; // hold
   static const myProduct = "$baseUrl/products/my-products?limit=1000000000000";//done
   static  updateProduct({required productId}) => "$baseUrl/products/$productId";
+    static  productDetails({required productId}) => "$baseUrl/products/$productId";
   static  vendorOrder({required authorId}) => "$baseUrl/orders?author=$authorId";
   static  deleteOrder({required orderId}) => "$baseUrl/orders/$orderId";
   static  updateOrderStatus({required orderId}) => "$baseUrl/orders/$orderId";

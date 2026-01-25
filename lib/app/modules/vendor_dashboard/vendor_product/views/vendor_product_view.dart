@@ -1,4 +1,5 @@
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/views/vendor_add_product_view.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/views/vendor_edit_product_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:flutter/material.dart' as Image;
@@ -131,7 +132,7 @@ class VendorProductView extends GetView<VendorProductController> {
                   right: 8,
                   child: GestureDetector(
                     onTap: () {
-                   //   Get.to(() => )
+                      Get.to(() => VendorEditProductView(productId: product.id.toString()));
                     },
                     child: Container(
                       padding: const EdgeInsets.all(6),

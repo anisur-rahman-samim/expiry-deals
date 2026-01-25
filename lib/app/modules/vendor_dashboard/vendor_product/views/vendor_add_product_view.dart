@@ -32,7 +32,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Upload Image',
+              'Upload Image(s)',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -277,15 +277,15 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
             sh40,
 
             /// SAVE BUTTON
-           Obx(() =>  controller.isLoading.value == true? CircularProgressIndicator() :   CustomCenterButton(
-             title: "Save Product",
-             width: Get.width,
-             onTap: () {
-               print(":ATappppp");
-               // Call the API to save the product with image
-               controller.addProduct();
-             },
-           ),),
+            Obx(() => controller.isLoading.value
+                ? const Center(child: CircularProgressIndicator())
+                : CustomCenterButton(
+                    title: "Save Product",
+                    width: Get.width,
+                    onTap: () {
+                      controller.addProduct(); // Call the addProduct function
+                    },
+                  )),
 
             sh30,
           ],
@@ -332,7 +332,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
       filled: true,
       fillColor: Colors.white,
       contentPadding:
-      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: AppColors.grayLight),

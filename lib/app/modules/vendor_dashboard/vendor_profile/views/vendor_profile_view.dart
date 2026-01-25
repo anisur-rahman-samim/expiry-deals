@@ -148,6 +148,44 @@ class VendorProfileView extends GetView {
                     ),
                   ),
 
+  sh16,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      onTap: () {
+                        Get.to(() => EditShopView());
+                      },
+                      leading: Image.asset(AppImages.profile, scale: 4,color: AppColors.mainColor,),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      title: Text(
+                          "Bank Details",
+                          style: h2
+                      ),
+                      subtitle: Text(
+                        "Setup your bank information",
+                        style: h3.copyWith(color: AppColors.gray, fontSize: 12),
+                      ),
+                    ).animate().fadeIn(
+                      duration: 600.ms,
+                      delay: 100.ms,
+                      curve: Curves.easeInOut,
+                    ).slideY(
+                      begin: 0.3,
+                      end: 0.0,
+                      duration: 600.ms,
+                      delay: 100.ms,
+                      curve: Curves.easeInOut,
+                    ).shake(
+                      duration: 800.ms,
+                      delay: 100.ms,
+                      hz: 2,
+                      rotation: 0.05,
+                    ),
+                  ),
+
                   sh16,
                   Container(
                     decoration: BoxDecoration(
