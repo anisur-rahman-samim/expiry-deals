@@ -1,12 +1,12 @@
 class Api {
   /// base url
  // static const baseUrl = "http://10.10.10.27:7000/api/v1";
-  static const baseUrl = "http://192.168.0.105:7000/api/v1";
+  static const baseUrl = "http://192.168.0.101:7000/api/v1";
 
   ///auth
-  static const login = "$baseUrl/auth/login";
+  static const login = "$baseUrl/auth/login"; //done
   static const register = "$baseUrl/users";
-  static const profile = "$baseUrl/users/my-profile";
+  static const profile = "$baseUrl/users/my-profile"; // done
   static const verifyOtp = "$baseUrl/otp/verify-otp";
   static const resendOtp = "$baseUrl/otp/resend-otp";
   static const changePassword = "$baseUrl/auth/change-password";
@@ -21,7 +21,7 @@ class Api {
   static const notifications = "$baseUrl/notifications";
   static const contents = "$baseUrl/contents";
 
-  //Users
+  //product order
   static const cart = "$baseUrl/add-to-card";
   static const createOrders = "$baseUrl/orders";
   static const allProducts = "$baseUrl/products";

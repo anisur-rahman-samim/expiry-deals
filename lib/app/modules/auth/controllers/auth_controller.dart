@@ -1,12 +1,11 @@
 import 'dart:convert';
-
+import 'package:expiry_deals/app/modules/auth/views/verify_view.dart';
 import 'package:get/get.dart';
 import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/app/data/base_client.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:flutter/material.dart';
-
 import '../../dashboard/views/dashboard_view.dart';
 import '../../vendor_dashboard/views/vendor_dashboard_view.dart';
 
@@ -46,13 +45,54 @@ class AuthController extends GetxController {
         // Navigate to the appropriate dashboard based on the role
         if (role == "vendor") {
           Get.offAll(() => VendorDashboardView());
-
         } else {
           Get.offAll(() => DashboardView());
         }
       }
     } catch (e) {
       debugPrint("Login Error: $e");
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // Registration function
+  Future<void> registration({
+    required String name,
+    required String email,
+    required String phone,
+    required String password,
+    required String address,
+  }) async {
+    try {
+      isLoading(true);
+
+      var headers = {
+        'Content-Type': 'application/json',
+      };
+
+      var body = {
+        'name': name,
+        'email': email,
+        'phoneNumber': phone,
+        'password': password,
+        'address': address,
+      };
+
+      // Sending request to the server for registration
+      dynamic response = await BaseClient.handleResponse(
+        await BaseClient.postRequest(
+          api: Api.register,
+          headers: headers,
+          body: jsonEncode(body),
+        ),
+      );
+
+      if (response != null) {
+      Get.to(() => VerifyView(isSignUp: true));
+      }
+    } catch (e) {
+      debugPrint("Registration Error: $e");
     } finally {
       isLoading(false);
     }

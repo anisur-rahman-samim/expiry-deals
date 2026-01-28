@@ -34,15 +34,4 @@ class CustomLoaderButton extends StatelessWidget {
   }
 }
 
-class CustomLoader extends StatelessWidget {
-  final Color color;
-  const CustomLoader({super.key, required this.color});
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: SpinKitDualRing(
-      color: color,
-      size: 30.0,
-    ),);
-  }
-}

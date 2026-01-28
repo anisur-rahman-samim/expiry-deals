@@ -1,4 +1,4 @@
-// app/modules/auth/login/views/login_view.dart
+import 'package:expiry_deals/app/modules/auth/controllers/auth_controller.dart';
 import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
@@ -7,11 +7,12 @@ import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
+import 'package:expiry_deals/common/widgets/custom_loader.dart';
+import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
 import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 
 class SignupView extends StatelessWidget {
   const SignupView({super.key});
@@ -22,8 +23,19 @@ class SignupView extends StatelessWidget {
     final height = size.height;
     final width = size.width;
 
+    // TextEditingControllers for the form fields
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController phoneController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+    final TextEditingController confirmPasswordController =
+        TextEditingController();
+    final TextEditingController addressController = TextEditingController();
+
+    final AuthController authController = Get.put(AuthController());
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -48,7 +60,9 @@ class SignupView extends StatelessWidget {
                     height: 50,
                     decoration: const BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(40),
+                      ),
                     ),
                   ),
                 ),
@@ -65,16 +79,22 @@ class SignupView extends StatelessWidget {
 
                       // Title
                       Text(
-                          "Create Your Account",
-                          style: h1.copyWith(color: AppColors.white, fontSize: 30),
+                        "Create Your Account",
+                        style: h1.copyWith(
+                          color: AppColors.white,
+                          fontSize: 30,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       sh10,
 
                       // Subtitle
                       Text(
-                          "Join smart and secure shopping made for you.",
-                          style: h2.copyWith(color: AppColors.white, fontSize: 14)
+                        "Join smart and secure shopping made for you.",
+                        style: h2.copyWith(
+                          color: AppColors.white,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
@@ -90,37 +110,104 @@ class SignupView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Full Name", style: h4.copyWith(fontWeight: FontWeight.w600)),
+                  Text(
+                    "Full Name",
+                    style: h4.copyWith(fontWeight: FontWeight.w600),
+                  ),
                   sh8,
-                  CustomTextField(hintText: "Enter Your Name",width: Get.width),
+                  CustomTextField(
+                    hintText: "Enter Your Name",
+                    controller: nameController,
+                    width: Get.width,
+                  ),
                   sh20,
 
                   // Email Field
-                  Text("Email Address", style: h4.copyWith(fontWeight: FontWeight.w600)),
+                  Text(
+                    "Email Address",
+                    style: h4.copyWith(fontWeight: FontWeight.w600),
+                  ),
                   sh8,
-                  CustomTextField(hintText: "Enter Your Email",width: Get.width),
+                  CustomTextField(
+                    hintText: "Enter Your Email",
+                    controller: emailController,
+                    width: Get.width,
+                  ),
+                  sh20,
+
+                  // Address
+                  Text(
+                    "Address",
+                    style: h4.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  sh8,
+                  CustomTextField(
+                    hintText: "Enter Your Address",
+                    controller: addressController,
+                    width: Get.width,
+                  ),
                   sh20,
 
                   // Password Field
-                  Text("Password", style: h4.copyWith(fontWeight: FontWeight.w600)),
+                  Text(
+                    "Password",
+                    style: h4.copyWith(fontWeight: FontWeight.w600),
+                  ),
                   sh8,
-                  CustomTextField(hintText: "Enter Your Password",width: Get.width,obscureText: true,),
+                  CustomTextField(
+                    hintText: "Enter Your Password",
+                    controller: passwordController,
+                    width: Get.width,
+                    obscureText: true,
+                  ),
                   sh20,
-                  // Password Field
-                  Text("Confirm Password", style: h4.copyWith(fontWeight: FontWeight.w600)),
-                  sh8,
-                  CustomTextField(hintText: "Enter Your Confirm Password",width: Get.width,obscureText: true,),
 
+                  // Confirm Password Field
+                  Text(
+                    "Confirm Password",
+                    style: h4.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  sh8,
+                  CustomTextField(
+                    hintText: "Enter Your Confirm Password",
+                    controller: confirmPasswordController,
+                    width: Get.width,
+                    obscureText: true,
+                  ),
                   sh30,
 
-                  // Login Button
-                  CustomCenterButton(
-                    title: "Sign Up",
-                    width: double.infinity,
-                    onTap: () {
-                      // Get.toNamed('/home');
-                    },
-                  ),
+                  // Sign Up Button
+                 Obx(() =>  authController.isLoading.value
+                      ? CustomLoaderButton()
+                      : CustomCenterButton(
+                          title: "Sign Up",
+                          width: double.infinity,
+                          onTap: () {
+                            final name = nameController.text;
+                            final email = emailController.text;
+                            final phone = phoneController.text;
+                            final password = passwordController.text;
+                            final confirmPassword =
+                                confirmPasswordController.text;
+                            final address = addressController.text;
+
+                            // Call the registration API
+                            if (password == confirmPassword) {
+                              authController.registration(
+                                name: name,
+                                email: email,
+                                phone: phone,
+                                password: password,
+                                address: address,
+                              );
+                            } else {
+                              kSnackBar(
+                                message: "Password is not match",
+                                bgColor: AppColors.failedColor,
+                              );
+                            }
+                          },
+                        ),),
 
                   sh30,
 
@@ -130,7 +217,10 @@ class SignupView extends StatelessWidget {
                       Expanded(child: Divider(color: Colors.grey[300])),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text("Or", style: TextStyle(color: Colors.grey[600])),
+                        child: Text(
+                          "Or",
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
                       ),
                       Expanded(child: Divider(color: Colors.grey[300])),
                     ],
@@ -142,7 +232,7 @@ class SignupView extends StatelessWidget {
                   Center(
                     child: TextButton(
                       onPressed: () {
-                      Get.to(() => LoginView());
+                        Get.to(() => LoginView());
                       },
                       child: RichText(
                         text: TextSpan(
