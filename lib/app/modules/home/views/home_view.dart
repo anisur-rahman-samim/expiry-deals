@@ -56,7 +56,8 @@ class HomeView extends GetView<HomeController> {
                  Obx(() =>  CircleAvatar(
                    radius: 24,
                    backgroundColor: AppColors.grayLight,
-                   child: ClipOval(child: Image.network( profileController.profileData.value.data?.profile ?? AppImages.noImage, fit: BoxFit.cover)),
+                   backgroundImage: NetworkImage(profileController.profileData.value.data?.profile ?? AppImages.noImage),
+                 //  child: ClipOval(child: Image.network( , fit: BoxFit.contain)),
                  ),)
                 ],
               ),

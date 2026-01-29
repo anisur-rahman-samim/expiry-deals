@@ -112,9 +112,7 @@ class SearchPageView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                ClipRRect(
+            ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                   child: Image.network(
                     product.images.isNotEmpty ? product.images[0].url ?? 'https://via.placeholder.com/300' : 'https://via.placeholder.com/300',
@@ -123,17 +121,6 @@ class SearchPageView extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ),
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Colors.white.withValues(alpha: 0.9),
-                    child: const Icon(Icons.favorite_border, size: 20),
-                  ),
-                ),
-              ],
-            ),
             Padding(
               padding: const EdgeInsets.all(14),
               child: Column(
