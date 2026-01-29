@@ -105,6 +105,95 @@ class ProfileView extends GetView<ProfileController> {
                     onTap: () => Get.to(() => PrivacyPolicyView()),
                   ),
                   _buildListTile(
+                    title: "Delete Account",
+                    subtitle: "Delete your account",
+                    icon: AppImages.logout,
+                    onTap: () {
+                      Get.dialog(
+                          Dialog(
+                            child: Container(
+                              height: Get.height / 2.5,
+                              width: Get.width / 1.2,
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Center(
+                                        child: Image.asset(
+                                          AppImages.logoutTag,
+                                          scale: 4,
+                                        )),
+                                    sh20,
+                                    Text(
+                                      "Are you sure you want to delete your account?",
+                                      style: h2.copyWith(
+                                        color: AppColors.black.withValues(alpha: 0.6),
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    sh10,
+                                    GestureDetector(
+                                      onTap: () {
+                                        controller.deleteProfile();
+                                      },
+                                      child: Container(
+                                        height: 50,
+                                        width: Get.width,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: AppColors.red,
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            controller.isLoading.value ? "Deleting...":  "Confirm Delete",
+                                            style: h2.copyWith(color: AppColors.white),
+                                          ),
+                                        ),
+                                      ).animate().scaleXY(
+                                        begin: 0.8,
+                                        end: 1.0,
+                                        duration: 500.ms,
+                                        curve: Curves.bounceOut,
+                                      ),
+                                    ),
+                                    sh5,
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        height: 50,
+                                        width: Get.width,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: AppColors.hintColor,
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            "Cancel",
+                                            style: h2.copyWith(color: AppColors.white),
+                                          ),
+                                        ),
+                                      ).animate().scaleXY(
+                                        begin: 0.8,
+                                        end: 1.0,
+                                        duration: 500.ms,
+                                        curve: Curves.bounceOut,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ));
+                    },
+                  ),
+                  _buildListTile(
                     title: "Log Out",
                     subtitle: "Securely log out of your account",
                     icon: AppImages.logout,
@@ -197,6 +286,8 @@ class ProfileView extends GetView<ProfileController> {
                   ),
                 ],
               ),
+
+              sh100,
             ],
           ),
         ),
@@ -211,33 +302,36 @@ class ProfileView extends GetView<ProfileController> {
     required String icon,
     required Function onTap,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ListTile(
+          onTap: () => onTap(),
+          leading: Image.asset(icon, scale: 4, color: AppColors.mainColor),
+          trailing: Icon(Icons.arrow_forward_ios),
+          title: Text(title, style: h2),
+          subtitle: Text(subtitle, style: h3.copyWith(color: AppColors.gray, fontSize: 12)),
+        ),
+      ).animate().fadeIn(
+        duration: 600.ms,
+        delay: 100.ms,
+        curve: Curves.easeInOut,
+      ).slideY(
+        begin: 0.3,
+        end: 0.0,
+        duration: 600.ms,
+        delay: 100.ms,
+        curve: Curves.easeInOut,
+      ).shake(
+        duration: 800.ms,
+        delay: 100.ms,
+        hz: 2,
+        rotation: 0.05,
       ),
-      child: ListTile(
-        onTap: () => onTap(),
-        leading: Image.asset(icon, scale: 4, color: AppColors.mainColor),
-        trailing: Icon(Icons.arrow_forward_ios),
-        title: Text(title, style: h2),
-        subtitle: Text(subtitle, style: h3.copyWith(color: AppColors.gray, fontSize: 12)),
-      ),
-    ).animate().fadeIn(
-      duration: 600.ms,
-      delay: 100.ms,
-      curve: Curves.easeInOut,
-    ).slideY(
-      begin: 0.3,
-      end: 0.0,
-      duration: 600.ms,
-      delay: 100.ms,
-      curve: Curves.easeInOut,
-    ).shake(
-      duration: 800.ms,
-      delay: 100.ms,
-      hz: 2,
-      rotation: 0.05,
     );
   }
 }

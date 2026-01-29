@@ -1,5 +1,6 @@
 import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/app/data/base_client.dart';
+import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:get/get.dart';
@@ -35,6 +36,28 @@ class ProfileController extends GetxController {
         profileData.value = ProfileModel.fromJson(response);
       } else {
         Get.snackbar("Error", "Failed to fetch profile data.");
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> deleteProfile() async {
+    try {
+
+      var response = await BaseClient.handleResponse(
+        await BaseClient.deleteRequest(api: Api.deleteProfile, ),
+      );
+
+      if (response != null) {
+
+        LocalStorage.removeData(key: AppConstant.token);
+        Get.offAll(() => LoginView());
+
+      } else {
+        Get.snackbar("Error", "Failed to delete account data.");
       }
     } catch (e) {
       Get.snackbar("Error", e.toString());
