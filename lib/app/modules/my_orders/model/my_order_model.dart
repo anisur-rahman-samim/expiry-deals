@@ -61,8 +61,8 @@ class MyOrder {
     final UserClass? user;
     final UserClass? author;
     final Product? product;
-    final double? totalPrice;
-    final int? discount;
+    final dynamic totalPrice;
+    final dynamic discount;
     final int? quantity;
     final String? status;
     final bool? isPaid;
@@ -203,11 +203,11 @@ class Product {
     final String? name;
     final String? details;
     final Category? category;
-    final double? price;
+    final dynamic price;
     final int? totalSell;
     final int? stock;
     final DateTime? expiredAt;
-    final int? discount;
+    final dynamic discount;
     final bool? isDeleted;
     final DateTime? createdAt;
     final DateTime? updatedAt;

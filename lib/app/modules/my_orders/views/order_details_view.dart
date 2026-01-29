@@ -170,7 +170,7 @@ class OrderDetailsView extends StatelessWidget {
         child: child,
       );
 
-  Widget _priceRow(String label, double amount, {bool bold = false, Color? color}) =>
+  Widget _priceRow(String label,  amount, {bool bold = false, Color? color}) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
