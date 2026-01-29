@@ -164,18 +164,18 @@ class _VerifyViewState extends State<VerifyView> {
                   sh50,
 
                   // Verify Button
-                  authController.isLoading.value ? CustomLoaderButton() :  CustomCenterButton(
-                    title:  "Verify Email",
-                    width: double.infinity,
-                    onTap: () {
-                      if (pinController.text.length == 6) {
-                        // Call the verifyOtp function
-                        authController.verifyOtp(pinController.text);
-                      } else {
-                        Get.snackbar('Error', 'Please enter 6-digit code');
-                      }
-                    },
-                  ),
+               Obx(() =>    authController.isLoading.value ? CustomLoaderButton() :  CustomCenterButton(
+                 title:  "Verify Email",
+                 width: double.infinity,
+                 onTap: () {
+                   if (pinController.text.length == 6) {
+                     // Call the verifyOtp function
+                     authController.verifyOtp(pinController.text, widget.isSignUp!);
+                   } else {
+                     Get.snackbar('Error', 'Please enter 6-digit code');
+                   }
+                 },
+               ),),
 
                   sh30,
 

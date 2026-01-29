@@ -10,7 +10,7 @@ class Api {
   static const verifyOtp = "$baseUrl/otp/verify-otp"; // done
   static const resendOtp = "$baseUrl/otp/resend-otp"; // done
   static const changePassword = "$baseUrl/auth/change-password"; // problem with api
-  static const forgetPassword = "$baseUrl/auth/forget-password";
+  static const forgetPassword = "$baseUrl/auth/forgot-password";
   static const resetPassword = "$baseUrl/auth/reset-password";
 
   static const updateProfile = "$baseUrl/users/update-my-profile";

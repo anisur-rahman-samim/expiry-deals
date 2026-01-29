@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/app/modules/auth/views/verify_view.dart';
+import 'package:expiry_deals/app/modules/forget/views/reset_view.dart';
 import 'package:get/get.dart';
 import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/app/data/base_client.dart';
@@ -105,7 +106,7 @@ class AuthController extends GetxController {
   }
 
   // Verify OTP function
-  Future<void> verifyOtp(String otp) async {
+  Future<void> verifyOtp(String otp, bool isSignup) async {
     try {
       isLoading(true);
 
@@ -136,8 +137,18 @@ class AuthController extends GetxController {
         // OTP successfully verified
         Get.snackbar("Success", "OTP Verified Successfully");
 
+        var token = response['data']['token'];
+
+        LocalStorage.saveData(key: AppConstant.token, data: token);
+
+        if(isSignup == true){
+          Get.offAll(() => LoginView());
+        }else{
+          Get.offAll(() => ResetView());
+        }
+
         // Navigate to the next step after OTP verification
-        Get.offAll(() => LoginView());
+
       } else {
         // OTP verification failed
         Get.snackbar("Error", "Invalid OTP. Please try again.");
