@@ -1,12 +1,18 @@
 import 'package:expiry_deals/app/modules/category/views/category_product_view.dart';
 import 'package:expiry_deals/app/modules/category/views/category_view.dart';
+import 'package:expiry_deals/app/modules/home/controllers/product_controller.dart';
+import 'package:expiry_deals/app/modules/home/controllers/special_product_controller.dart';
+import 'package:expiry_deals/app/modules/home/model/product_model.dart' as allProduct;
+import 'package:expiry_deals/app/modules/home/model/special_product_model.dart' as sProduct;
 import 'package:expiry_deals/app/modules/product_details/views/product_details_view.dart';
 import 'package:expiry_deals/app/modules/profile/controllers/profile_controller.dart';
 import 'package:expiry_deals/app/modules/search_page/views/search_page_view.dart';
 import 'package:expiry_deals/app/modules/store/views/store_view.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/controllers/category_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
+import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,16 +22,6 @@ import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
    HomeView({super.key});
-
-  final productImageList =[
-    "https://www.dhresource.com/webp/m/0x0/f2/albu/g21/M00/1F/F5/rBVaq2DCDRGABLbyAADQ8DkUmO8389.jpg",
-    "https://i.pinimg.com/736x/af/38/16/af3816f775f479ab6fb7dfaf30d3e553.jpg",
-    "https://img.freepik.com/free-photo/woman-leaning-white-wooden-board-talking-phone-while-smiling_1157-2023.jpg?semt=ais_hybrid&w=740&q=80",
-    "https://img.freepik.com/free-photo/young-attractive-woman-blue-winter-jacket_1303-20115.jpg?semt=ais_hybrid&w=740&q=80",
-    "https://media.istockphoto.com/id/641684768/photo/pretty-girl-in-a-leather-jacket-on-white-background.jpg?s=612x612&w=is&k=20&c=p1Cbfw4L-mKS3eRGpk4DD3QQi3XvdqH2Ot28aOBR2xQ=",
-    "https://www.dhresource.com/webp/m/0x0/f2/albu/g21/M00/1F/F5/rBVaq2DCDRGABLbyAADQ8DkUmO8389.jpg"
-  ];
-
 
    final recommendedProductImageList =[
       "https://img.freepik.com/free-photo/young-attractive-woman-blue-winter-jacket_1303-20115.jpg?semt=ais_hybrid&w=740&q=80",
@@ -44,6 +40,9 @@ class HomeView extends GetView<HomeController> {
    
    final ProfileController profileController = Get.put(ProfileController());
    final CategoryDataController categoryDataController = Get.put(CategoryDataController());
+
+   final ProductController productController = Get.put(ProductController());
+   final SpecialProductController specialProductController = Get.put(SpecialProductController());
 
 
   @override
@@ -72,7 +71,7 @@ class HomeView extends GetView<HomeController> {
                  Obx(() =>  CircleAvatar(
                    radius: 24,
                    backgroundColor: AppColors.grayLight,
-                   child: ClipOval(child: Image.network( profileController.profileData.value.data?.profile ?? 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png', fit: BoxFit.cover)),
+                   child: ClipOval(child: Image.network( profileController.profileData.value.data?.profile ?? AppImages.noImage, fit: BoxFit.cover)),
                  ),)
                 ],
               ),
@@ -142,11 +141,14 @@ class HomeView extends GetView<HomeController> {
 
               SizedBox(
                 height: 200,
-                child: ListView.builder(
+                child: Obx(() => ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: 4,
-                  itemBuilder: (ctx, i) => _specialOfferCard(index: i),
-                ),
+                  itemCount: specialProductController.specialProducts.length,
+                  itemBuilder: (ctx, i) {
+                    var item = specialProductController.specialProducts;
+                    return _specialOfferCard(index: i, productList: item);
+                  },
+                ),)
               ),
               const SizedBox(height: 32),
 
@@ -169,18 +171,18 @@ class HomeView extends GetView<HomeController> {
               // === Recommended for You ===
               _sectionHeader('Recommended for You', () {}),
               const SizedBox(height: 12),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.78,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
-                itemCount: 6,
-                itemBuilder: (ctx, i) => _productCard(i),
-              ),
+             Obx(() =>  GridView.builder(
+               shrinkWrap: true,
+               physics: const NeverScrollableScrollPhysics(),
+               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                 crossAxisCount: 2,
+                 childAspectRatio: 0.78,
+                 crossAxisSpacing: 16,
+                 mainAxisSpacing: 16,
+               ),
+               itemCount: productController.products.length,
+               itemBuilder: (ctx, i) => _productCard(index: i, productList: productController.products),
+             ),),
               const SizedBox(height: 24),
             ],
           ),
@@ -308,7 +310,7 @@ class HomeView extends GetView<HomeController> {
      );
    }
 
-  Widget _specialOfferCard({required index}) {
+  Widget _specialOfferCard({required List<sProduct.SpecialProducts> productList, required index}) {
     return GestureDetector(
       onTap: (){
         Get.to(() => ProductDetailsView());
@@ -339,20 +341,17 @@ class HomeView extends GetView<HomeController> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: Image.network(productImageList[index], height: 200, width: double.infinity, fit: BoxFit.cover),
-            ),
-            Positioned(
-              top: 16, left: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(20)),
-                child: Text('-60% OFF', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-              ),
+              child: Image.network(productList[index].images[0].url ?? "", height: 200, width: double.infinity, fit: BoxFit.cover),
             ),
             // Positioned(
-            //   top: 16, right: 16,
-            //   child: CircleAvatar(backgroundColor: Colors.white.withOpacity(0.8), child: const Icon(Icons.favorite_border, color: AppColors.black)),
+            //   top: 16, left: 16,
+            //   child: Container(
+            //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            //     decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(20)),
+            //     child: Text('-60% OFF', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+            //   ),
             // ),
+          
             Positioned(
               bottom: 0, left: 0, right: 0,
               child: Container(
@@ -372,16 +371,28 @@ class HomeView extends GetView<HomeController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Modern Light Clothes', style: GoogleFonts.dmSans(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-                    Text('T-Shirt', style: h5.copyWith(color: Colors.white70)),
+                    Text(productList[index].name ?? "", style: GoogleFonts.dmSans(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                    Text(productList[index].author?.shop?.name ?? "", style: h5.copyWith(color: Colors.white70)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('\$12.99', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                        Row(children: [
-                          const Icon(Icons.star, color: Colors.amber, size: 16),
-                          Text('5.0', style: GoogleFonts.dmSans(color: Colors.white)),
-                        ]),
+                        Row(
+                          children: [
+                            Text('\$${productList[index].discount}', style: GoogleFonts.dmSans(color: AppColors.orange, fontWeight: FontWeight.bold, fontSize: 18)),
+                           sw5,
+                            Text(
+                              '\$${productList[index].price}',
+                              style: GoogleFonts.dmSans(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            ),
+
+                          ],
+                        ),
+                        const Icon(Icons.shopping_bag, color: Colors.amber, size: 16),
                       ],
                     ),
                   ],
@@ -394,9 +405,9 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  Widget _productCard(int index) {
-    final discounts = ['-30%', '-20%', '-50%'];
-    final discount = index < 3 ? discounts[index] : null;
+  Widget _productCard({required index, required List<allProduct.Products> productList}) {
+   // final discounts = ['-30%', '-20%', '-50%'];
+   // final discount = index < 3 ? discounts[index] : null;
     return GestureDetector(
       onTap: (){
         Get.to(() => ProductDetailsView());
@@ -414,7 +425,7 @@ class HomeView extends GetView<HomeController> {
                   child: ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                     child: Image.network(
-                      recommendedProductImageList[index],
+                      productList[index].images[0].url ?? AppImages.noImage,
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),
@@ -426,22 +437,24 @@ class HomeView extends GetView<HomeController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        index == 0 ? 'Wireless Bluetooth Earbuds' : 'Modern Light Clothes',
+                      productList[index].name ?? "",
                         style: h3,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      Text('T-shirt', style: h5.copyWith(color: AppColors.hintColor)),
+                      Text(  productList[index].author?.shop?.name ?? "", style: h5.copyWith(color: AppColors.hintColor)),
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('\$${index == 0 ? '49.99' : '12.99'}', style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold)),
-                          Row(children: const [
-                            Icon(Icons.star, color: Colors.amber, size: 16),
-                            SizedBox(width: 4),
-                            Text('5.0', style: TextStyle(fontSize: 12)),
-                          ]),
+                          Row(
+                            children: [
+                              Text('\$${ productList[index].discount}', style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold)),
+                             sw5,
+                              Text('\$${ productList[index].price}', style: h3.copyWith(color: AppColors.gray, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          Icon(Icons.shopping_bag, color: Colors.amber, size: 16),
                         ],
                       ),
                     ],
@@ -449,15 +462,7 @@ class HomeView extends GetView<HomeController> {
                 ),
               ],
             ),
-            if (discount != null)
-              Positioned(
-                top: 12, left: 12,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(20)),
-                  child: Text(discount, style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
-                ),
-              ),
+
             // Positioned(
             //   top: 12, right: 12,
             //   child: CircleAvatar(
