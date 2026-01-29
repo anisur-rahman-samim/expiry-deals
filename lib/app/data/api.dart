@@ -17,9 +17,9 @@ class Api {
   static const deleteProfile = "$baseUrl/users/delete-my-account"; // done
 
   //Common
-  static const categories = "$baseUrl/categories";
-  static const notifications = "$baseUrl/notifications";
-  static const contents = "$baseUrl/contents";
+  static const categories = "$baseUrl/categories"; // done
+  static const notifications = "$baseUrl/notifications"; // hold for data
+  static const contents = "$baseUrl/contents"; // done
 
   //product order
   static const cart = "$baseUrl/add-to-card";
