@@ -1,15 +1,15 @@
 class Api {
   /// base url
  // static const baseUrl = "http://10.10.10.27:7000/api/v1";
-  static const baseUrl = "http://192.168.0.101:7000/api/v1";
+  static const baseUrl = "http://103.186.20.117:9000/api/v1";
 
   ///auth
   static const login = "$baseUrl/auth/login"; //done
-  static const register = "$baseUrl/users";
+  static const register = "$baseUrl/users"; // done
   static const profile = "$baseUrl/users/my-profile"; // done
-  static const verifyOtp = "$baseUrl/otp/verify-otp";
-  static const resendOtp = "$baseUrl/otp/resend-otp";
-  static const changePassword = "$baseUrl/auth/change-password";
+  static const verifyOtp = "$baseUrl/otp/verify-otp"; // done
+  static const resendOtp = "$baseUrl/otp/resend-otp"; // done
+  static const changePassword = "$baseUrl/auth/change-password"; // problem with api
   static const forgetPassword = "$baseUrl/auth/forget-password";
   static const resetPassword = "$baseUrl/auth/reset-password";
 

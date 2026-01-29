@@ -23,9 +23,11 @@ class ChangePasswordController extends GetxController {
       return;
     }
 
+
     var headers = {
       'Authorization': 'Bearer $token',
     };
+    debugPrint(token);
 
     var body = {
       "oldPassword": oldPassword,

@@ -1,14 +1,13 @@
-// app/modules/auth/forget/views/forget_view.dart
+import 'package:expiry_deals/app/modules/auth/controllers/auth_controller.dart';
 import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/app/modules/forget/views/reset_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
-import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
-import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
+import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
@@ -23,8 +22,10 @@ class VerifyView extends StatefulWidget {
 
 class _VerifyViewState extends State<VerifyView> {
   final TextEditingController pinController = TextEditingController();
+  final AuthController authController = Get.put(AuthController());
   int countdown = 60;
   bool canResend = false;
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +51,7 @@ class _VerifyViewState extends State<VerifyView> {
     });
     startTimer();
     // TODO: Call your resend API here
+    Get.find<AuthController>().resendOtp();
     Get.snackbar("Success", "Verification code sent!");
   }
 
@@ -155,36 +157,22 @@ class _VerifyViewState extends State<VerifyView> {
                     cursor: Container(width: 2, color: AppColors.mainColor),
                     onCompleted: (pin) {
                       // Auto submit when 6 digits entered
-                      //  Get.toNamed('/reset-password');
+                   //   authController.verifyOtp(pin);
                     },
                   ),
 
                   sh50,
 
                   // Verify Button
-                  CustomCenterButton(
-                    title: "Verify Email",
+                  authController.isLoading.value ? CustomLoaderButton() :  CustomCenterButton(
+                    title:  "Verify Email",
                     width: double.infinity,
                     onTap: () {
                       if (pinController.text.length == 6) {
-                        kSnackBar(message: "OTP Verify Successfully", bgColor: AppColors.green);
-                        if(widget.isSignUp == true){
-                            Get.to(() => LoginView());
-                        }else{
-                          Get.to(() => ResetView());
-                        }
-
-
+                        // Call the verifyOtp function
+                        authController.verifyOtp(pinController.text);
                       } else {
-
-                        Get.showSnackbar(
-                          GetSnackBar(
-                            title: "Error",
-                            message: "Please enter 6-digit code",
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-
+                        Get.snackbar('Error', 'Please enter 6-digit code');
                       }
                     },
                   ),

@@ -1,6 +1,7 @@
 import 'package:expiry_deals/app/modules/category/views/category_product_view.dart';
 import 'package:expiry_deals/app/modules/category/views/category_view.dart';
 import 'package:expiry_deals/app/modules/product_details/views/product_details_view.dart';
+import 'package:expiry_deals/app/modules/profile/controllers/profile_controller.dart';
 import 'package:expiry_deals/app/modules/search_page/views/search_page_view.dart';
 import 'package:expiry_deals/app/modules/store/views/store_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
@@ -39,6 +40,8 @@ class HomeView extends GetView<HomeController> {
      "https://img.freepik.com/free-photo/woman-leaning-white-wooden-board-talking-phone-while-smiling_1157-2023.jpg?semt=ais_hybrid&w=740&q=80",
 
    ];
+   
+   final ProfileController profileController = Get.put(ProfileController());
 
 
   @override
@@ -60,15 +63,15 @@ class HomeView extends GetView<HomeController> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Hello, Welcome', style: h5.copyWith(color: AppColors.hintColor)),
-                        Text('Albert Stevano', style: h2.copyWith(fontSize: 20)),
+                     Obx(() =>    Text(profileController.profileData.value.data?.name?? "", style: h2.copyWith(fontSize: 20)),)
                       ],
                     ),
                   ),
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: AppColors.grayLight,
-                    child: ClipOval(child: Image.network('https://i.pravatar.cc/150?img=3', fit: BoxFit.cover)),
-                  ),
+                 Obx(() =>  CircleAvatar(
+                   radius: 24,
+                   backgroundColor: AppColors.grayLight,
+                   child: ClipOval(child: Image.network( profileController.profileData.value.data?.profile ?? 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png', fit: BoxFit.cover)),
+                 ),)
                 ],
               ),
               const SizedBox(height: 24),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/app/modules/auth/views/verify_view.dart';
 import 'package:get/get.dart';
 import 'package:expiry_deals/app/data/api.dart';
@@ -89,10 +90,98 @@ class AuthController extends GetxController {
       );
 
       if (response != null) {
-      Get.to(() => VerifyView(isSignUp: true));
+        var otpToken = response['data']['otpToken']['token'];
+
+        LocalStorage.saveData(key: AppConstant.otpToken, data: otpToken);
+
+        // Redirect to OTP verification screen
+        Get.to(() => VerifyView(isSignUp: true));
       }
     } catch (e) {
       debugPrint("Registration Error: $e");
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // Verify OTP function
+  Future<void> verifyOtp(String otp) async {
+    try {
+      isLoading(true);
+
+      String? otpToken = LocalStorage.getData(key: AppConstant.otpToken);
+
+      if (otpToken == null || otpToken.isEmpty) {
+        throw 'OTP Token is missing.';
+      }
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'token': otpToken,
+      };
+
+      var body = {
+        'otp': otp,
+      };
+
+      dynamic response = await BaseClient.handleResponse(
+        await BaseClient.postRequest(
+          api: Api.verifyOtp,
+          headers: headers,
+          body: jsonEncode(body),
+        ),
+      );
+
+      if (response != null && response['success'] == true) {
+        // OTP successfully verified
+        Get.snackbar("Success", "OTP Verified Successfully");
+
+        // Navigate to the next step after OTP verification
+        Get.offAll(() => LoginView());
+      } else {
+        // OTP verification failed
+        Get.snackbar("Error", "Invalid OTP. Please try again.");
+      }
+    } catch (e) {
+      debugPrint("OTP Verification Error: $e");
+      Get.snackbar("Error", e.toString());
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // Resend OTP function
+  Future<void> resendOtp() async {
+    try {
+      isLoading(true);
+
+      String? otpToken = LocalStorage.getData(key: AppConstant.otpToken);
+
+      if (otpToken == null || otpToken.isEmpty) {
+        throw 'OTP Token is missing.';
+      }
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $otpToken',
+      };
+
+      dynamic response = await BaseClient.handleResponse(
+        await BaseClient.postRequest(
+          api: Api.resendOtp,
+          headers: headers,
+          body: jsonEncode({}),
+        ),
+      );
+
+      if (response != null && response['success'] == true) {
+        Get.snackbar("Success", "OTP Sent Again!");
+      } else {
+        Get.snackbar("Error", "Failed to resend OTP.");
+      }
+    } catch (e) {
+      debugPrint("Resend OTP Error: $e");
+      Get.snackbar("Error", e.toString());
     } finally {
       isLoading(false);
     }

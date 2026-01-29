@@ -1,5 +1,6 @@
 import 'package:expiry_deals/app/modules/change_password/controllers/change_password_controller.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
+import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
@@ -72,7 +73,7 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
             sh20,
             Obx(() {
               return controller.isLoading.value
-                  ? CircularProgressIndicator(color: AppColors.mainColor)
+                  ? CustomLoaderButton()
                   : CustomCenterButton(
                       onTap: () {
                         // Call the API to change the password
