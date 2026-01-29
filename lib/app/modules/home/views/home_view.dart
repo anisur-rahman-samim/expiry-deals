@@ -4,6 +4,7 @@ import 'package:expiry_deals/app/modules/product_details/views/product_details_v
 import 'package:expiry_deals/app/modules/profile/controllers/profile_controller.dart';
 import 'package:expiry_deals/app/modules/search_page/views/search_page_view.dart';
 import 'package:expiry_deals/app/modules/store/views/store_view.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/controllers/category_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,7 @@ class HomeView extends GetView<HomeController> {
    ];
    
    final ProfileController profileController = Get.put(ProfileController());
+   final CategoryDataController categoryDataController = Get.put(CategoryDataController());
 
 
   @override
@@ -118,22 +120,20 @@ class HomeView extends GetView<HomeController> {
 
               const SizedBox(height: 24),
               _sectionHeader('Categories', () {
-               Get.to(() => CategoryView());
+               Get.to(() => CategoryView(categoryList: categoryDataController.categories,));
               }),
               // === Category Chips ===
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                  //  _categoryChip('All Items', isSelected: true),
-                    _categoryChip('Dress'),
-                    _categoryChip('T-Shirt'),
-                    _categoryChip('Jeans'),
-                    _categoryChip('Shoes'),
-                    _categoryChip('Bag'),
-                  ],
-                ),
-              ),
+             SizedBox(
+               height: 40,
+               child: Obx(() => ListView.builder(
+                   shrinkWrap: true,
+                   scrollDirection: Axis.horizontal,
+                   itemCount: categoryDataController.categories.length,
+                   itemBuilder: (context,index){
+                     var item = categoryDataController.categories[index];
+                     return       _categoryChip(item.name??"");
+                   }),)
+             ),
               const SizedBox(height: 24),
 
               // === Special Offer Section ===

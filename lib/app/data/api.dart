@@ -5,7 +5,7 @@ class Api {
 
   ///auth
   static const login = "$baseUrl/auth/login"; //done
-  static const register = "$baseUrl/users"; // done
+  static const register = "$baseUrl/users"; // done33
   static const profile = "$baseUrl/users/my-profile"; // done
   static const verifyOtp = "$baseUrl/otp/verify-otp"; // done
   static const resendOtp = "$baseUrl/otp/resend-otp"; // done
@@ -13,8 +13,8 @@ class Api {
   static const forgetPassword = "$baseUrl/auth/forgot-password"; // done
   static const resetPassword = "$baseUrl/auth/reset-password"; // done
 
-  static const updateProfile = "$baseUrl/users/update-my-profile";
-  static const deleteProfile = "$baseUrl/users/delete-my-account";
+  static const updateProfile = "$baseUrl/users/update-my-profile";  // problem with api
+  static const deleteProfile = "$baseUrl/users/delete-my-account"; // done
 
   //Common
   static const categories = "$baseUrl/categories";

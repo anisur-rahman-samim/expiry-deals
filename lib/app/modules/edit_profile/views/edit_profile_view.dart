@@ -18,6 +18,7 @@ class EditProfileView extends GetView<EditProfileController> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +124,7 @@ class EditProfileView extends GetView<EditProfileController> {
                 width: Get.width,
                 hintText: "Enter your email",
                 controller: emailController,
+                enabled: false,
               );
             }),
             sh10,
@@ -135,6 +137,18 @@ class EditProfileView extends GetView<EditProfileController> {
                 width: Get.width,
                 hintText: "Your phone number",
                 controller: phoneController,
+              );
+            }),
+            sh10,
+            Text("Address", style: h3),
+            sh5,
+            Obx(() {
+              // Check if the phone number is available, if not leave it empty
+              addressController.text = editProfileController.profileData.value.data?.address ?? '';
+              return CustomTextField(
+                width: Get.width,
+                hintText: "Your address",
+                controller: addressController,
               );
             }),
             sh20,
@@ -150,6 +164,7 @@ class EditProfileView extends GetView<EditProfileController> {
                           nameController.text,
                           emailController.text,
                           phoneController.text,
+                          addressController.text,
                           context
                         );
                       },

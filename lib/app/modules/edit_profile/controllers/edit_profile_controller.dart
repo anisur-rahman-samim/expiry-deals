@@ -60,7 +60,7 @@ class EditProfileController extends GetxController {
   }
 
   // Update Profile Data with Image
-  Future<void> updateProfile(String name, String email, String phone, BuildContext context) async {
+  Future<void> updateProfile(String name, String email, String phone, String address,  BuildContext context) async {
     String? token = LocalStorage.getData(key: AppConstant.token);
     if (token == null || token.isEmpty) {
       Get.snackbar("Error", "Authentication token is missing.");
@@ -75,9 +75,7 @@ class EditProfileController extends GetxController {
       "status": "active",
       "name": name,
       "phoneNumber": phone,
-      "gender": "Male", // Add gender if necessary
-      "dateOfBirth": "1990-01-01", // Update with actual date if needed
-      "address": "123 Main St, New York, NY", // Update with actual address if needed
+      "address": address, // Update with actual address if needed
     };
 
     isLoading.value = true;
@@ -98,16 +96,19 @@ class EditProfileController extends GetxController {
       // Send the request
       var response = await request.send();
 
+      print(response.statusCode);
+
       if (response.statusCode == 200) {
         // Successfully updated profile
        await fetchProfileData();
        Navigator.pop(context);
-        Get.snackbar("Success", "Profile updated successfully.");
+     //   Get.snackbar("Success", "Profile updated successfully.");
       } else {
-        Get.snackbar("Error", "Failed to update profile.");
+       debugPrint("Api issue");
       }
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      debugPrint("Error: $e");
+
     } finally {
       isLoading.value = false;
     }
