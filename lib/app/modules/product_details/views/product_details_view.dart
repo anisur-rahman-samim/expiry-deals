@@ -1,21 +1,18 @@
 import 'package:expiry_deals/app/modules/store/views/store_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ProductDetailsView extends StatelessWidget {
-  ProductDetailsView({super.key});
+import '../../home/model/product_model.dart';
 
-  final List<String> productImageList = [
-    "https://www.dhresource.com/webp/m/0x0/f2/albu/g21/M00/1F/F5/rBVaq2DCDRGABLbyAADQ8DkUmO8389.jpg",
-    "https://i.pinimg.com/736x/af/38/16/af3816f775f479ab6fb7dfaf30d3e553.jpg",
-    "https://img.freepik.com/free-photo/woman-leaning-white-wooden-board-talking-phone-while-smiling_1157-2023.jpg",
-    "https://img.freepik.com/free-photo/young-attractive-woman-blue-winter-jacket_1303-20115.jpg",
-    "https://media.istockphoto.com/id/641684768/photo/pretty-girl-in-a-leather-jacket-on-white-background.jpg?s=612x612&w=is&k=20&c=p1Cbfw4L-mKS3eRGpk4DD3QQi3XvdqH2Ot28aOBR2xQ=",
-    "https://www.dhresource.com/webp/m/0x0/f2/albu/g21/M00/1F/F5/rBVaq2DCDRGABLbyAADQ8DkUmO8389.jpg"
-  ];
+class ProductDetailsView extends StatelessWidget {
+
+  var  productDetails;
+
+  ProductDetailsView({super.key, required this.productDetails});
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +34,10 @@ class ProductDetailsView extends StatelessWidget {
                 Container(
                   height: 420,
                   width: double.infinity,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     image: DecorationImage(
                       image: NetworkImage(
-                        "https://img.freepik.com/free-photo/young-attractive-woman-blue-winter-jacket_1303-20115.jpg?w=740",
+                          productDetails.images[0].url ?? ""
                       ),
                       fit: BoxFit.cover,
                     ),
@@ -59,12 +56,58 @@ class ProductDetailsView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Vendor Card
-                      _buildVendorCard(),
+                      Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: AppColors.grayLight),
+                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10)],
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 26,
+                              backgroundImage: NetworkImage(productDetails.author?.shop?.logo ?? AppImages.noImage),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(productDetails.author?.shop?.name ??"", style: h3.copyWith(fontWeight: FontWeight.w600)),
+                                  // Row(
+                                  //   children: [
+                                  //     const Icon(Icons.star, color: Colors.amber, size: 17),
+                                  //     Text(' 4.9', style: GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w600)),
+                                  //     Text(' • 45.2k+ Products', style: h5.copyWith(color: AppColors.hintColor)),
+                                  //   ],
+                                  // ),
+                                ],
+                              ),
+                            ),
+                            OutlinedButton(
+                              onPressed: () {
+                                Get.to(() => StoreView());
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: AppColors.mainColor, width: 1.5),
+                                foregroundColor: AppColors.mainColor,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                child: Text('Visit Store', style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 20),
 
                       // Product Title
                       Text(
-                        'Premium Leather Jacket for Women',
+                        productDetails.name ?? "",
                         style: h2.copyWith(fontSize: 24),
                       ),
                       const SizedBox(height: 12),
@@ -73,33 +116,19 @@ class ProductDetailsView extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            '\$89.99',
+                            '\$${productDetails.discount}',
                             style: h2.copyWith(color: AppColors.mainColor, fontSize: 30),
                           ),
                           const SizedBox(width: 16),
                           Text(
-                            '\$189.99',
+                            '\$${productDetails.price}',
                             style: h4.copyWith(
                               decoration: TextDecoration.lineThrough,
                               color: AppColors.hintColor,
                             ),
                           ),
                           const SizedBox(width: 16),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: AppColors.red,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: Text(
-                              '-53% OFF',
-                              style: GoogleFonts.dmSans(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
+
                         ],
                       ),
                       const SizedBox(height: 28),
@@ -111,27 +140,10 @@ class ProductDetailsView extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Elevate your style with this premium genuine leather jacket. Crafted from 100% cowhide leather with a soft inner lining for maximum comfort. Features include zippered pockets, adjustable waist belt, and a detachable hood. Perfect for winter, casual outings, and making a bold fashion statement.',
+                        productDetails.details ?? "",
                         style: h4.copyWith(height: 1.8, color: AppColors.textColor.withValues(alpha: 0.9),),
                       ),
-                      const SizedBox(height: 32),
 
-                      // You Might Also Like (using your productImageList)
-                      Text(
-                        'You Might Also Like',
-                        style: h2.copyWith(fontSize: 19),
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        height: 260,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: productImageList.length,
-                          itemBuilder: (context, index) {
-                            return _relatedProductCard(productImageList[index]);
-                          },
-                        ),
-                      ),
                       const SizedBox(height: 120), // Space for bottom bar
                     ],
                   ),
@@ -270,92 +282,7 @@ class ProductDetailsView extends StatelessWidget {
     );
   }
 
-  // Vendor Card
-  Widget _buildVendorCard() {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.grayLight),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10)],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 26,
-            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=5'),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Fashion Elite Store', style: h3.copyWith(fontWeight: FontWeight.w600)),
-                Row(
-                  children: [
-                    const Icon(Icons.star, color: Colors.amber, size: 17),
-                    Text(' 4.9', style: GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w600)),
-                    Text(' • 45.2k+ Products', style: h5.copyWith(color: AppColors.hintColor)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          OutlinedButton(
-            onPressed: () {
-              Get.to(() => StoreView());
-            },
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: AppColors.mainColor, width: 1.5),
-              foregroundColor: AppColors.mainColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text('Visit Store', style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  // Related Product Card using productImageList
-  Widget _relatedProductCard(String imageUrl) {
-    return Container(
-      width: 170,
-      margin: const EdgeInsets.only(right: 16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 6))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            child: Image.network(
-              imageUrl,
-              height: 140,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Leather Jacket', style: h4, maxLines: 1, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 6),
-                Text('\$89.99', style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
+
 }

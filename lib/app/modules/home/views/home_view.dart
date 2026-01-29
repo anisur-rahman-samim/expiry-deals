@@ -22,21 +22,6 @@ import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
    HomeView({super.key});
-
-   final recommendedProductImageList =[
-      "https://img.freepik.com/free-photo/young-attractive-woman-blue-winter-jacket_1303-20115.jpg?semt=ais_hybrid&w=740&q=80",
-     "https://media.istockphoto.com/id/641684768/photo/pretty-girl-in-a-leather-jacket-on-white-background.jpg?s=612x612&w=is&k=20&c=p1Cbfw4L-mKS3eRGpk4DD3QQi3XvdqH2Ot28aOBR2xQ=",
-     "https://www.dhresource.com/webp/m/0x0/f2/albu/g21/M00/1F/F5/rBVaq2DCDRGABLbyAADQ8DkUmO8389.jpg"
-         "https://www.dhresource.com/webp/m/0x0/f2/albu/g21/M00/1F/F5/rBVaq2DCDRGABLbyAADQ8DkUmO8389.jpg",
-     "https://i.pinimg.com/736x/af/38/16/af3816f775f479ab6fb7dfaf30d3e553.jpg",
-     "https://img.freepik.com/free-photo/woman-leaning-white-wooden-board-talking-phone-while-smiling_1157-2023.jpg?semt=ais_hybrid&w=740&q=80",
-     "https://img.freepik.com/free-photo/young-attractive-woman-blue-winter-jacket_1303-20115.jpg?semt=ais_hybrid&w=740&q=80",
-     "https://media.istockphoto.com/id/641684768/photo/pretty-girl-in-a-leather-jacket-on-white-background.jpg?s=612x612&w=is&k=20&c=p1Cbfw4L-mKS3eRGpk4DD3QQi3XvdqH2Ot28aOBR2xQ=",
-     "https://www.dhresource.com/webp/m/0x0/f2/albu/g21/M00/1F/F5/rBVaq2DCDRGABLbyAADQ8DkUmO8389.jpg",
-     "https://i.pinimg.com/736x/af/38/16/af3816f775f479ab6fb7dfaf30d3e553.jpg",
-     "https://img.freepik.com/free-photo/woman-leaning-white-wooden-board-talking-phone-while-smiling_1157-2023.jpg?semt=ais_hybrid&w=740&q=80",
-
-   ];
    
    final ProfileController profileController = Get.put(ProfileController());
    final CategoryDataController categoryDataController = Get.put(CategoryDataController());
@@ -220,7 +205,7 @@ class HomeView extends GetView<HomeController> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title, style: h2.copyWith(fontSize: 18)),
-        TextButton(onPressed: onTap, child: Text('See all', style: h4.copyWith(color: AppColors.mainColor))),
+       // TextButton(onPressed: onTap, child: Text('See all', style: h4.copyWith(color: AppColors.mainColor))),
       ],
     );
   }
@@ -313,7 +298,7 @@ class HomeView extends GetView<HomeController> {
   Widget _specialOfferCard({required List<sProduct.SpecialProducts> productList, required index}) {
     return GestureDetector(
       onTap: (){
-        Get.to(() => ProductDetailsView());
+        Get.to(() => ProductDetailsView(productDetails: productList[index],));
       },
       child: Container(
         width: 280,
@@ -410,7 +395,7 @@ class HomeView extends GetView<HomeController> {
    // final discount = index < 3 ? discounts[index] : null;
     return GestureDetector(
       onTap: (){
-        Get.to(() => ProductDetailsView());
+        Get.to(() => ProductDetailsView(productDetails: productList[index],));
       },
       child: Container(
         decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(20), boxShadow: [

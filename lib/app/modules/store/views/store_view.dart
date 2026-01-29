@@ -161,7 +161,7 @@ class StoreView extends StatelessWidget {
   Widget _productCard() {
     return GestureDetector(
       onTap: (){
-        Get.to(() => ProductDetailsView());
+        Get.to(() => ProductDetailsView(productDetails: null,));
       },
       child: Container(
         decoration: BoxDecoration(
