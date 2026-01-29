@@ -1,3 +1,4 @@
+import 'package:expiry_deals/app/modules/my_orders/model/my_order_model.dart';
 import 'package:expiry_deals/app/modules/my_orders/views/order_details_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
@@ -75,7 +76,8 @@ class MyOrdersView extends GetView<MyOrdersController> {
     );
   }
 
-  Widget _buildList(List<Order> orders) {
+  // Build List of Orders based on the selected tab
+  Widget _buildList(List<MyOrder> orders) {
     if (orders.isEmpty) {
       return RefreshIndicator(
         onRefresh: controller.fetchOrders,
@@ -106,7 +108,8 @@ class MyOrdersView extends GetView<MyOrdersController> {
     );
   }
 
-  Widget _buildOrderCard(Order order) {
+  // Build individual Order Card
+  Widget _buildOrderCard(MyOrder order) {
     final color = _getStatusColor(order.status);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -127,22 +130,22 @@ class MyOrdersView extends GetView<MyOrdersController> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Order #${order.id}', style: h3.copyWith(fontWeight: FontWeight.w600)),
+                  Text('Order ${order.MyOrderId}', style: h3.copyWith(fontWeight: FontWeight.w600)),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(20), ),
-                    child: Text(order.status.capitalizeFirst!, style: GoogleFonts.dmSans(color: color, fontWeight: FontWeight.w600, fontSize: 12)),
+                    child: Text(order.status!.capitalizeFirst!, style: GoogleFonts.dmSans(color: color, fontWeight: FontWeight.w600, fontSize: 12)),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
-              Text(DateFormat('dd MMM yyyy • hh:mm a').format(order.orderDate), style: h5.copyWith(color: AppColors.hintColor)),
+              Text(DateFormat('dd MMM yyyy • hh:mm a').format(order.createdAt!), style: h5.copyWith(color: AppColors.hintColor)),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('${order.items.length} items', style: h4),
-                  Text('\$${order.total.toStringAsFixed(2)}', style: h1.copyWith(color: AppColors.mainColor,fontSize: 20)),
+                  Text('${order.quantity} items', style: h4),
+                  Text('\$${order.totalPrice?.toStringAsFixed(2)}', style: h1.copyWith(color: AppColors.mainColor,fontSize: 20)),
                 ],
               ),
             ],
@@ -152,8 +155,9 @@ class MyOrdersView extends GetView<MyOrdersController> {
     );
   }
 
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
+  // Get the status color based on order status
+  Color _getStatusColor(String? status) {
+    switch (status?.toLowerCase()) {
       case 'delivered': return AppColors.green;
       case 'pending':
       case 'processing': return AppColors.orange;
