@@ -15,8 +15,8 @@ import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
 
 class LoginView extends StatelessWidget {
-
-  const LoginView({super.key,});
+ final bool? isVendor;
+  const LoginView({super.key,this.isVendor = false});
 
 
   @override
@@ -29,8 +29,8 @@ class LoginView extends StatelessWidget {
     final AuthController authController = Get.put(AuthController());
 
     // Define TextEditingControllers for email and password
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+    final TextEditingController emailController = TextEditingController(text: "samimcse9@gmail.com");
+    final TextEditingController passwordController = TextEditingController(text: "112233");
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -168,7 +168,28 @@ class LoginView extends StatelessWidget {
                   sh30,
 
                   // Sign Up Link
-                  Center(
+               isVendor == true? Center(
+                    child: TextButton(
+                      onPressed: () {
+                        Get.to(() => SignupView());
+                      },
+                      child: RichText(
+                        text: TextSpan(
+                          style: h3,
+                          children: [
+                            const TextSpan(text: "Become a Vendor, "),
+                            TextSpan(
+                              text: "Apply",
+                              style: h3.copyWith(
+                                color: AppColors.mainColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ) :   Center(
                     child: TextButton(
                       onPressed: () {
                         Get.to(() => SignupView());

@@ -105,7 +105,7 @@ class ChooseRoleView extends StatelessWidget {
                 textColor: AppColors.mainColor,
                 onTap: () {
                   LocalStorage.saveData(key: AppConstant.role, data: "Vendor");
-                   Get.to(() => LoginView());
+                   Get.to(() => LoginView(isVendor: true,));
                 },
               ),
             ),

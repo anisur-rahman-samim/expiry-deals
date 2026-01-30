@@ -107,16 +107,17 @@ class HomeView extends GetView<HomeController> {
               _sectionHeader('Categories', () {
                Get.to(() => CategoryView(categoryList: categoryDataController.categories,));
               }),
+              sh10,
               // === Category Chips ===
              SizedBox(
-               height: 40,
+               height: 80,
                child: Obx(() => ListView.builder(
                    shrinkWrap: true,
                    scrollDirection: Axis.horizontal,
                    itemCount: categoryDataController.categories.length,
                    itemBuilder: (context,index){
                      var item = categoryDataController.categories[index];
-                     return       _categoryChip(item.name??"");
+                     return       _categoryChip(item.name??"", item.banner ?? "");
                    }),)
              ),
               const SizedBox(height: 24),
@@ -177,25 +178,31 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  Widget _categoryChip(String title, {bool isSelected = false}) {
+  Widget _categoryChip(String title, String image, {bool isSelected = false}) {
     return GestureDetector(
       onTap: () {
         Get.to(() =>  CategoryProductView(), arguments: title);
       },
       child: Container(
+        width: 80,
         margin: const EdgeInsets.only(right: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.mainColor : AppColors.white,
           borderRadius: BorderRadius.circular(30),
           border: Border.all(color: isSelected ? AppColors.mainColor : AppColors.grayLight),
         ),
-        child: Text(
-          title,
-          style: GoogleFonts.dmSans(
-            color: isSelected ? Colors.white : AppColors.textColor,
-            fontWeight: FontWeight.w600,
-          ),
+        child: Column(
+          children: [
+            Image.network(image,width: 30,height: 30,),
+            sh5,
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: h4,
+            ),
+          ],
         ),
       ),
     );

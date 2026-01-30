@@ -25,6 +25,7 @@ class ChangePasswordController extends GetxController {
 
 
     var headers = {
+         'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
     };
     debugPrint(token);
