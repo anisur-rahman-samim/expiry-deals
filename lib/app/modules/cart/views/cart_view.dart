@@ -190,13 +190,15 @@ class _CartViewState extends Material.State<CartView> {
   }
 
   // Checkout Bottom Bar
+  // Checkout Bottom Bar
   Widget _buildCheckoutBar() {
     // Total price calculation
     double totalPrice = 0;
     for (var item in controller.cartItems) {
+      double itemPrice = (item.product?.price ?? 0) * (item.quantity ?? 1);
+      totalPrice += itemPrice;  // Accumulate the total price
       print(">>>>>> product qty: ${item.quantity}");
-      totalPrice = (item.product?.price ?? 0)  * (item.quantity ?? 1);
-      print(">>>>>> product price: $totalPrice");
+      print(">>>>>> product price: $itemPrice");
     }
 
     return Container(
@@ -222,9 +224,7 @@ class _CartViewState extends Material.State<CartView> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                // Go to checkout
-              //  Get.to(() => OrderSuccessView());
-                Get.to(() => BillingDetailsView());
+             //   Get.to(() => BillingDetailsView(productId: productId, quantity: quantity));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.mainColor,
@@ -243,6 +243,7 @@ class _CartViewState extends Material.State<CartView> {
       ),
     );
   }
+
 
   Widget _priceRow(String label, double amount, {bool bold = false, bool large = false}) {
     return Padding(

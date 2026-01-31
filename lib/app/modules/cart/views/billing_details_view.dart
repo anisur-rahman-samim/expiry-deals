@@ -1,13 +1,17 @@
+import 'package:expiry_deals/app/modules/cart/controllers/order_place_controller.dart';
 import 'package:expiry_deals/app/modules/order_success/views/order_success_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
+import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class BillingDetailsView extends StatefulWidget {
-  BillingDetailsView({super.key});
+  final String productId;
+  final int quantity;
+  const BillingDetailsView({super.key, required this.productId, required this.quantity});
 
   @override
   State<BillingDetailsView> createState() => _BillingDetailsViewState();
@@ -15,14 +19,12 @@ class BillingDetailsView extends StatefulWidget {
 
 class _BillingDetailsViewState extends State<BillingDetailsView> {
   final TextEditingController addressController = TextEditingController();
-
   final TextEditingController cityController = TextEditingController();
-
   final TextEditingController stateController = TextEditingController();
-
   final TextEditingController zipCodeController = TextEditingController();
-
   final TextEditingController countryController = TextEditingController();
+
+  final OrderPlaceController orderPlaceController = Get.put(OrderPlaceController());
 
   // Payment method state
   int _paymentMethod = 1;
@@ -119,23 +121,23 @@ class _BillingDetailsViewState extends State<BillingDetailsView> {
             const SizedBox(height: 16),
 
             // Save Button
-            CustomCenterButton(
-              onTap: () {
-                // Handle the order submission and display the selected payment method
-                String paymentMethod = _paymentMethod == 1
-                    ? "Cash on Delivery"
-                    : "Online Payment";
+           Obx(() => orderPlaceController.isLoading.value ? CustomLoaderButton():  CustomCenterButton(
+             onTap: () {
+               // Handle the order submission and display the selected payment method
+               String paymentMethod = _paymentMethod == 1
+                   ? "Cash on Delivery"
+                   : "Online Payment";
 
-                debugPrint(paymentMethod);
-                Get.offAll(() => OrderSuccessView());
-                Get.snackbar(
-                  "Order Placed",
-                  "You selected $paymentMethod as your payment method.",
-                );
-              },
-              title: "Place Order",
-              width: Get.width,
-            ),
+               debugPrint(paymentMethod);
+               orderPlaceController.createOrder(productId: widget.productId, quantity: widget.quantity, method: _paymentMethod, address: addressController.text, city: cityController.text, state: stateController.text, zipCode: zipCodeController.text, country: countryController.text);
+               Get.snackbar(
+                 "Order Placed",
+                 "You selected $paymentMethod as your payment method.",
+               );
+             },
+             title: "Place Order",
+             width: Get.width,
+           ),),
             const SizedBox(height: 24),
           ],
         ),
