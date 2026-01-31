@@ -1,17 +1,29 @@
-// cart_view.dart
 import 'package:expiry_deals/app/modules/cart/controllers/cart_controller.dart';
+import 'package:expiry_deals/app/modules/cart/model/add_to_cart_model.dart';
+import 'package:expiry_deals/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:expiry_deals/app/modules/order_success/views/order_success_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
+import 'package:flutter/material.dart' as Material;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+class CartView extends Material.StatefulWidget {
+  CartView({super.key});
 
-class CartView extends StatelessWidget {
-   CartView({super.key});
+  @override
+  Material.State<CartView> createState() => _CartViewState();
+}
 
-   final CartController controller = Get.put(CartController());
+class _CartViewState extends Material.State<CartView> {
+  final CartController controller = Get.put(CartController());
+
+  @override
+  void initState() {
+    controller.fetchAddToCart();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +88,7 @@ class CartView extends StatelessWidget {
                 Text('Add items to get started!', style: h4.copyWith(color: AppColors.hintColor)),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Get.to(() => DashboardView()),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.mainColor,
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -93,9 +105,9 @@ class CartView extends StatelessWidget {
   }
 
   // Cart Item Card
-  Widget _buildCartItem(CartItem item) {
+  Widget _buildCartItem(AddToCart item) {
     return Dismissible(
-      key: Key(item.id),
+      key: Key(item.id ?? ''),
       direction: DismissDirection.endToStart,
       background: Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -104,7 +116,10 @@ class CartView extends StatelessWidget {
         padding: const EdgeInsets.only(right: 30),
         child: const Icon(Icons.delete_forever, color: Colors.white, size: 32),
       ),
-      onDismissed: (_) => controller.removeFromCart(item.id),
+      onDismissed: (_) {
+        controller.removeFromCart(item.id ?? '');
+        controller.deleteAddToCart(cartId: item.id ?? "");
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         padding: const EdgeInsets.all(16),
@@ -112,24 +127,24 @@ class CartView extends StatelessWidget {
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.grayLight),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
         ),
         child: Row(
           children: [
             // Checkbox
-            Checkbox(
-              value: item.isSelected,
-              onChanged: (_) => controller.toggleItemSelection(item.id),
-              activeColor: AppColors.mainColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            const SizedBox(width: 12),
+            // Checkbox(
+            //   value: item.isSelected,
+            //   onChanged: (_) => controller.toggleItemSelection(item.id ?? ''),
+            //   activeColor: AppColors.mainColor,
+            //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            // ),
+            // const SizedBox(width: 12),
 
             // Product Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                item.imageUrl,
+              child: Material.Image.network(
+                item.product?.images.first.url ?? '',  // Updated access to images
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
@@ -142,32 +157,29 @@ class CartView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.title, style: h3.copyWith(fontWeight: FontWeight.w600), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  Text(item.product?.name ?? '', style: h3.copyWith(fontWeight: FontWeight.w600), maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 8),
-                  Text('\$${item.price.toStringAsFixed(2)}', style: h2.copyWith(color: AppColors.mainColor)),
+                  Text("QTY: ${item.quantity}", style: h3.copyWith(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  Text('\$${item.product?.price?.toStringAsFixed(2)}', style: h2.copyWith(color: AppColors.mainColor)),
                 ],
               ),
             ),
 
             // Quantity Control
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.grayLight),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Row(
-                children: [
-                  IconButton(onPressed: () => controller.decrementQty(item.id), icon: const Icon(Icons.remove, size: 18)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('${item.quantity}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  ),
-                  IconButton(
-                    onPressed: () => controller.incrementQty(item.id),
-                    icon: const Icon(Icons.add, size: 18),
-                    color: AppColors.mainColor,
-                  ),
-                ],
+            GestureDetector(
+              onTap: (){
+                controller.deleteAddToCart(cartId: item.id ?? "");
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.grayLight),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Material.Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(Icons.delete,color: AppColors.red,),
+                ),
               ),
             ),
           ],
@@ -178,23 +190,29 @@ class CartView extends StatelessWidget {
 
   // Checkout Bottom Bar
   Widget _buildCheckoutBar() {
+    // Total price calculation
+    double totalPrice = 0;
+    for (var item in controller.cartItems) {
+      print(">>>>>> product qty: ${item.quantity}");
+      totalPrice = (item.product?.price ?? 0)  * (item.quantity ?? 1);
+      print(">>>>>> product price: $totalPrice");
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 20, offset: const Offset(0, -5))],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 20, offset: const Offset(0, -5))],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-
-
           // Price Breakdown
-          _priceRow('Subtotal', controller.subtotal.value),
-          _priceRow('Shipping', 9.99),
+          _priceRow('Subtotal', totalPrice),
+          _priceRow('Shipping cost', 0.0),
           const Divider(height: 24),
-          _priceRow('Total', controller.total.value, bold: true, large: true),
+          _priceRow('Total', totalPrice + 0.0, bold: true, large: true),  // Add shipping cost to total
 
           const SizedBox(height: 16),
 
@@ -202,9 +220,9 @@ class CartView extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: controller.selectedItems.isEmpty ? null : () {
+              onPressed: () {
                 // Go to checkout
-              Get.to(() => OrderSuccessView());
+                Get.to(() => OrderSuccessView());
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.mainColor,
@@ -213,7 +231,7 @@ class CartView extends StatelessWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
               ),
               child: Text(
-                'Proceed to Checkout (${controller.selectedItems.length} items)',
+                'Proceed to Checkout (${controller.cartItems.length} items)',
                 style: GoogleFonts.dmSans(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
               ),
             ),
