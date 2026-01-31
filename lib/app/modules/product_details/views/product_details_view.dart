@@ -123,7 +123,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                               ),
                               OutlinedButton(
                                 onPressed: () {
-                                  Get.to(() => StoreView(shopId: productDetails?.author?.shop?.id ?? "",));
+                                  Get.to(() => StoreView(shopId: productDetails?.author?.shop?.id ?? "",authorId: productDetails?.author?.id ?? "",));
                                 },
                                 style: OutlinedButton.styleFrom(
                                   side: BorderSide(color: AppColors.mainColor, width: 1.5),

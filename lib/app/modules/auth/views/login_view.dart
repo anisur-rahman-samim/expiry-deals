@@ -1,4 +1,5 @@
 import 'package:expiry_deals/app/modules/auth/controllers/auth_controller.dart';
+import 'package:expiry_deals/app/modules/auth/views/vendor_request_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -171,7 +172,7 @@ class LoginView extends StatelessWidget {
                isVendor == true? Center(
                     child: TextButton(
                       onPressed: () {
-                        Get.to(() => SignupView());
+                        Get.to(() => VendorRequestView());
                       },
                       child: RichText(
                         text: TextSpan(

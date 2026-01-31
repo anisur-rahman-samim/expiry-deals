@@ -214,6 +214,7 @@ class _CartViewState extends Material.State<CartView> {
           // Price Breakdown
           _priceRow('Subtotal', totalPrice),
           _priceRow('Shipping cost', 0.0),
+        //  _priceRow('Tax', 8.25),
           const Divider(height: 24),
           _priceRow('Total', totalPrice + 0.0, bold: true, large: true),  // Add shipping cost to total
 

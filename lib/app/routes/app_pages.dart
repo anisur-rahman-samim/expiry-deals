@@ -146,7 +146,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.STORE,
-      page: () =>  StoreView(shopId: '',),
+      page: () =>  StoreView(shopId: '', authorId: '',),
       binding: StoreBinding(),
     ),
     GetPage(

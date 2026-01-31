@@ -16,7 +16,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 class StoreView extends StatefulWidget {
   final String shopId;
-  const StoreView({super.key, required this.shopId});
+  final String authorId;
+  const StoreView({super.key, required this.shopId, required this.authorId});
 
   @override
   State<StoreView> createState() => _StoreViewState();
@@ -29,7 +30,7 @@ class _StoreViewState extends State<StoreView> {
   @override
   void initState() {
     singleStoreController.fetchSingleStoreProduct(shopId: widget.shopId);
-    storeWiseProductController.fetchStoreWiseProduct(shopId: widget.shopId);
+    storeWiseProductController.fetchStoreWiseProduct(shopId: widget.authorId);
     super.initState();
   }
 
