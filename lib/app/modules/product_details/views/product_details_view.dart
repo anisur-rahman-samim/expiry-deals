@@ -11,8 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../home/model/product_model.dart';
 
 class ProductDetailsView extends StatefulWidget {
-
-  final String  productId;
+  final String productId;
 
   const ProductDetailsView({super.key, required this.productId});
 
@@ -23,10 +22,31 @@ class ProductDetailsView extends StatefulWidget {
 class _ProductDetailsViewState extends State<ProductDetailsView> {
   final ProductDetailsController productDetailsController = Get.put(ProductDetailsController());
 
+  // State for managing the item quantity
+  int quantity = 1;
+
   @override
   void initState() {
     productDetailsController.fetchSingleProduct(productId: widget.productId);
     super.initState();
+  }
+
+  // Method to increase the quantity with stock limit
+  void increaseQuantity(int stock) {
+    setState(() {
+      if (quantity < stock) {
+        quantity++;
+      }
+    });
+  }
+
+  // Method to decrease the quantity, ensuring it never goes below 1
+  void decreaseQuantity() {
+    setState(() {
+      if (quantity > 1) {
+        quantity--;
+      }
+    });
   }
 
   @override
@@ -43,6 +63,8 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
         // Fetching product details here because this is reactive
         var productDetails = productDetailsController.singleProduct.value.data;
 
+        int stock = productDetails?.stock ?? 0; // Get the available stock
+
         return Stack(
           children: [
             SingleChildScrollView(
@@ -55,9 +77,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: NetworkImage(
-                            productDetails?.images[0].url ?? ""
-                        ),
+                        image: NetworkImage(productDetails?.images[0].url ?? ""),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -197,7 +217,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           InkWell(
-                            onTap: () {},
+                            onTap: () => decreaseQuantity(),
                             borderRadius: BorderRadius.circular(50),
                             child: const Padding(
                               padding: EdgeInsets.all(8),
@@ -205,7 +225,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                             ),
                           ),
                           Text(
-                            '1 Item',
+                            '$quantity Item${quantity > 1 ? 's' : ''}', // Dynamically showing item(s)
                             style: GoogleFonts.dmSans(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -213,7 +233,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                             ),
                           ),
                           InkWell(
-                            onTap: () {},
+                            onTap: () => increaseQuantity(stock),
                             borderRadius: BorderRadius.circular(50),
                             child: Container(
                               padding: const EdgeInsets.all(8),
@@ -292,4 +312,3 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
     );
   }
 }
-
