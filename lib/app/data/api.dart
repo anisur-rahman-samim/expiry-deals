@@ -9,7 +9,7 @@ class Api {
   static const profile = "$baseUrl/users/my-profile"; // done
   static const verifyOtp = "$baseUrl/otp/verify-otp"; // done
   static const resendOtp = "$baseUrl/otp/resend-otp"; // done
-  static const changePassword = "$baseUrl/auth/change-password"; // problem with api
+  static const changePassword = "$baseUrl/auth/change-password"; // done
   static const forgetPassword = "$baseUrl/auth/forgot-password"; // done
   static const resetPassword = "$baseUrl/auth/reset-password"; // done
 
@@ -27,8 +27,9 @@ class Api {
   static const allProducts = "$baseUrl/products"; // done
   static const allShop = "$baseUrl/shop"; // done
   static const myOrders = "$baseUrl/orders/my-orders"; // done
-  static  shopWiseProduct({required shopId}) => "$baseUrl/products/author/$shopId";
-  static  shopById({required shopId}) => "$baseUrl/shop/$shopId";
+  static  shopWiseProduct({required shopId}) => "$baseUrl/products/author/$shopId"; // done
+  static  shopById({required shopId}) => "$baseUrl/shop/$shopId"; // done
+  static  productById({required productId}) => "$baseUrl/products/$productId"; // done
   static  deleteCart({required cartId}) => "$baseUrl/add-to-card/$cartId";
 
   //Vendor

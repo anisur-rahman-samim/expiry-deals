@@ -185,7 +185,7 @@ class _StoreViewState extends State<StoreView> {
   Widget _productCard({required List<SWProduct.StoreWiseProduct> productList, required int index}) {
     return GestureDetector(
       onTap: (){
-        Get.to(() => ProductDetailsView(productDetails: null,));
+        Get.to(() => ProductDetailsView(productId: productList[index].id ?? "",));
       },
       child: Container(
         decoration: BoxDecoration(

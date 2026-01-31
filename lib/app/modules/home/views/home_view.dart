@@ -310,7 +310,7 @@ class HomeView extends GetView<HomeController> {
   Widget _specialOfferCard({required List<sProduct.SpecialProducts> productList, required index}) {
     return GestureDetector(
       onTap: (){
-        Get.to(() => ProductDetailsView(productDetails: productList[index],));
+        Get.to(() => ProductDetailsView(productId: productList[index].id ?? "",));
       },
       child: Container(
         width: 280,
@@ -407,7 +407,7 @@ class HomeView extends GetView<HomeController> {
    // final discount = index < 3 ? discounts[index] : null;
     return GestureDetector(
       onTap: (){
-        Get.to(() => ProductDetailsView(productDetails: productList[index],));
+        Get.to(() => ProductDetailsView(productId: productList[index].id ?? "",));
       },
       child: Container(
         decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(20), boxShadow: [

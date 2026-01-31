@@ -3,6 +3,7 @@ import 'package:expiry_deals/app/modules/home/model/search_product_model.dart' a
 import 'package:expiry_deals/app/modules/product_details/views/product_details_view.dart';
 import 'package:expiry_deals/app/modules/search_page/controllers/search_page_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:flutter/material.dart';
@@ -101,7 +102,7 @@ class SearchPageView extends StatelessWidget {
   Widget productCard(searchProduct.SearchProduct product) {
     return GestureDetector(
       onTap: (){
-        Get.to(() => ProductDetailsView(productDetails: product));
+        Get.to(() => ProductDetailsView(productId: product.id ?? ""));
       },
       child: Container(
         decoration: BoxDecoration(
@@ -115,7 +116,7 @@ class SearchPageView extends StatelessWidget {
             ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                   child: Image.network(
-                    product.images.isNotEmpty ? product.images[0].url ?? 'https://via.placeholder.com/300' : 'https://via.placeholder.com/300',
+                    product.images.isNotEmpty ? product.images[0].url ?? AppImages.noImage : AppImages.noImage,
                     height: 140,
                     width: double.infinity,
                     fit: BoxFit.cover,

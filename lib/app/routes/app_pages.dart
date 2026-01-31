@@ -141,7 +141,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PRODUCT_DETAILS,
-      page: () => ProductDetailsView(productDetails: null,),
+      page: () => ProductDetailsView(productId: "",),
       binding: ProductDetailsBinding(),
     ),
     GetPage(
