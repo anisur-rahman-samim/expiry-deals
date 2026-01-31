@@ -62,6 +62,7 @@ class VendorAddProductController extends GetxController {
         }
 
         var headers = {
+           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         };
 

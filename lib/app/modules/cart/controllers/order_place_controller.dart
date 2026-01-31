@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:expiry_deals/app/modules/cart/views/cart_view.dart';
 import 'package:expiry_deals/app/modules/order_success/views/order_success_view.dart';
+import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
 import 'package:get/get.dart';
 import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/app/data/base_client.dart';
@@ -64,15 +65,18 @@ class OrderPlaceController extends GetxController {
       if (response != null) {
         if (response["success"] == true) {
           Get.offAll(() => OrderSuccessView());
-          Get.snackbar('Success', 'Order placed successfully');
+  
+          kSnackBar(message: 'Order placed successfully', bgColor: AppColors.green);
         } else {
-          Get.snackbar('Error', 'Failed to place order.');
+      
+          kSnackBar(message: 'Failed to place order.', bgColor: AppColors.failedColor);
         }
       } else {
-        Get.snackbar('Error', 'Failed to place order.');
+      
+            kSnackBar(message: 'Failed to place order.', bgColor: AppColors.failedColor);
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      debugPrint(e.toString());
     } finally {
       isLoading(false);
     }

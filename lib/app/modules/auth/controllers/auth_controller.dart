@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/app/modules/auth/views/verify_view.dart';
 import 'package:expiry_deals/app/modules/forget/views/reset_view.dart';
+import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
 import 'package:get/get.dart';
 import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/app/data/base_client.dart';
@@ -46,10 +48,18 @@ class AuthController extends GetxController {
 
         // Navigate to the appropriate dashboard based on the role
         if (role == "vendor") {
+          
+            kSnackBar(message: "${response['message']}", bgColor: AppColors.green);
           Get.offAll(() => VendorDashboardView());
+        
         } else {
+         kSnackBar(message: "${response['message']}", bgColor: AppColors.green);
           Get.offAll(() => DashboardView());
         }
+        if(response['success'] = false){
+                     kSnackBar(message: "${response['message']}", bgColor: AppColors.failedColor);
+        }
+
       }
     } catch (e) {
       debugPrint("Login Error: $e");
@@ -135,7 +145,8 @@ class AuthController extends GetxController {
 
       if (response != null && response['success'] == true) {
         // OTP successfully verified
-        Get.snackbar("Success", "OTP Verified Successfully");
+  
+        kSnackBar(message: "OTP Verified Successfully", bgColor: AppColors.green);
 
         var token = response['data']['token'];
 
@@ -151,11 +162,12 @@ class AuthController extends GetxController {
 
       } else {
         // OTP verification failed
-        Get.snackbar("Error", "Invalid OTP. Please try again.");
+       
+        kSnackBar(message: "Invalid OTP. Please try again.", bgColor: AppColors.failedColor);
       }
     } catch (e) {
       debugPrint("OTP Verification Error: $e");
-      Get.snackbar("Error", e.toString());
+
     } finally {
       isLoading(false);
     }
@@ -186,13 +198,14 @@ class AuthController extends GetxController {
       );
 
       if (response != null && response['success'] == true) {
-        Get.snackbar("Success", "OTP Sent Again!");
+      
+        kSnackBar(message: "OTP Sent Again!", bgColor: AppColors.green);
       } else {
-        Get.snackbar("Error", "Failed to resend OTP.");
+              kSnackBar(message: "Failed to resend OTP.", bgColor: AppColors.failedColor);
+  
       }
     } catch (e) {
       debugPrint("Resend OTP Error: $e");
-      Get.snackbar("Error", e.toString());
     } finally {
       isLoading(false);
     }

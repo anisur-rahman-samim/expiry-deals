@@ -60,7 +60,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.white,
+      //  foregroundColor: Colors.white,
       ),
       body: Obx(() {
         // Fetching product details here because this is reactive

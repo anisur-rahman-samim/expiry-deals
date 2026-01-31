@@ -8,6 +8,7 @@ import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_loader.dart';
+import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
@@ -52,7 +53,7 @@ class _VerifyViewState extends State<VerifyView> {
     startTimer();
     // TODO: Call your resend API here
     Get.find<AuthController>().resendOtp();
-    Get.snackbar("Success", "Verification code sent!");
+    kSnackBar(message: "Verification code sent!", bgColor: AppColors.failedColor);
   }
 
   final defaultPinTheme = PinTheme(

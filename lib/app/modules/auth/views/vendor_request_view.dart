@@ -178,7 +178,7 @@ class VendorRequestView extends StatelessWidget {
                   Obx(() => vendorRequestController.isLoading.value
                       ? CustomLoaderButton()
                       : CustomCenterButton(
-                    title: "Sign Up",
+                    title: "Apply",
                     width: double.infinity,
                     onTap: () {
                       final name = nameController.text;

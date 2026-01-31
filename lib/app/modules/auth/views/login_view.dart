@@ -1,5 +1,6 @@
 import 'package:expiry_deals/app/modules/auth/controllers/auth_controller.dart';
 import 'package:expiry_deals/app/modules/auth/views/vendor_request_view.dart';
+import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -144,7 +145,8 @@ class LoginView extends StatelessWidget {
 
                         if (email.isEmpty || password.isEmpty) {
                           // Show an error if the fields are empty
-                          Get.snackbar('Error', 'Please fill in all fields', snackPosition: SnackPosition.BOTTOM);
+                  
+                          kSnackBar(message: 'Please fill in all fields', bgColor: AppColors.failedColor);
                         } else {
                           authController.login(email: email, password: password,);
                         }

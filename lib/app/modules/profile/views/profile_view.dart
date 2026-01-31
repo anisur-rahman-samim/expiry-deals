@@ -50,8 +50,7 @@ class ProfileView extends GetView<ProfileController> {
                     CircleAvatar(
                       radius: 60,
                       backgroundImage: NetworkImage(
-                        user?.profile ??
-                            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png",
+                        user?.profile ?? AppImages.noImage
                       ),
                     ),
                     sw10,
