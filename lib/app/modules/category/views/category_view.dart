@@ -44,6 +44,7 @@ class CategoryView extends StatelessWidget {
           itemBuilder: (context, index) {
             final category = categoryList[index];
             return _categoryGridItem(
+              id: category.id ?? "",
               name: category.name ?? "",
               icon: category.banner ?? "",
               color: AppColors.grayLight,
@@ -55,13 +56,14 @@ class CategoryView extends StatelessWidget {
   }
 
   Widget _categoryGridItem({
+    required String id,
     required String name,
     required String icon,
     required Color color,
   }) {
     return GestureDetector(
       onTap: () {
-        Get.to(() =>  CategoryProductView(), arguments: name);
+        Get.to(() =>  CategoryProductView(categoryId: id,), arguments: name);
       },
       child: Container(
         decoration: BoxDecoration(

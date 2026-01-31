@@ -121,7 +121,7 @@ class HomeView extends GetView<HomeController> {
                    itemCount: categoryDataController.categories.length,
                    itemBuilder: (context,index){
                      var item = categoryDataController.categories[index];
-                     return       _categoryChip(item.name??"", item.banner ?? "");
+                     return       _categoryChip(item.id ?? "",item.name??"", item.banner ?? "");
                    }),)
              ),
               const SizedBox(height: 24),
@@ -182,10 +182,10 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  Widget _categoryChip(String title, String image, {bool isSelected = false}) {
+  Widget _categoryChip(String id,String title, String image, {bool isSelected = false}) {
     return GestureDetector(
       onTap: () {
-        Get.to(() =>  CategoryProductView(), arguments: title);
+        Get.to(() =>  CategoryProductView(categoryId: id,), arguments: title);
       },
       child: Container(
         width: 80,

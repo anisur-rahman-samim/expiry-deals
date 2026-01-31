@@ -1,29 +1,36 @@
 // category_product_view.dart
+import 'package:expiry_deals/app/modules/home/controllers/category_product_controller.dart';
+import 'package:expiry_deals/app/modules/home/model/category_product_model.dart';
+import 'package:expiry_deals/app/modules/product_details/views/product_details_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
+import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
+import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as material;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 
-class CategoryProductView extends StatelessWidget {
-   CategoryProductView({super.key});
+class CategoryProductView extends StatefulWidget {
+  final String categoryId;
+   CategoryProductView({super.key, required this.categoryId});
 
-  // Sample product data (replace with API later)
-  final List<Map<String, dynamic>> products = List.generate(12, (index) => {
-    'title': index % 3 == 0
-        ? 'Premium Cotton T-Shirt'
-        : index % 2 == 0
-        ? 'Slim Fit Denim Jeans'
-        : 'Classic Leather Jacket',
-    'price': 29.99 + (index * 5),
-   // 'rating': 4.5 + (index % 5) / 10,
-    'image': [
-      'https://img.freepik.com/free-photo/young-man-wearing-blank-t-shirt_1187-1401.jpg?w=740',
-      'https://img.freepik.com/free-photo/confident-young-man-wearing-blue-jeans_176420-3215.jpg?w=740',
-      'https://img.freepik.com/free-photo/portrait-handsome-young-man-leather-jacket_176420-3289.jpg?w=740',
-    ][index % 3],
-  });
+  @override
+  State<CategoryProductView> createState() => _CategoryProductViewState();
+}
+
+class _CategoryProductViewState extends State<CategoryProductView> {
+
+  final CategoryProductController categoryProductController = Get.put(CategoryProductController());
+
+
+  @override
+  void initState() {
+    categoryProductController.fetchCategoryProducts(categoryId: widget.categoryId);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +54,10 @@ class CategoryProductView extends StatelessWidget {
         foregroundColor: AppColors.black,
 
       ),
-      body: products.isEmpty
-          ? _buildEmptyState()
-          : RefreshIndicator(
+      body: Obx(() => categoryProductController.isLoading.value ? Center(child: SpinKitDualRing(
+        color: AppColors.white,
+        size: 30.0,
+      ),) :  categoryProductController.categoryProducts.isEmpty? Center(child: Text("Product not available"),) : RefreshIndicator(
         onRefresh: () async => await Future.delayed(const Duration(seconds: 1)),
         color: AppColors.mainColor,
         child: GridView.builder(
@@ -60,20 +68,20 @@ class CategoryProductView extends StatelessWidget {
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
           ),
-          itemCount: products.length,
+          itemCount: categoryProductController.categoryProducts.length,
           itemBuilder: (context, index) {
-            final product = products[index];
-            return _productCard(product);
+            final product = categoryProductController.categoryProducts;
+            return _productCard(product,index);
           },
         ),
-      ),
+      ),)
     );
   }
 
-  Widget _productCard(Map<String, dynamic> product) {
+  Widget _productCard(List<CategoryProduct> product, int index) {
     return GestureDetector(
       onTap: () {
-        Get.toNamed('/product-details', arguments: product);
+       Get.to(() => ProductDetailsView(productId: product[index].id ?? ""));
       },
       child: Container(
         decoration: BoxDecoration(
@@ -96,8 +104,8 @@ class CategoryProductView extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                  child: Image.network(
-                    product['image'],
+                  child: material.Image.network(
+                    product[index].images.first.url ?? "",
                     height: 160,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -114,20 +122,32 @@ class CategoryProductView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product['title'],
+                    product[index].name ?? "",
                     style: h4.copyWith(fontWeight: FontWeight.w600),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
 
                   const SizedBox(height: 8),
-                  Text(
-                    '\$${product['price'].toStringAsFixed(2)}',
-                    style: h3.copyWith(
-                      color: AppColors.mainColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Row(
+                    children: [
+                      Text(
+                        '\$${product[index].discount.toStringAsFixed(2)}',
+                        style: h3.copyWith(
+                          color: AppColors.mainColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      sw5,
+                      Text(
+                        '\$${product[index].price.toStringAsFixed(2)}',
+                        style: h3.copyWith(
+                          color: AppColors.gray,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),

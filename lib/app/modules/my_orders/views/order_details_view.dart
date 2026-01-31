@@ -65,7 +65,7 @@ class OrderDetailsView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Order ${order.MyOrderId}', style: h2),
+              Text('Order ${order.datumId}', style: h2),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(20)),
@@ -83,7 +83,7 @@ class OrderDetailsView extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '${order.quantity} items • Total: \$${order.totalPrice!.toStringAsFixed(2)}',
+            '${order.items.length} items • Total: \$${order.totalPrice!.toStringAsFixed(2)}',
             style: h3.copyWith(color: AppColors.mainColor),
           ),
         ],
@@ -94,10 +94,10 @@ class OrderDetailsView extends StatelessWidget {
   Widget _buildItems() => _card(ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: order.product!.images!.length,
+        itemCount: order.items.length,
         separatorBuilder: (_, __) => const Divider(height: 32),
         itemBuilder: (_, i) {
-          final item = order.product!.images![i];
+          final item = order.items[i];
           return Row(
             children: [
               Container(
@@ -107,33 +107,30 @@ class OrderDetailsView extends StatelessWidget {
                   color: AppColors.grayLight,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Image.network(item.url!),
+                child: Image.network(item.product?.images[0].url ?? ""),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(order.product!.name!, style: h3, maxLines: 2, overflow: TextOverflow.ellipsis),
-                    Text('Qty: ${order.quantity}', style: h5.copyWith(color: AppColors.hintColor)),
+                    Text(item.product?.name ?? "", style: h3, maxLines: 2, overflow: TextOverflow.ellipsis),
+                    Text('Qty: ${item.quantity}', style: h5.copyWith(color: AppColors.hintColor)),
                   ],
                 ),
               ),
-              Text('\$${(order.totalPrice! * order.quantity!).toStringAsFixed(2)}', style: h3.copyWith(fontWeight: FontWeight.w600)),
+              Text('\$${(order.totalPrice! * item.quantity!).toStringAsFixed(2)}', style: h3.copyWith(fontWeight: FontWeight.w600)),
             ],
           );
         },
       ));
 
   Widget _buildPrice() {
-    final subtotal = order.quantity! * order.totalPrice!;
+
     return _card(
       Column(
         children: [
-          _priceRow('Subtotal', subtotal),
-          _priceRow('Shipping', 9.99),
-          _priceRow('Tax', 5.50),
-          const Divider(height: 32),
+        //  _priceRow('Subtotal', subtotal),
           _priceRow('Total', order.totalPrice!, bold: true, color: AppColors.mainColor),
         ],
       ),
@@ -148,13 +145,6 @@ class OrderDetailsView extends StatelessWidget {
         ],
       ));
 
-  Widget _buildPayment() => _card(Row(
-        children: [
-          Icon(Icons.credit_card, color: AppColors.mainColor, size: 32),
-          const SizedBox(width: 16),
-          Text('Credit/Debit Card •••• 4242', style: h3),
-        ],
-      ));
 
   Widget _card(Widget child) => Container(
         width: double.infinity,

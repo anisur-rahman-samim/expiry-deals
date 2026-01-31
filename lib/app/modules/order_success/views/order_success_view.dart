@@ -80,8 +80,6 @@ class OrderSuccessView extends StatelessWidget {
 
             const SizedBox(height: 32),
 
-
-
             const Spacer(),
 
             // Action Buttons
@@ -91,7 +89,7 @@ class OrderSuccessView extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.to(() => DashboardView());
+                      Get.offAll(() => DashboardView());
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.mainColor,

@@ -9,7 +9,7 @@ class MyOrderModel {
     final String? message;
     final Data? data;
 
-    factory MyOrderModel.fromJson(Map<String, dynamic> json){ 
+    factory MyOrderModel.fromJson(Map<String, dynamic> json){
         return MyOrderModel(
             success: json["success"],
             message: json["message"],
@@ -28,7 +28,7 @@ class Data {
     final List<MyOrder> data;
     final Meta? meta;
 
-    factory Data.fromJson(Map<String, dynamic> json){ 
+    factory Data.fromJson(Map<String, dynamic> json){
         return Data(
             data: json["data"] == null ? [] : List<MyOrder>.from(json["data"]!.map((x) => MyOrder.fromJson(x))),
             meta: json["meta"] == null ? null : Meta.fromJson(json["meta"]),
@@ -43,14 +43,12 @@ class MyOrder {
         required this.id,
         required this.user,
         required this.author,
-        required this.product,
+        required this.items,
         required this.totalPrice,
-        required this.discount,
-        required this.quantity,
         required this.status,
         required this.isPaid,
         required this.isDeleted,
-        required this.MyOrderId,
+        required this.datumId,
         required this.tnxId,
         required this.createdAt,
         required this.updatedAt,
@@ -60,32 +58,28 @@ class MyOrder {
     final String? id;
     final UserClass? user;
     final UserClass? author;
-    final Product? product;
-    final dynamic totalPrice;
-    final dynamic discount;
-    final int? quantity;
+    final List<Item> items;
+    final double? totalPrice;
     final String? status;
     final bool? isPaid;
     final bool? isDeleted;
-    final String? MyOrderId;
+    final String? datumId;
     final String? tnxId;
     final DateTime? createdAt;
     final DateTime? updatedAt;
 
-    factory MyOrder.fromJson(Map<String, dynamic> json){ 
+    factory MyOrder.fromJson(Map<String, dynamic> json){
         return MyOrder(
             billingDetails: json["billingDetails"] == null ? null : BillingDetails.fromJson(json["billingDetails"]),
             id: json["_id"],
             user: json["user"] == null ? null : UserClass.fromJson(json["user"]),
             author: json["author"] == null ? null : UserClass.fromJson(json["author"]),
-            product: json["product"] == null ? null : Product.fromJson(json["product"]),
+            items: json["items"] == null ? [] : List<Item>.from(json["items"]!.map((x) => Item.fromJson(x))),
             totalPrice: json["totalPrice"],
-            discount: json["discount"],
-            quantity: json["quantity"],
             status: json["status"],
             isPaid: json["isPaid"],
             isDeleted: json["isDeleted"],
-            MyOrderId: json["id"],
+            datumId: json["id"],
             tnxId: json["tnxId"],
             createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
             updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
@@ -111,7 +105,7 @@ class UserClass {
     final String? phoneNumber;
     final String? profile;
 
-    factory UserClass.fromJson(Map<String, dynamic> json){ 
+    factory UserClass.fromJson(Map<String, dynamic> json){
         return UserClass(
             id: json["_id"],
             name: json["name"],
@@ -135,11 +129,11 @@ class UserShop {
 
     final String? id;
     final String? name;
-    final dynamic logo;
-    final dynamic banner;
+    final String? logo;
+    final String? banner;
     final String? bannerColor;
 
-    factory UserShop.fromJson(Map<String, dynamic> json){ 
+    factory UserShop.fromJson(Map<String, dynamic> json){
         return UserShop(
             id: json["_id"],
             name: json["name"],
@@ -166,13 +160,40 @@ class BillingDetails {
     final String? zipCode;
     final String? country;
 
-    factory BillingDetails.fromJson(Map<String, dynamic> json){ 
+    factory BillingDetails.fromJson(Map<String, dynamic> json){
         return BillingDetails(
             address: json["address"],
             city: json["city"],
             state: json["state"],
             zipCode: json["zipCode"],
             country: json["country"],
+        );
+    }
+
+}
+
+class Item {
+    Item({
+        required this.product,
+        required this.price,
+        required this.discount,
+        required this.quantity,
+        required this.id,
+    });
+
+    final Product? product;
+    final double? price;
+    final int? discount;
+    final int? quantity;
+    final String? id;
+
+    factory Item.fromJson(Map<String, dynamic> json){
+        return Item(
+            product: json["product"] == null ? null : Product.fromJson(json["product"]),
+            price: json["price"],
+            discount: json["discount"],
+            quantity: json["quantity"],
+            id: json["_id"],
         );
     }
 
@@ -203,17 +224,17 @@ class Product {
     final String? name;
     final String? details;
     final Category? category;
-    final dynamic price;
+    final double? price;
     final int? totalSell;
     final int? stock;
-    final DateTime? expiredAt;
-    final dynamic discount;
+    final String? expiredAt;
+    final int? discount;
     final bool? isDeleted;
     final DateTime? createdAt;
     final DateTime? updatedAt;
     final int? v;
 
-    factory Product.fromJson(Map<String, dynamic> json){ 
+    factory Product.fromJson(Map<String, dynamic> json){
         return Product(
             id: json["_id"],
             images: json["images"] == null ? [] : List<Image>.from(json["images"]!.map((x) => Image.fromJson(x))),
@@ -224,7 +245,7 @@ class Product {
             price: json["price"],
             totalSell: json["totalSell"],
             stock: json["stock"],
-            expiredAt: DateTime.tryParse(json["expiredAt"] ?? ""),
+            expiredAt: json["expiredAt"],
             discount: json["discount"],
             isDeleted: json["isDeleted"],
             createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
@@ -252,7 +273,7 @@ class ProductAuthor {
     final dynamic phoneNumber;
     final dynamic profile;
 
-    factory ProductAuthor.fromJson(Map<String, dynamic> json){ 
+    factory ProductAuthor.fromJson(Map<String, dynamic> json){
         return ProductAuthor(
             id: json["_id"],
             name: json["name"],
@@ -292,8 +313,8 @@ class PurpleShop {
     final dynamic address;
     final dynamic openingHours;
     final dynamic openingDays;
-    final dynamic logo;
-    final dynamic banner;
+    final String? logo;
+    final String? banner;
     final String? document;
     final String? author;
     final bool? isDeleted;
@@ -302,7 +323,7 @@ class PurpleShop {
     final DateTime? updatedAt;
     final int? v;
 
-    factory PurpleShop.fromJson(Map<String, dynamic> json){ 
+    factory PurpleShop.fromJson(Map<String, dynamic> json){
         return PurpleShop(
             location: json["location"] == null ? null : Location.fromJson(json["location"]),
             id: json["_id"],
@@ -334,7 +355,7 @@ class Location {
     final String? type;
     final List<double> coordinates;
 
-    factory Location.fromJson(Map<String, dynamic> json){ 
+    factory Location.fromJson(Map<String, dynamic> json){
         return Location(
             type: json["type"],
             coordinates: json["coordinates"] == null ? [] : List<double>.from(json["coordinates"]!.map((x) => x)),
@@ -354,7 +375,7 @@ class Category {
     final String? name;
     final String? banner;
 
-    factory Category.fromJson(Map<String, dynamic> json){ 
+    factory Category.fromJson(Map<String, dynamic> json){
         return Category(
             id: json["_id"],
             name: json["name"],
@@ -375,7 +396,7 @@ class Image {
     final String? url;
     final String? id;
 
-    factory Image.fromJson(Map<String, dynamic> json){ 
+    factory Image.fromJson(Map<String, dynamic> json){
         return Image(
             key: json["key"],
             url: json["url"],
@@ -398,7 +419,7 @@ class Meta {
     final int? total;
     final int? totalPage;
 
-    factory Meta.fromJson(Map<String, dynamic> json){ 
+    factory Meta.fromJson(Map<String, dynamic> json){
         return Meta(
             page: json["page"],
             limit: json["limit"],

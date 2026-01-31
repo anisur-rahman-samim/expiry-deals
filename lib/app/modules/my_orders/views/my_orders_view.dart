@@ -130,7 +130,7 @@ class MyOrdersView extends GetView<MyOrdersController> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Order ${order.MyOrderId}', style: h3.copyWith(fontWeight: FontWeight.w600)),
+                  Text('Order ${order.datumId}', style: h3.copyWith(fontWeight: FontWeight.w600)),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(20), ),
@@ -144,8 +144,8 @@ class MyOrdersView extends GetView<MyOrdersController> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('${order.quantity} items', style: h4),
-                  Text('\$${order.totalPrice?.toStringAsFixed(2)}', style: h1.copyWith(color: AppColors.mainColor,fontSize: 20)),
+                  Text('${order.items.length} items', style: h4),
+                  Text('\$${order.totalPrice?.toStringAsFixed(2) }', style: h1.copyWith(color: AppColors.mainColor,fontSize: 20)),
                 ],
               ),
             ],
