@@ -2,7 +2,6 @@ import 'package:expiry_deals/app/modules/cart/controllers/cart_controller.dart';
 import 'package:expiry_deals/app/modules/cart/model/add_to_cart_model.dart';
 import 'package:expiry_deals/app/modules/cart/views/billing_details_view.dart';
 import 'package:expiry_deals/app/modules/dashboard/views/dashboard_view.dart';
-import 'package:expiry_deals/app/modules/order_success/views/order_success_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:flutter/material.dart' as Material;
@@ -42,6 +41,20 @@ class _CartViewState extends Material.State<CartView> {
           return _buildEmptyCart(context);
         }
 
+        double totalPrice = 0;
+        List<Map<String, dynamic>> items = [];
+
+        // Calculate total price and prepare items list
+        for (var item in controller.cartItems) {
+          double itemPrice = (item.product?.price ?? 0) * (item.quantity ?? 1);
+          totalPrice += itemPrice;
+
+          items.add({
+            "product": item.product?.id,
+            "quantity": item.quantity,
+          });
+        }
+
         return Stack(
           children: [
             // Cart Items List
@@ -63,7 +76,7 @@ class _CartViewState extends Material.State<CartView> {
               bottom: 0,
               left: 0,
               right: 0,
-              child: _buildCheckoutBar(),
+              child: _buildCheckoutBar(totalPrice, items),
             ),
           ],
         );
@@ -132,15 +145,6 @@ class _CartViewState extends Material.State<CartView> {
         ),
         child: Row(
           children: [
-            // Checkbox
-            // Checkbox(
-            //   value: item.isSelected,
-            //   onChanged: (_) => controller.toggleItemSelection(item.id ?? ''),
-            //   activeColor: AppColors.mainColor,
-            //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            // ),
-            // const SizedBox(width: 12),
-
             // Product Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -190,17 +194,7 @@ class _CartViewState extends Material.State<CartView> {
   }
 
   // Checkout Bottom Bar
-  // Checkout Bottom Bar
-  Widget _buildCheckoutBar() {
-    // Total price calculation
-    double totalPrice = 0;
-    for (var item in controller.cartItems) {
-      double itemPrice = (item.product?.price ?? 0) * (item.quantity ?? 1);
-      totalPrice += itemPrice;  // Accumulate the total price
-      print(">>>>>> product qty: ${item.quantity}");
-      print(">>>>>> product price: $itemPrice");
-    }
-
+  Widget _buildCheckoutBar(double totalPrice, List<Map<String, dynamic>> items) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -214,7 +208,6 @@ class _CartViewState extends Material.State<CartView> {
           // Price Breakdown
           _priceRow('Subtotal', totalPrice),
           _priceRow('Shipping cost', 0.0),
-        //  _priceRow('Tax', 8.25),
           const Divider(height: 24),
           _priceRow('Total', totalPrice + 0.0, bold: true, large: true),  // Add shipping cost to total
 
@@ -225,11 +218,15 @@ class _CartViewState extends Material.State<CartView> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-             //   Get.to(() => BillingDetailsView(productId: productId, quantity: quantity));
+                // Navigate to BillingDetailsView with calculated total price and items list
+                Get.to(() => BillingDetailsView(
+                  authorId: controller.cartItems.first.product?.author?.id ?? "",
+                  totalPrice: totalPrice,
+                  items: items, // Pass the items here
+                ));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.mainColor,
-                disabledBackgroundColor: AppColors.gray,
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
               ),
@@ -245,7 +242,7 @@ class _CartViewState extends Material.State<CartView> {
     );
   }
 
-
+  // Price Row Helper
   Widget _priceRow(String label, double amount, {bool bold = false, bool large = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),

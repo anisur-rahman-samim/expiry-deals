@@ -9,9 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class BillingDetailsView extends StatefulWidget {
-  final String productId;
-  final int quantity;
-  const BillingDetailsView({super.key, required this.productId, required this.quantity});
+  final String authorId;
+  final double totalPrice;
+  final List<Map<String, dynamic>> items; // Added items list
+
+  const BillingDetailsView({
+    super.key,
+    required this.authorId,
+    required this.totalPrice,
+    required this.items,
+  });
 
   @override
   State<BillingDetailsView> createState() => _BillingDetailsViewState();
@@ -25,10 +32,8 @@ class _BillingDetailsViewState extends State<BillingDetailsView> {
   final TextEditingController countryController = TextEditingController();
 
   final OrderPlaceController orderPlaceController = Get.put(OrderPlaceController());
+  int _paymentMethod = 1; // Default to Cash on Delivery
 
-  // Payment method state
-  int _paymentMethod = 1;
- // Default: 1 (Cash on Delivery)
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,120 +47,79 @@ class _BillingDetailsViewState extends State<BillingDetailsView> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            // Address Field
             CustomTextField(
-              width: MediaQuery.of(context).size.width,
-              hintText: 'Enter your address',
               controller: addressController,
-              preIcon: const Icon(Icons.home),
+              hintText: 'Enter your address',  width: Get.width,
             ),
             const SizedBox(height: 16),
-
-            // City Field
             CustomTextField(
-              width: MediaQuery.of(context).size.width,
-              hintText: 'Enter your city',
               controller: cityController,
-              preIcon: const Icon(Icons.location_city),
+              hintText: 'Enter your city', width: Get.width,
             ),
             const SizedBox(height: 16),
-
-            // State Field
             CustomTextField(
-              width: MediaQuery.of(context).size.width,
-              hintText: 'Enter your state',
               controller: stateController,
-              preIcon: const Icon(Icons.account_balance),
+              hintText: 'Enter your state', width: Get.width,
             ),
             const SizedBox(height: 16),
-
-            // Zip Code Field
             CustomTextField(
-              width: MediaQuery.of(context).size.width,
-              hintText: 'Enter your zip code',
               controller: zipCodeController,
-              preIcon: const Icon(Icons.confirmation_number),
+              hintText: 'Enter your zip code', width: Get.width,
             ),
             const SizedBox(height: 16),
-
-            // Country Field
             CustomTextField(
-              width: MediaQuery.of(context).size.width,
-              hintText: 'Enter your country',
               controller: countryController,
-              preIcon: const Icon(Icons.public),
+              hintText: 'Enter your country', width: Get.width,
             ),
             const SizedBox(height: 16),
 
-            // Payment Method Selector
-            Text("Payment Method", style: h2),
-            const SizedBox(height: 8),
+            // Payment Method Selection
             RadioListTile<int>(
-              value: 1, // Cash on Delivery
+              value: 1,
               groupValue: _paymentMethod,
               onChanged: (int? value) {
-                if (value != null) {
-                  _paymentMethod = value;
                 setState(() {
-
+                  if (value != null) _paymentMethod = value;
                 });
-                }
               },
               title: const Text('Cash on Delivery'),
               activeColor: AppColors.mainColor,
             ),
             RadioListTile<int>(
-              value: 2, // Online Payment
+              value: 2,
               groupValue: _paymentMethod,
               onChanged: (int? value) {
-                if (value != null) {
-                  _paymentMethod = value;
-                  setState(() {
-
-                  });
-                }
+                setState(() {
+                  if (value != null) _paymentMethod = value;
+                });
               },
               title: const Text('Online Payment'),
               activeColor: AppColors.mainColor,
             ),
-            const SizedBox(height: 16),
 
-            // Save Button
-           Obx(() => orderPlaceController.isLoading.value ? CustomLoaderButton():  CustomCenterButton(
-             onTap: () {
-               // Handle the order submission and display the selected payment method
-               String paymentMethod = _paymentMethod == 1
-                   ? "Cash on Delivery"
-                   : "Online Payment";
-
-               debugPrint(paymentMethod);
-               orderPlaceController.createOrder(productId: widget.productId, quantity: widget.quantity, method: _paymentMethod, address: addressController.text, city: cityController.text, state: stateController.text, zipCode: zipCodeController.text, country: countryController.text);
-               Get.snackbar(
-                 "Order Placed",
-                 "You selected $paymentMethod as your payment method.",
-               );
-             },
-             title: "Place Order",
-             width: Get.width,
-           ),),
-            const SizedBox(height: 24),
+            // Place Order Button
+            Obx(() => orderPlaceController.isLoading.value
+                ? CustomLoaderButton()
+                : CustomCenterButton(
+              onTap: () {
+                orderPlaceController.createOrder(
+                  authorId: widget.authorId,  // Replace with actual author ID
+                  items: widget.items,
+                  totalPrice: widget.totalPrice,
+                  address: addressController.text,
+                  city: cityController.text,
+                  state: stateController.text,
+                  zipCode: zipCodeController.text,
+                  country: countryController.text,
+                );
+              },
+              title: "Place Order",
+              width: Get.width,
+            ),
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  // Widget to display the entered billing details (optional)
-  Widget _buildBillingDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Address: ${addressController.text}'),
-        Text('City: ${cityController.text}'),
-        Text('State: ${stateController.text}'),
-        Text('Zip Code: ${zipCodeController.text}'),
-        Text('Country: ${countryController.text}'),
-      ],
     );
   }
 }

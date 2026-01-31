@@ -12,11 +12,11 @@ import 'package:flutter/material.dart';
 class OrderPlaceController extends GetxController {
   var isLoading = false.obs;
 
-  // Method to add item to cart
+  // Method to create an order
   Future<void> createOrder({
-    required String productId,
-    required int quantity,
-    required int method,
+    required String authorId, // Added author ID
+    required List<Map<String, dynamic>> items, // List of items with product ID and quantity
+    required double totalPrice, // Total price calculation
     required String address,
     required String city,
     required String state,
@@ -40,8 +40,9 @@ class OrderPlaceController extends GetxController {
 
       // Define the request body
       var body = {
-        "product": productId,
-        "quantity": quantity,
+        "author": authorId,
+        "items": items,
+        "totalPrice": totalPrice,
         "billingDetails": {
           "address": address,
           "city": city,
@@ -51,7 +52,7 @@ class OrderPlaceController extends GetxController {
         }
       };
 
-      // API call to add to cart
+      // API call to create an order
       dynamic response = await BaseClient.handleResponse(
         await BaseClient.postRequest(
           api: Api.createOrders,
@@ -61,15 +62,14 @@ class OrderPlaceController extends GetxController {
       );
 
       if (response != null) {
-        if (method == 1) {
+        if (response["success"] == true) {
           Get.offAll(() => OrderSuccessView());
-        }else{
-          print("online payment");
+          Get.snackbar('Success', 'Order placed successfully');
+        } else {
+          Get.snackbar('Error', 'Failed to place order.');
         }
-
-        Get.snackbar('Success', 'Order place successfully');
       } else {
-        Get.snackbar('Error', 'Failed to order place.');
+        Get.snackbar('Error', 'Failed to place order.');
       }
     } catch (e) {
       Get.snackbar('Error', e.toString());
@@ -78,3 +78,4 @@ class OrderPlaceController extends GetxController {
     }
   }
 }
+
