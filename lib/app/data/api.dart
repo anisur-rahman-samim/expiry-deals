@@ -30,7 +30,7 @@ class Api {
   static  shopWiseProduct({required shopId}) => "$baseUrl/products/author/$shopId"; // done
   static  shopById({required shopId}) => "$baseUrl/shop/$shopId"; // done
   static  productById({required productId}) => "$baseUrl/products/$productId"; // done
-  static  deleteCart({required cartId}) => "$baseUrl/add-to-card/$cartId";
+  static  deleteCart({required cartId}) => "$baseUrl/add-to-card/$cartId"; // done
 
   //Vendor
   static const addProduct = "$baseUrl/products"; // hold

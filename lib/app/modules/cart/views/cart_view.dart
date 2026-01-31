@@ -1,5 +1,6 @@
 import 'package:expiry_deals/app/modules/cart/controllers/cart_controller.dart';
 import 'package:expiry_deals/app/modules/cart/model/add_to_cart_model.dart';
+import 'package:expiry_deals/app/modules/cart/views/billing_details_view.dart';
 import 'package:expiry_deals/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:expiry_deals/app/modules/order_success/views/order_success_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
@@ -222,7 +223,8 @@ class _CartViewState extends Material.State<CartView> {
             child: ElevatedButton(
               onPressed: () {
                 // Go to checkout
-                Get.to(() => OrderSuccessView());
+              //  Get.to(() => OrderSuccessView());
+                Get.to(() => BillingDetailsView());
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.mainColor,
