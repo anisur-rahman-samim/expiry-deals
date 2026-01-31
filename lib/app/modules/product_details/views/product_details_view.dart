@@ -2,6 +2,7 @@ import 'package:expiry_deals/app/modules/store/views/store_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
+import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -140,7 +141,7 @@ class ProductDetailsView extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        productDetails.details ?? "",
+                        productDetails.details ?? "sdfsfsdfsddfsfsedfsdfsd",
                         style: h4.copyWith(height: 1.8, color: AppColors.textColor.withValues(alpha: 0.9),),
                       ),
 
@@ -148,6 +149,8 @@ class ProductDetailsView extends StatelessWidget {
                     ],
                   ),
                 ),
+                sh100,
+                sh100,
               ],
             ),
           ),

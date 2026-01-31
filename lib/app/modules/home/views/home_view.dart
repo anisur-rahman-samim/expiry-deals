@@ -1,7 +1,9 @@
 import 'package:expiry_deals/app/modules/category/views/category_product_view.dart';
 import 'package:expiry_deals/app/modules/category/views/category_view.dart';
+import 'package:expiry_deals/app/modules/home/controllers/near_me_stores_controller.dart';
 import 'package:expiry_deals/app/modules/home/controllers/product_controller.dart';
 import 'package:expiry_deals/app/modules/home/controllers/special_product_controller.dart';
+import 'package:expiry_deals/app/modules/home/model/near_me_stores_model.dart';
 import 'package:expiry_deals/app/modules/home/model/product_model.dart' as allProduct;
 import 'package:expiry_deals/app/modules/home/model/special_product_model.dart' as sProduct;
 import 'package:expiry_deals/app/modules/product_details/views/product_details_view.dart';
@@ -28,6 +30,8 @@ class HomeView extends GetView<HomeController> {
 
    final ProductController productController = Get.put(ProductController());
    final SpecialProductController specialProductController = Get.put(SpecialProductController());
+
+   final NearMeStoresController nearMeStoresController = Get.put(NearMeStoresController());
 
 
   @override
@@ -147,11 +151,11 @@ class HomeView extends GetView<HomeController> {
 
               SizedBox(
                 height: 100,
-                child: ListView.builder(
+                child: Obx(() => nearMeStoresController.nearMeStores.isEmpty ? Center(child: Text("No Store Available"),) : ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: 6,
-                  itemBuilder: (context, index) => _nearMeStoreCard(),
-                ),
+                  itemCount: nearMeStoresController.nearMeStores.length,
+                  itemBuilder: (context, index) => _nearMeStoreCard(nearStores: nearMeStoresController.nearMeStores, index: index),
+                ),)
               ),
               const SizedBox(height: 32),
 
@@ -218,7 +222,7 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-   Widget _nearMeStoreCard() {
+   Widget _nearMeStoreCard({required List<NearMeStores> nearStores, required int index}) {
      return GestureDetector(
        onTap: (){
          Get.to(() => StoreView());
@@ -247,8 +251,8 @@ class HomeView extends GetView<HomeController> {
                height: 80,
                decoration: BoxDecoration(
                  borderRadius: BorderRadius.circular(16),
-                 image: const DecorationImage(
-                   image: NetworkImage('https://i.pravatar.cc/300?img=12'),
+                 image:  DecorationImage(
+                   image: NetworkImage(nearStores[index].logo ?? AppImages.noImage),
                    fit: BoxFit.cover,
                  ),
                ),
@@ -262,7 +266,7 @@ class HomeView extends GetView<HomeController> {
                  mainAxisAlignment: MainAxisAlignment.center,
                  children: [
                    Text(
-                     'Fashion Hub Outlet',
+               nearStores[index].name ?? "",
                      style: h3.copyWith(fontWeight: FontWeight.w600),
                      maxLines: 1,
                      overflow: TextOverflow.ellipsis,
@@ -272,7 +276,7 @@ class HomeView extends GetView<HomeController> {
                      children: [
                        Icon(Icons.location_on, size: 16, color: AppColors.hintColor),
                        const SizedBox(width: 4),
-                       Text('2.4 km away', style: h5.copyWith(color: AppColors.hintColor)),
+                       Text('${nearStores[index].distanceKm?.toStringAsFixed(2)} km away', style: h5.copyWith(color: AppColors.hintColor)),
                      ],
                    ),
                    const SizedBox(height: 8),
