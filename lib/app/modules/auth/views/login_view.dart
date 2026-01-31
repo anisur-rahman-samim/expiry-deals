@@ -30,8 +30,8 @@ class LoginView extends StatelessWidget {
     final AuthController authController = Get.put(AuthController());
 
     // Define TextEditingControllers for email and password
-    final TextEditingController emailController = TextEditingController(text: "samimcse9@gmail.com");
-    final TextEditingController passwordController = TextEditingController(text: "112233");
+    final TextEditingController emailController = TextEditingController(text: "samimcse7@gmail.com");
+    final TextEditingController passwordController = TextEditingController(text: "#473Y2GLXN2");
 
     return Scaffold(
       backgroundColor: Colors.white,

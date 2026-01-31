@@ -1,18 +1,19 @@
+import 'dart:io';
 import 'package:expiry_deals/app/modules/auth/controllers/auth_controller.dart';
-import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
-import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
-import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
 import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
-
+import 'package:expiry_deals/app/modules/auth/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../controllers/vendor_request_controller.dart';
 
 class VendorRequestView extends StatelessWidget {
   const VendorRequestView({super.key});
@@ -28,7 +29,7 @@ class VendorRequestView extends StatelessWidget {
     final TextEditingController emailController = TextEditingController();
     final TextEditingController shopNameController = TextEditingController();
 
-    final AuthController authController = Get.put(AuthController());
+    final VendorRequestController vendorRequestController = Get.put(VendorRequestController());
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -56,9 +57,7 @@ class VendorRequestView extends StatelessWidget {
                     height: 50,
                     decoration: const BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(40),
-                      ),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
                     ),
                   ),
                 ),
@@ -75,7 +74,7 @@ class VendorRequestView extends StatelessWidget {
 
                       // Title
                       Text(
-                        "Apply for vendor",
+                        "Apply for Vendor",
                         style: h1.copyWith(
                           color: AppColors.white,
                           fontSize: 30,
@@ -145,8 +144,38 @@ class VendorRequestView extends StatelessWidget {
 
                   sh30,
 
+                  // Document upload button with image preview
+                  GestureDetector(
+                    onTap: () async {
+                      // Call the pickDocument method in the controller
+                      await vendorRequestController.pickDocument();
+                    },
+                    child: Obx(() {
+                      return Container(
+                        height: 150,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: AppColors.grayLight.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.grayLight),
+                        ),
+                        child: Center(
+                          child: vendorRequestController.documentFile.value != null
+                              ? Image.file(
+                            vendorRequestController.documentFile.value!,
+                            fit: BoxFit.fill,
+                          )
+                              : Icon(Icons.cloud_upload, size: 50, color: AppColors.mainColor),
+                        ),
+                      );
+                    }),
+                  ),
+
+                  // Spacer
+                  sh20,
+
                   // Sign Up Button
-                  Obx(() =>  authController.isLoading.value
+                  Obx(() => vendorRequestController.isLoading.value
                       ? CustomLoaderButton()
                       : CustomCenterButton(
                     title: "Sign Up",
@@ -154,14 +183,26 @@ class VendorRequestView extends StatelessWidget {
                     onTap: () {
                       final name = nameController.text;
                       final email = emailController.text;
+                      final shopName = shopNameController.text;
 
+                      // Check if document is selected
+                      if (vendorRequestController.documentFile.value != null) {
+
+                        vendorRequestController.submitVendorRequest(
+                          name: name,
+                          email: email,
+                          shopName: shopName,
+                          document: vendorRequestController.documentFile.value!,
+                          locationCoordinates: [90.407960, 23.780803], // Example coordinates
+                        );
+                        print("ssssssss");
+                      } else {
+                        debugPrint( 'Please upload a document.');
+                      }
                     },
                   ),),
 
                   sh30,
-
-
-
 
                   sh50,
                 ],
