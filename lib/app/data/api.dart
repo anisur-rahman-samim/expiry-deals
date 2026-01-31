@@ -25,9 +25,10 @@ class Api {
   static const cart = "$baseUrl/add-to-card";
   static const createOrders = "$baseUrl/orders";
   static const allProducts = "$baseUrl/products"; // done
-  static const allShop = "$baseUrl/shop";
-  static const myOrders = "$baseUrl/orders/my-orders";
+  static const allShop = "$baseUrl/shop"; // done
+  static const myOrders = "$baseUrl/orders/my-orders"; // done
   static  shopWiseProduct({required shopId}) => "$baseUrl/products/author/$shopId";
+  static  shopById({required shopId}) => "$baseUrl/shop/$shopId";
   static  deleteCart({required cartId}) => "$baseUrl/add-to-card/$cartId";
 
   //Vendor

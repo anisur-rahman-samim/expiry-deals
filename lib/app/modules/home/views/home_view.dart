@@ -225,7 +225,7 @@ class HomeView extends GetView<HomeController> {
    Widget _nearMeStoreCard({required List<NearMeStores> nearStores, required int index}) {
      return GestureDetector(
        onTap: (){
-         Get.to(() => StoreView());
+         Get.to(() => StoreView(shopId: nearStores[index].id ?? "",));
        },
        child: Container(
          width: 300,

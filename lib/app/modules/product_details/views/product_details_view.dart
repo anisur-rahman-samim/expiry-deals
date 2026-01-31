@@ -77,19 +77,13 @@ class ProductDetailsView extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(productDetails.author?.shop?.name ??"", style: h3.copyWith(fontWeight: FontWeight.w600)),
-                                  // Row(
-                                  //   children: [
-                                  //     const Icon(Icons.star, color: Colors.amber, size: 17),
-                                  //     Text(' 4.9', style: GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w600)),
-                                  //     Text(' • 45.2k+ Products', style: h5.copyWith(color: AppColors.hintColor)),
-                                  //   ],
-                                  // ),
+
                                 ],
                               ),
                             ),
                             OutlinedButton(
                               onPressed: () {
-                                Get.to(() => StoreView());
+                                Get.to(() => StoreView(shopId: productDetails.author?.shop?.id ?? "",));
                               },
                               style: OutlinedButton.styleFrom(
                                 side: BorderSide(color: AppColors.mainColor, width: 1.5),

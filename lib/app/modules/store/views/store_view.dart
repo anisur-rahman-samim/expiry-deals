@@ -1,14 +1,37 @@
 // store_view.dart
+import 'package:expiry_deals/app/modules/home/model/near_me_stores_model.dart';
 import 'package:expiry_deals/app/modules/product_details/views/product_details_view.dart';
+import 'package:expiry_deals/app/modules/store/controllers/single_store_controller.dart';
+import 'package:expiry_deals/app/modules/store/controllers/store_wise_product_controller.dart';
+import 'package:expiry_deals/app/modules/store/model/single_store_model.dart';
+import 'package:expiry_deals/app/modules/store/model/store_wise_product_model.dart' as SWProduct;
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
+import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 
-class StoreView extends StatelessWidget {
-  const StoreView({super.key});
+class StoreView extends StatefulWidget {
+  final String shopId;
+  const StoreView({super.key, required this.shopId});
+
+  @override
+  State<StoreView> createState() => _StoreViewState();
+}
+
+class _StoreViewState extends State<StoreView> {
+  final SingleStoreController singleStoreController = Get.put(SingleStoreController());
+  final StoreWiseProductController storeWiseProductController = Get.put(StoreWiseProductController());
+
+  @override
+  void initState() {
+    singleStoreController.fetchSingleStoreProduct(shopId: widget.shopId);
+    storeWiseProductController.fetchStoreWiseProduct(shopId: widget.shopId);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,44 +41,45 @@ class StoreView extends StatelessWidget {
         length: 2,
         child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            SliverAppBar(
-              expandedHeight: 250,
-              floating: false,
-              pinned: true,
-              backgroundColor: AppColors.bgColor,
-              elevation: 0,
-              iconTheme: const IconThemeData(
-                color: Colors.white, // Back arrow color
-              ),
-              flexibleSpace: FlexibleSpaceBar(
-                collapseMode: CollapseMode.parallax,
-                background: _buildStoreHeader(),
-              ),
-              bottom: _buildTabBar(innerBoxIsScrolled),
-            ),
+           Obx(() =>  SliverAppBar(
+             expandedHeight: 250,
+             floating: false,
+             pinned: true,
+             backgroundColor: AppColors.bgColor,
+             elevation: 0,
+             iconTheme: const IconThemeData(
+               color: Colors.white, // Back arrow color
+             ),
+             flexibleSpace: FlexibleSpaceBar(
+               collapseMode: CollapseMode.parallax,
+               background: _buildStoreHeader(shop: singleStoreController.singleStore.value),
+             ),
+             bottom: _buildTabBar(innerBoxIsScrolled),
+           ),)
           ],
-          body: TabBarView(
+          body: Obx(() => TabBarView(
             children: [
-              _buildProductsTab(),
-              _buildAboutTab(),
+              _buildProductsTab(productList: storeWiseProductController.storeWiseProduct),
+              _buildAboutTab(shop: singleStoreController.singleStore.value),
             ],
-          ),
+          ),)
         ),
       ),
     );
   }
 
-  Widget _buildStoreHeader() {
+  Widget _buildStoreHeader({required SingleShopModel shop}) {
     return Stack(
       children: [
         // Store Banner
         Container(
           height: 320,
           width: double.infinity,
-          decoration: const BoxDecoration(
+          decoration:  BoxDecoration(
             image: DecorationImage(
               image: NetworkImage(
-                'https://img.freepik.com/free-photo/fashion-store-interior-with-clothes-hangers_23-2151050859.jpg?w=1800',
+                  shop.data?.banner ?? AppImages.noImage
+               // 'https://img.freepik.com/free-photo/fashion-store-interior-with-clothes-hangers_23-2151050859.jpg?w=1800',
               ),
               fit: BoxFit.cover,
             ),
@@ -86,8 +110,8 @@ class StoreView extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.white, width: 4),
-                  image: const DecorationImage(
-                    image: NetworkImage('https://i.pravatar.cc/300?img=16'),
+                  image:  DecorationImage(
+                    image: NetworkImage(shop.data?.logo ?? AppImages.noImage),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -98,7 +122,7 @@ class StoreView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Fashion Elite Store',
+                      shop.data?.name ?? "",
                       style: GoogleFonts.dmSans(
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
@@ -139,26 +163,26 @@ class StoreView extends StatelessWidget {
     );
   }
 
-  Widget _buildProductsTab() {
+  Widget _buildProductsTab({required List<SWProduct.StoreWiseProduct> productList}) {
     return RefreshIndicator(
       onRefresh: () async => await Future.delayed(const Duration(seconds: 1)),
       color: AppColors.mainColor,
-      child: GridView.builder(
+      child: Obx(() => productList.isEmpty? Center(child: Text("No product available"),) : GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.78,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          mainAxisExtent: 250
+            crossAxisCount: 2,
+            childAspectRatio: 0.78,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            mainAxisExtent: 250
         ),
-        itemCount: 12,
-        itemBuilder: (context, index) => _productCard(),
-      ),
+        itemCount: productList.length,
+        itemBuilder: (context, index) => _productCard(productList: productList, index: index),
+      ),)
     );
   }
 
-  Widget _productCard() {
+  Widget _productCard({required List<SWProduct.StoreWiseProduct> productList, required int index}) {
     return GestureDetector(
       onTap: (){
         Get.to(() => ProductDetailsView(productDetails: null,));
@@ -177,7 +201,7 @@ class StoreView extends StatelessWidget {
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                   child: Image.network(
-                    'https://i.pinimg.com/736x/af/38/16/af3816f775f479ab6fb7dfaf30d3e553.jpg',
+                    productList[index].images[0].url ?? AppImages.noImage,
                     height: 160,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -191,9 +215,15 @@ class StoreView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Leather Jacket', style: h4, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(productList[index].name ?? "", style: h4, maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 6),
-                  Text('\$89.99', style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold)),
+                  Row(
+                    children: [
+                      Text('\$${productList[index].discount ?? ""}', style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold)),
+                   sw5,
+                      Text('\$${productList[index].price ?? ""}' ,style: h3.copyWith(color: AppColors.gray, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
                   const SizedBox(height: 6),
                 ],
               ),
@@ -204,7 +234,7 @@ class StoreView extends StatelessWidget {
     );
   }
 
-  Widget _buildAboutTab() {
+  Widget _buildAboutTab({required SingleShopModel shop}) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -213,14 +243,14 @@ class StoreView extends StatelessWidget {
           Text('About Store', style: h2.copyWith(fontSize: 20)),
           const SizedBox(height: 16),
           Text(
-            'Fashion Elite Store has been providing premium quality fashion items since 2018. We specialize in leather jackets, designer wear, and trendy accessories. Trusted by over 45k+ happy customers worldwide.',
+            shop.data?.description ?? "No description available",
             style: h4.copyWith(height: 1.7, color: AppColors.textColor.withValues(alpha: 0.9),),
           ),
           const SizedBox(height: 24),
-          _infoRow(Icons.location_on, 'Lagos, Nigeria'),
-          _infoRow(Icons.phone, '+234 801 234 5678'),
-          _infoRow(Icons.email, 'support@fashionelite.com'),
-          _infoRow(Icons.access_time, 'Open • 9:00 AM - 10:00 PM'),
+          _infoRow(Icons.location_on, '${shop.data?.address ?? "No location"}'),
+          // _infoRow(Icons.phone, '${shop.data?.author}'),
+          // _infoRow(Icons.email, 'support@fashionelite.com'),
+          _infoRow(Icons.access_time, 'Open • ${shop.data?.openingHours ?? "N/A"}'),
         ],
       ),
     );

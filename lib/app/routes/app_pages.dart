@@ -146,7 +146,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.STORE,
-      page: () => const StoreView(),
+      page: () =>  StoreView(shopId: '',),
       binding: StoreBinding(),
     ),
     GetPage(
