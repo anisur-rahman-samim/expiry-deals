@@ -1,3 +1,4 @@
+import 'package:expiry_deals/app/modules/product_details/controllers/add_to_cart_controller.dart';
 import 'package:expiry_deals/app/modules/product_details/controllers/product_details_controller.dart';
 import 'package:expiry_deals/app/modules/store/views/store_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
@@ -21,6 +22,8 @@ class ProductDetailsView extends StatefulWidget {
 
 class _ProductDetailsViewState extends State<ProductDetailsView> {
   final ProductDetailsController productDetailsController = Get.put(ProductDetailsController());
+  final AddToCartController addToCartController = Get.put(AddToCartController());
+
 
   // State for managing the item quantity
   int quantity = 1;
@@ -255,7 +258,9 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                       children: [
                         Expanded(
                           child: InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              addToCartController.addToCart(productId: productDetails?.id ?? "", quantity: quantity,isBuyNow: false);
+                            },
                             borderRadius: BorderRadius.circular(18),
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 20),
@@ -279,7 +284,10 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              addToCartController.addToCart(productId: productDetails?.id ?? "", quantity: quantity,isBuyNow: true);
+
+                            },
                             borderRadius: BorderRadius.circular(18),
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 20),

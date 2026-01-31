@@ -22,7 +22,7 @@ class Api {
   static const contents = "$baseUrl/contents"; // done
 
   //product order
-  static const cart = "$baseUrl/add-to-card";
+  static const cart = "$baseUrl/add-to-card"; // done
   static const createOrders = "$baseUrl/orders";
   static const allProducts = "$baseUrl/products"; // done
   static const allShop = "$baseUrl/shop"; // done
