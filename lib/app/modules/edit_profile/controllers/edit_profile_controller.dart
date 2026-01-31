@@ -60,7 +60,7 @@ class EditProfileController extends GetxController {
   }
 
   // Update Profile Data with Image
-  Future<void> updateProfile(String name, String email, String phone, String address,  BuildContext context) async {
+  Future<void> updateProfile({required String name, required String email, required String phone,required String address, required BuildContext context}) async {
     String? token = LocalStorage.getData(key: AppConstant.token);
     if (token == null || token.isEmpty) {
       Get.snackbar("Error", "Authentication token is missing.");
@@ -102,7 +102,7 @@ class EditProfileController extends GetxController {
         // Successfully updated profile
        await fetchProfileData();
        Navigator.pop(context);
-     //   Get.snackbar("Success", "Profile updated successfully.");
+        Get.snackbar("Success", "Profile updated successfully.");
       } else {
        debugPrint("Api issue");
       }
