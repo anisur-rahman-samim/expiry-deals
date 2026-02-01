@@ -119,7 +119,7 @@ class OrderDetailsView extends StatelessWidget {
                   ],
                 ),
               ),
-              Text('\$${(order.totalPrice! * item.quantity!).toStringAsFixed(2)}', style: h3.copyWith(fontWeight: FontWeight.w600)),
+              Text('\$${(item.product!.price! * item.quantity!).toStringAsFixed(2)}', style: h3.copyWith(fontWeight: FontWeight.w600)),
             ],
           );
         },
