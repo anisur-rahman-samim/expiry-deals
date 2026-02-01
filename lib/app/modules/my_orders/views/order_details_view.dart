@@ -24,16 +24,16 @@ class OrderDetailsView extends StatelessWidget {
         backgroundColor: AppColors.bgColor,
         elevation: 0,
         foregroundColor: AppColors.black,
-        actions: [
-          if (canCancel)
-            TextButton(
-              onPressed: () => _confirmCancel(context),
-              child: Text(
-                'Cancel Order',
-                style: GoogleFonts.dmSans(color: AppColors.red, fontWeight: FontWeight.w600),
-              ),
-            ),
-        ],
+        // actions: [
+        //   if (canCancel)
+        //     TextButton(
+        //       onPressed: () => _confirmCancel(context),
+        //       child: Text(
+        //         'Cancel Order',
+        //         style: GoogleFonts.dmSans(color: AppColors.red, fontWeight: FontWeight.w600),
+        //       ),
+        //     ),
+        // ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -130,7 +130,7 @@ class OrderDetailsView extends StatelessWidget {
     return _card(
       Column(
         children: [
-        //  _priceRow('Tax', "8.25%"),
+         // _priceRow('Sub-Total', (order.items * order.quantity!).toStringAsFixed(2)!, bold: true, color: AppColors.mainColor),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Row(
@@ -154,7 +154,7 @@ class OrderDetailsView extends StatelessWidget {
         children: [
           Icon(Icons.location_on, color: AppColors.mainColor, size: 32),
           const SizedBox(width: 16),
-          Expanded(child: Text(order.billingDetails!.address!, style: h4)),
+          Expanded(child: Text("${order.billingDetails!.address!}, ${order.billingDetails!.city}, ${order.billingDetails!.state}, ${order.billingDetails!.zipCode}, ${order.billingDetails!.country}", style: h4)),
         ],
       ));
 

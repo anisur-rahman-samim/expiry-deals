@@ -340,14 +340,14 @@ class HomeView extends GetView<HomeController> {
               borderRadius: BorderRadius.circular(20),
               child: Image.network(productList[index].images[0].url ?? "", height: 200, width: double.infinity, fit: BoxFit.cover),
             ),
-            // Positioned(
-            //   top: 16, left: 16,
-            //   child: Container(
-            //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            //     decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(20)),
-            //     child: Text('-60% OFF', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-            //   ),
-            // ),
+            Positioned(
+              top: 16, left: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(20)),
+                child: Text('-${productList[index].discount}% OFF', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
+            ),
           
             Positioned(
               bottom: 0, left: 0, right: 0,
@@ -375,7 +375,9 @@ class HomeView extends GetView<HomeController> {
                       children: [
                         Row(
                           children: [
-                            Text('\$${productList[index].discount}', style: GoogleFonts.dmSans(color: AppColors.orange, fontWeight: FontWeight.bold, fontSize: 18)),
+                            Text(
+                                '\$${((productList[index].price ?? 0) * (1 - (productList[index].discount ?? 0) / 100)).toStringAsFixed(2)}',
+                                style: GoogleFonts.dmSans(color: AppColors.orange, fontWeight: FontWeight.bold, fontSize: 18)),
                            sw5,
                             Text(
                               '\$${productList[index].price}',
@@ -403,8 +405,6 @@ class HomeView extends GetView<HomeController> {
   }
 
   Widget _productCard({required index, required List<allProduct.Products> productList}) {
-   // final discounts = ['-30%', '-20%', '-50%'];
-   // final discount = index < 3 ? discounts[index] : null;
     return GestureDetector(
       onTap: (){
         Get.to(() => ProductDetailsView(productId: productList[index].id ?? "",));
@@ -428,6 +428,7 @@ class HomeView extends GetView<HomeController> {
                     ),
                   ),
                 ),
+
                 Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(
@@ -446,7 +447,9 @@ class HomeView extends GetView<HomeController> {
                         children: [
                           Row(
                             children: [
-                              Text('\$${ productList[index].discount}', style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold)),
+                              Text(
+                                  '\$${((productList[index].price ?? 0) * (1 - (productList[index].discount ?? 0) / 100)).toStringAsFixed(2)}',
+                                  style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold)),
                              sw5,
                               Text('\$${ productList[index].price}', style: h3.copyWith(color: AppColors.gray, fontWeight: FontWeight.bold)),
                             ],
@@ -458,6 +461,14 @@ class HomeView extends GetView<HomeController> {
                   ),
                 ),
               ],
+            ),
+            Positioned(
+              top: 16, left: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(20)),
+                child: Text('-${productList[index].discount}% OFF', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
             ),
 
             // Positioned(

@@ -4,6 +4,7 @@ import 'package:expiry_deals/app/modules/cart/views/billing_details_view.dart';
 import 'package:expiry_deals/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
+import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:get/get.dart';
@@ -47,7 +48,7 @@ class _CartViewState extends State<CartView> {
         // Calculations moved inside Obx — this is fine as long as we don't mutate observables here
         final totalPrice = controller.cartItems.fold<double>(
           0.0,
-              (sum, item) => sum + (item.product?.price ?? 0) * (item.quantity ?? 1),
+              (sum, item) => sum + ((item.product?.price ?? 0) * (1 - (item.product?.discount ?? 0) / 100) ?? 0) * (item.quantity ?? 1),
         );
 
         final checkoutItems = controller.cartItems
@@ -198,9 +199,16 @@ class _CartViewState extends State<CartView> {
                     style: h4.copyWith(fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    '\$${item.product?.price?.toStringAsFixed(2) ?? '0.00'}',
-                    style: h2.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.w700),
+                  Row(
+                    children: [
+                      Text(
+                       // '\$${item.product?.price?.toStringAsFixed(2) ?? '0.00'}',
+                        '\$${((item.product?.price ?? 0) * (1 - (item.product?.discount ?? 0) / 100)).toStringAsFixed(2)}',
+                        style: h2.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.w700),
+                      ),
+                      sw5,
+                      Text('\$${ item.product?.price}', style: h3.copyWith(color: AppColors.gray, fontWeight: FontWeight.bold)),
+                    ],
                   ),
                 ],
               ),
@@ -245,9 +253,32 @@ class _CartViewState extends State<CartView> {
         mainAxisSize: MainAxisSize.min,
         children: [
           _priceRow('Subtotal', totalPrice),
-          _priceRow('Shipping cost', 0.0),
+          // _priceRow('Shipping cost', 8.7), // still commented out — uncomment if needed
+
+          // Tax row: percentage + calculated amount
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Tax", style: h4.copyWith(color: AppColors.black)),
+                Text(
+                  '${(totalPrice * 0.0825).toStringAsFixed(2)} (8.25%)',
+                  style: h2.copyWith(color: AppColors.mainColor),
+                ),
+              ],
+            ),
+          ),
+
           const Divider(height: 28, thickness: 1),
-          _priceRow('Total', totalPrice, bold: true, large: true),
+
+          // Grand total (subtotal + tax)
+          _priceRow(
+            'Total',
+            totalPrice * 1.0825,           // or totalPrice + (totalPrice * 0.0825)
+            bold: true,
+            large: true,
+          ),
 
           const SizedBox(height: 20),
 
@@ -256,11 +287,15 @@ class _CartViewState extends State<CartView> {
             child: ElevatedButton(
               onPressed: () {
                 if (controller.cartItems.isNotEmpty) {
+                  // Option A: Pass subtotal only (most common — tax calculated later)
                   Get.to(() => BillingDetailsView(
                     authorId: controller.cartItems.first.product?.author?.id ?? "",
-                    totalPrice: totalPrice,
+                    totalPrice: totalPrice * 1.0825,           // ← subtotal here
                     items: items,
                   ));
+
+                  // Option B: If BillingDetailsView expects the final amount including tax:
+                  // totalPrice: totalPrice * 1.0825,
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -278,7 +313,8 @@ class _CartViewState extends State<CartView> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+
+          const SizedBox(height: 120),
         ],
       ),
     );

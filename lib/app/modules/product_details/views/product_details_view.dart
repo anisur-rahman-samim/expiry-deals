@@ -75,15 +75,28 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Main Product Image (Single Large Image)
-                  Container(
-                    height: 420,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(productDetails?.images[0].url ?? ""),
-                        fit: BoxFit.cover,
+                  Stack(
+                    children: [
+                      Container(
+                        height: 420,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(productDetails?.images[0].url ?? ""),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
-                    ),
+
+                      Positioned(
+                        top: 100, right: 30,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(20)),
+                          child: Text('-${productDetails?.discount}% OFF', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                        ),
+                      ),
+                    ],
                   ),
 
                   // Content Area
@@ -151,7 +164,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                         Row(
                           children: [
                             Text(
-                              '\$${productDetails?.discount}',
+                              '\$${((productDetails?.price ?? 0) * (1 - (productDetails?.discount ?? 0) / 100)).toStringAsFixed(2)}',
                               style: h2.copyWith(color: AppColors.mainColor, fontSize: 30),
                             ),
                             const SizedBox(width: 16),

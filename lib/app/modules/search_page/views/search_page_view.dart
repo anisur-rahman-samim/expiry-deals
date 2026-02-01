@@ -8,6 +8,7 @@ import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SearchPageView extends StatelessWidget {
   SearchPageView({super.key});
@@ -113,15 +114,28 @@ class SearchPageView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                  child: Image.network(
-                    product.images.isNotEmpty ? product.images[0].url ?? AppImages.noImage : AppImages.noImage,
-                    height: 140,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+            Stack(
+              children: [
+                ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                      child: Image.network(
+                        product.images.isNotEmpty ? product.images[0].url ?? AppImages.noImage : AppImages.noImage,
+                        height: 140,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+
+                Positioned(
+                  top: 16, left: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(20)),
+                    child: Text('-${product.discount}% OFF', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
                   ),
                 ),
+              ],
+            ),
             Padding(
               padding: const EdgeInsets.all(14),
               child: Column(
@@ -137,7 +151,7 @@ class SearchPageView extends StatelessWidget {
                  Row(
                    children: [
                      Text(
-                       '\$${product.discount?.toStringAsFixed(2) ?? '0.00'}',
+                       '\$${((product.price ?? 0) * (1 - (product.discount ?? 0) / 100)).toStringAsFixed(2)}',
                        style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold),
                      ),
                      sw5,

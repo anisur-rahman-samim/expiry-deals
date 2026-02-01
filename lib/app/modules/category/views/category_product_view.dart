@@ -112,6 +112,15 @@ class _CategoryProductViewState extends State<CategoryProductView> {
                   ),
                 ),
 
+                Positioned(
+                  top: 16, left: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(20)),
+                    child: Text('-${product[index].discount}% OFF', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                  ),
+                ),
+
               ],
             ),
 
@@ -132,7 +141,7 @@ class _CategoryProductViewState extends State<CategoryProductView> {
                   Row(
                     children: [
                       Text(
-                        '\$${product[index].discount.toStringAsFixed(2)}',
+                        '\$${((product[index].price ?? 0) * (1 - (product[index].discount ?? 0) / 100)).toStringAsFixed(2)}',
                         style: h3.copyWith(
                           color: AppColors.mainColor,
                           fontWeight: FontWeight.bold,
