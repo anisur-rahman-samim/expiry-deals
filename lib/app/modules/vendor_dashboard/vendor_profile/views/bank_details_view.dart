@@ -1,5 +1,7 @@
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/controllers/bank_details_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/widgets/custom_button.dart';
+import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -134,26 +136,8 @@ class BankDetailsView extends StatelessWidget {
                   ),
                 ],
               ),
-              child: ElevatedButton(
-                onPressed: controller.saveBankDetails,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.black,
-                  foregroundColor: AppColors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  elevation: 1,
-                ),
-                child: const Text(
-                  "SAVE BANK DETAILS",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.4,
-                  ),
-                ),
-              ),
+              child: Obx(() => controller.isLoading.value ? CustomLoaderButton() : CustomCenterButton(onTap: controller.addMyBankDetails,title: "SAVE BANK DETAILS", width: Get.width),)
+
             ),
           ),
         ],

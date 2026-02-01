@@ -43,55 +43,56 @@ class VendorRequestController extends GetxController {
     isLoading.value = true;
 
     try {
-      var request = http.MultipartRequest('POST', Uri.parse(Api.vendorRequest));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(Api.vendorRequest),
+      );
 
-      // Prepare JSON data part
-      final data = {
-        'name': name,
-        'email': email,
-        'shopName': shopName,
-        'location': jsonEncode({
-          'type': 'Point',
-          'coordinates': locationCoordinates, // [lng, lat]
-        }),
-      };
+      // Normal fields
+      request.fields['name'] = name;
+      request.fields['email'] = email;
+      request.fields['shopName'] = shopName;
 
-      // Add all fields
-      data.forEach((key, value) {
-        request.fields[key] = value;
+      // GeoJSON location (stringified)
+      request.fields['location'] = jsonEncode({
+        'type': 'Point',
+        'coordinates': locationCoordinates, // [lng, lat]
       });
 
-      // Add file
+      debugPrint("Request fields: ${request.fields}");
+
+      // Add document file
       if (await document.exists()) {
-        request.files.add(await http.MultipartFile.fromPath(
-          'document',
-          document.path,
-          filename: document.path.split('/').last,
-        ));
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'document',
+            document.path,
+          ),
+        );
       } else {
         Get.snackbar("Error", "Document file not found");
         return;
       }
 
       final response = await request.send();
-
       final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         Get.snackbar("Success", "Vendor request submitted successfully!");
         Get.off(() => LoginView());
       } else {
+        debugPrint("Server response: $responseBody");
         Get.snackbar(
           "Error",
-          "Failed to submit request (${response.statusCode})\n${responseBody.substring(0, 200)}...",
+          "Failed (${response.statusCode})",
         );
-        debugPrint("Server response: $responseBody");
       }
     } catch (e, stack) {
-      Get.snackbar("Error", "Something went wrong: $e");
       debugPrint("Submit error: $e\n$stack");
+      Get.snackbar("Error", "Something went wrong");
     } finally {
       isLoading.value = false;
     }
   }
+
 }
