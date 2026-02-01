@@ -45,6 +45,12 @@ class CartController extends GetxController {
 
  // List<AddToCart> get selectedItems => cartItems.where((e) => e.isSelected).toList();
 
+  String? getCartAuthorId() {
+    if (cartItems.isEmpty) return null;
+
+    return cartItems.first.product?.author?.id;
+  }
+
   // Fetch products from the server
   Future<void> fetchAddToCart() async {
     try {

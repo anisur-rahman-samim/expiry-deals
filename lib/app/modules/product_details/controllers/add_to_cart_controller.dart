@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:expiry_deals/app/modules/cart/controllers/cart_controller.dart';
 import 'package:expiry_deals/app/modules/cart/views/cart_view.dart';
 import 'package:get/get.dart';
 import 'package:expiry_deals/app/data/api.dart';
@@ -11,17 +12,31 @@ import 'package:flutter/material.dart';
 class AddToCartController extends GetxController {
   var isLoading = false.obs;
 
+  final CartController cartController = Get.put(CartController());
+
 
   // Method to add item to cart
-  Future<void> addToCart({required String productId, required int quantity, required bool isBuyNow}) async {
+  Future<void> addToCart({
+    required String productId,
+    required int quantity,
+    required bool isBuyNow,
+    required String authorId, // 🔴 pass authorId from product
+  }) async {
     try {
       isLoading(true);
 
-      // Retrieve the token from local storage
       var token = LocalStorage.getData(key: AppConstant.token);
       if (token == null || token.isEmpty) {
         Get.snackbar('Error', 'Authentication token is missing.');
         return;
+      }
+
+      // 🔍 Check existing cart author
+      String? cartAuthorId = cartController.getCartAuthorId();
+
+      // ❌ Different author → Empty cart first
+      if (cartAuthorId != null && cartAuthorId != authorId) {
+        await cartController.cartEmpty();
       }
 
       var headers = {
@@ -29,13 +44,11 @@ class AddToCartController extends GetxController {
         'Content-Type': 'application/json',
       };
 
-      // Define the request body
       var body = {
         'product': productId,
         'quantity': quantity,
       };
 
-      // API call to add to cart
       dynamic response = await BaseClient.handleResponse(
         await BaseClient.postRequest(
           api: Api.cart,
@@ -44,13 +57,13 @@ class AddToCartController extends GetxController {
         ),
       );
 
-      if (response != null) {
+      if (response != null && response['success'] == true) {
+        await cartController.fetchAddToCart();
 
-
-        if(  isBuyNow == true){
-
+        if (isBuyNow) {
           Get.to(() => CartView());
         }
+
         Get.snackbar('Success', 'Item added to cart!');
       } else {
         Get.snackbar('Error', 'Failed to add item to cart.');
@@ -61,6 +74,7 @@ class AddToCartController extends GetxController {
       isLoading(false);
     }
   }
+
 
 
 }

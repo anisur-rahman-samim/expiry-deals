@@ -259,7 +259,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                         Expanded(
                           child: InkWell(
                             onTap: () {
-                              addToCartController.addToCart(productId: productDetails?.id ?? "", quantity: quantity,isBuyNow: false);
+                              addToCartController.addToCart(productId: productDetails?.id ?? "", quantity: quantity,isBuyNow: false,authorId: productDetails?.author?.id ?? "");
                             },
                             borderRadius: BorderRadius.circular(18),
                             child: Container(
@@ -285,7 +285,8 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                         Expanded(
                           child: InkWell(
                             onTap: () {
-                              addToCartController.addToCart(productId: productDetails?.id ?? "", quantity: quantity,isBuyNow: true);
+                              addToCartController.addToCart(productId: productDetails?.id ?? "", quantity: quantity,isBuyNow: true, authorId: productDetails?.author?.id ?? ""
+                              );
 
                             },
                             borderRadius: BorderRadius.circular(18),
