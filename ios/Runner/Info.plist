@@ -27,6 +27,10 @@
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>We need your location to show nearby stores</string>
 
+    <key>GMSApiKey</key>
+    <string>AIzaSyC9cIXgAFN2LCR7mZwqBOB6ZZD8cBzCaio</string>
+
+
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>

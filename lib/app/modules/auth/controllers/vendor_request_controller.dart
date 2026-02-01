@@ -1,18 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
-import 'package:expiry_deals/common/app_color/app_colors.dart';
-import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../views/login_view.dart';  // For location selection
 
 class VendorRequestController extends GetxController {
   var isLoading = false.obs;
-  var documentFile = Rx<File?>(null); // Observable for selected document file
   var locationCoordinates = Rx<List<double>>([0.0, 0.0]); // Default to 0,0
+  var documentFile = Rx<File?>(null); // Observable for selected document file
 
   // Method to pick a document (image)
   Future<void> pickDocument() async {
@@ -22,15 +24,14 @@ class VendorRequestController extends GetxController {
     if (pickedFile != null) {
       documentFile.value = File(pickedFile.path);  // Update documentFile
     } else {
-      documentFile.value = null; // Reset the file if the user cancels the selection
+      documentFile.value = null;
     }
   }
 
-  // Method to select location (using a method to simulate a location picker)
-  Future<void> selectLocation() async {
-    // Here we use a simulated location picker. Replace this with actual location picking
-    // For now, we'll set default coordinates (e.g., coordinates for a location)
-    locationCoordinates.value = [90.407960, 23.780803]; // Example coordinates (Bangladesh)
+  // Method to select location (using Google Maps)
+  Future<void> selectLocation(LatLng selectedLocation) async {
+    // Here, we update the location coordinates to the selected point from the map
+    locationCoordinates.value = [selectedLocation.longitude, selectedLocation.latitude];
   }
 
   // Vendor request API call
@@ -38,24 +39,23 @@ class VendorRequestController extends GetxController {
     required String name,
     required String email,
     required String shopName,
-    required File document,  // file input for document
+    required File document,
     required List<double> locationCoordinates,
   }) async {
     try {
-      isLoading(true);
+      isLoading(true);  // Set loading state to true
 
-      var token = LocalStorage.getData(key: AppConstant.token);
-      if (token == null || token.isEmpty) {
-        Get.snackbar('Error', 'Authentication token is missing.');
-        
-        return;
-      }
-
+      // var token = LocalStorage.getData(key: AppConstant.token);
+      // if (token == null || token.isEmpty) {
+      //   Get.snackbar('Error', 'Authentication token is missing.');
+      //   return;
+      // }
+      //
       var headers = {
-        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
       };
+      debugPrint("this is location: ${locationCoordinates}");
 
-      // Prepare the request body (without the file)
       var body = {
         'name': name,
         'email': email,
@@ -66,36 +66,38 @@ class VendorRequestController extends GetxController {
         }),
       };
 
-      // Prepare multipart request
-      var request = http.MultipartRequest('POST', Uri.parse(Api.vendorRequest));
-      request.headers.addAll(headers);
+      // var request = http.MultipartRequest('POST', Uri.parse(Api.vendorRequest));
+      // request.headers.addAll(headers);
+      var request = http.MultipartRequest('POST', Uri.parse(Api.vendorRequest))
+        ..headers.addAll(headers)
+        ..fields['data'] = jsonEncode(body);
 
-      // Attach form fields to the request
+      // Add body fields
       body.forEach((key, value) {
         request.fields[key] = value;
       });
 
-      // Check if a document is picked and attach it to the request
+      // Add document if selected
       if (document.existsSync()) {
         request.files.add(await http.MultipartFile.fromPath('document', document.path));
       } else {
-        Get.snackbar('Error', 'Document file is missing.');
+        Get.snackbar('Error', 'Please upload a document.');
         return;
       }
 
-      // Send the request
+      // Sending the request
       var response = await request.send();
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
         Get.snackbar('Success', 'Vendor request submitted successfully!');
-        Get.to(() => LoginView());  // Navigate to login view or anywhere else after success
+        Get.to(() => LoginView());  // Navigate after success
       } else {
-        Get.snackbar('Error', 'Failed to submit vendor request. Please try again.');
+        Get.snackbar('Error', 'Failed to submit vendor request.');
       }
     } catch (e) {
       Get.snackbar('Error', 'An error occurred: $e');
     } finally {
-      isLoading(false);
+      isLoading(false);  // Set loading state to false after completion
     }
   }
 }

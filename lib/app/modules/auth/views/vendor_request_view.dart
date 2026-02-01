@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:expiry_deals/app/modules/auth/controllers/auth_controller.dart';
+import 'package:expiry_deals/app/modules/auth/views/location_picker_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
@@ -8,15 +8,19 @@ import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
 import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
-import 'package:expiry_deals/app/modules/auth/controllers/auth_controller.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../controllers/vendor_request_controller.dart';
 
 class VendorRequestView extends StatelessWidget {
-  const VendorRequestView({super.key});
+   VendorRequestView({super.key});
+
+  final VendorRequestController vendorRequestController = Get.put(VendorRequestController());
+   final TextEditingController nameController = TextEditingController();
+   final TextEditingController emailController = TextEditingController();
+   final TextEditingController shopNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +28,8 @@ class VendorRequestView extends StatelessWidget {
     final height = size.height;
     final width = size.width;
 
-    // TextEditingControllers for the form fields
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController shopNameController = TextEditingController();
 
-    final VendorRequestController vendorRequestController = Get.put(VendorRequestController());
+
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -130,6 +130,7 @@ class VendorRequestView extends StatelessWidget {
                   ),
                   sh20,
 
+
                   // Address
                   Text(
                     "Shop Name",
@@ -143,6 +144,37 @@ class VendorRequestView extends StatelessWidget {
                   ),
 
                   sh30,
+
+                  // Location picker (Google Map)
+                  GestureDetector(
+                    onTap: () async {
+
+                      LatLng selectedLocation = await showLocationPicker(context); // Implement this function for map picking
+                      vendorRequestController.selectLocation(selectedLocation);
+                    },
+                    child: Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors.grayLight.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.grayLight),
+                      ),
+                      child: Obx(() {
+                        return vendorRequestController.locationCoordinates.value != null
+                            ? GoogleMap(
+                          initialCameraPosition: CameraPosition(
+                            target: LatLng(
+                                vendorRequestController.locationCoordinates.value[0],
+                                vendorRequestController.locationCoordinates.value[1]),
+                            zoom: 10,
+                          ),
+                          onMapCreated: (GoogleMapController controller) {},
+                        )
+                            : Icon(Icons.location_on, size: 50, color: AppColors.mainColor);
+                      }),
+                    ),
+                  ),
 
                   // Document upload button with image preview
                   GestureDetector(
@@ -163,7 +195,7 @@ class VendorRequestView extends StatelessWidget {
                           child: vendorRequestController.documentFile.value != null
                               ? Image.file(
                             vendorRequestController.documentFile.value!,
-                            fit: BoxFit.fill,
+                            fit: BoxFit.cover,
                           )
                               : Icon(Icons.cloud_upload, size: 50, color: AppColors.mainColor),
                         ),
@@ -178,7 +210,7 @@ class VendorRequestView extends StatelessWidget {
                   Obx(() => vendorRequestController.isLoading.value
                       ? CustomLoaderButton()
                       : CustomCenterButton(
-                    title: "Apply",
+                    title: "Sign Up",
                     width: double.infinity,
                     onTap: () {
                       final name = nameController.text;
@@ -187,24 +219,21 @@ class VendorRequestView extends StatelessWidget {
 
                       // Check if document is selected
                       if (vendorRequestController.documentFile.value != null) {
-
+                        print("not null");
                         vendorRequestController.submitVendorRequest(
                           name: name,
                           email: email,
                           shopName: shopName,
                           document: vendorRequestController.documentFile.value!,
-                          locationCoordinates: [90.407960, 23.780803], // Example coordinates
+                          locationCoordinates: vendorRequestController.locationCoordinates.value,
                         );
-                        print("ssssssss");
                       } else {
-                        debugPrint( 'Please upload a document.');
+                        Get.snackbar('Error', 'Please upload a document.');
                       }
                     },
-                  ),),
+                  )),
 
                   sh30,
-
-                  sh50,
                 ],
               ),
             ),
@@ -212,5 +241,11 @@ class VendorRequestView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<LatLng> showLocationPicker(BuildContext context) async {
+    // Implement location picker here. You can use google_maps_flutter to show map and return selected LatLng
+    // For now, we'll simulate by returning default coordinates
+    return LatLng(23.780803, 90.407960);  // Example coordinates
   }
 }
