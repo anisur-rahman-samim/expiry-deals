@@ -18,7 +18,7 @@ class VendorProductController extends GetxController {
   }
 
   // Fetch products from the server
-  void fetchProducts() async {
+   fetchProducts() async {
     isLoading.value = true;
     try {
       String? token = LocalStorage.getData(key: AppConstant.token);
@@ -40,6 +40,31 @@ class VendorProductController extends GetxController {
         products.assignAll(MyProductModel.fromJson(response).data?.data ?? []);
       } else {
         Get.snackbar("Error", "Failed to fetch products");
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  void deleteProduct({required String productId}) async {
+    isLoading.value = true;
+    try {
+      String? token = LocalStorage.getData(key: AppConstant.token);
+      if (token == null || token.isEmpty) {
+        throw "Authentication token is missing.";
+      }
+
+
+      dynamic response = await BaseClient.handleResponse(
+        await BaseClient.deleteRequest(api: Api.deleteProduct(productId: productId),),
+      );
+
+      if (response != null && response['success'] == true) {
+        await  fetchProducts();
+        Get.snackbar("Success", "Product delete successfully");
+      } else {
+        Get.snackbar("Error", "Failed to delete product");
       }
     } catch (e) {
       Get.snackbar("Error", e.toString());

@@ -14,7 +14,9 @@ class VendorProductView extends GetView<VendorProductController> {
   @override
   Widget build(BuildContext context) {
     // Get the VendorProductController instance
-    final VendorProductController controller = Get.put(VendorProductController());
+    final VendorProductController controller = Get.put(
+      VendorProductController(),
+    );
 
     return Scaffold(
       backgroundColor: AppColors.bgColor,
@@ -40,11 +42,21 @@ class VendorProductView extends GetView<VendorProductController> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.inventory_2_outlined, size: 80, color: Colors.grey[400]),
+                    Icon(
+                      Icons.inventory_2_outlined,
+                      size: 80,
+                      color: Colors.grey[400],
+                    ),
                     sh20,
-                    Text('No products yet', style: TextStyle(fontSize: 18, color: Colors.grey[600])),
+                    Text(
+                      'No products yet',
+                      style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                    ),
                     sh10,
-                    Text('Tap + Add Product to get started', style: TextStyle(color: Colors.grey[500])),
+                    Text(
+                      'Tap + Add Product to get started',
+                      style: TextStyle(color: Colors.grey[500]),
+                    ),
                   ],
                 ),
               );
@@ -80,7 +92,10 @@ class VendorProductView extends GetView<VendorProductController> {
               icon: const Icon(Icons.add, color: Colors.white),
               label: const Text(
                 'Add Product',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -114,7 +129,9 @@ class VendorProductView extends GetView<VendorProductController> {
                   height: 140,
                   width: double.infinity,
                   child: Image.Image.network(
-                    product.images.isNotEmpty ? product.images[0].url ?? '' : '',
+                    product.images.isNotEmpty
+                        ? product.images[0].url ?? ''
+                        : '',
                     fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
@@ -122,7 +139,11 @@ class VendorProductView extends GetView<VendorProductController> {
                     },
                     errorBuilder: (_, __, ___) => Container(
                       color: Colors.grey[200],
-                      child: Icon(Icons.image, size: 60, color: Colors.grey[400]),
+                      child: Icon(
+                        Icons.image,
+                        size: 60,
+                        color: Colors.grey[400],
+                      ),
                     ),
                   ),
                 ),
@@ -130,19 +151,72 @@ class VendorProductView extends GetView<VendorProductController> {
                 Positioned(
                   top: 8,
                   right: 8,
-                  child: GestureDetector(
-                    onTap: () {
-                      Get.to(() => VendorEditProductView(productId: product.id.toString()));
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 6)],
+                  child: Image.Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Get.to(
+                            () => VendorEditProductView(
+                              productId: product.id.toString(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppColors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(color: Colors.black26, blurRadius: 6),
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.edit,
+                            size: 18,
+                            color: AppColors.mainColor,
+                          ),
+                        ),
                       ),
-                      child: Icon(Icons.edit, size: 18, color: AppColors.mainColor),
-                    ),
+                      sh5,
+                      GestureDetector(
+                        onTap: () {
+                          Get.defaultDialog(
+                            title: "Delete Product",
+                            middleText:
+                                "Are you sure you want to delete this product?",
+                            textConfirm: "Yes",
+                            textCancel: "No",
+                            confirmTextColor: Colors.white,
+                            cancelTextColor: AppColors.mainColor,
+                            buttonColor: AppColors.mainColor,
+                            onConfirm: () {
+                              Get.back(); // close dialog
+                              controller.deleteProduct(
+                                productId: product.id ?? "",
+                              );
+                            },
+                            onCancel: () {
+                              Get.back(); // optional (dialog auto closes)
+                            },
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppColors.mainColor,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(color: Colors.black26, blurRadius: 6),
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.delete,
+                            size: 18,
+                            color: AppColors.white,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
