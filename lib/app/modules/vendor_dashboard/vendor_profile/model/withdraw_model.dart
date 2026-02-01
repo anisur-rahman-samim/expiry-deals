@@ -1,0 +1,167 @@
+class WithdrawRequestModel {
+  WithdrawRequestModel({
+     this.success,
+     this.message,
+     this.data,
+  });
+
+  final bool? success;
+  final String? message;
+  final Data? data;
+
+  factory WithdrawRequestModel.fromJson(Map<String, dynamic> json){
+    return WithdrawRequestModel(
+      success: json["success"],
+      message: json["message"],
+      data: json["data"] == null ? null : Data.fromJson(json["data"]),
+    );
+  }
+
+}
+
+class Data {
+  Data({
+    required this.data,
+    required this.meta,
+  });
+
+  final List<WithdrawRequest> data;
+  final Meta? meta;
+
+  factory Data.fromJson(Map<String, dynamic> json){
+    return Data(
+      data: json["data"] == null ? [] : List<WithdrawRequest>.from(json["data"]!.map((x) => WithdrawRequest.fromJson(x))),
+      meta: json["meta"] == null ? null : Meta.fromJson(json["meta"]),
+    );
+  }
+
+}
+
+class WithdrawRequest {
+  WithdrawRequest({
+    required this.id,
+    required this.vendor,
+    required this.amount,
+    required this.status,
+    required this.isDeleted,
+    required this.bankDetails,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  final String? id;
+  final Vendor? vendor;
+  final int? amount;
+  final String? status;
+  final bool? isDeleted;
+  final BankDetails? bankDetails;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  factory WithdrawRequest.fromJson(Map<String, dynamic> json){
+    return WithdrawRequest(
+      id: json["_id"],
+      vendor: json["vendor"] == null ? null : Vendor.fromJson(json["vendor"]),
+      amount: json["amount"],
+      status: json["status"],
+      isDeleted: json["isDeleted"],
+      bankDetails: json["bankDetails"] == null ? null : BankDetails.fromJson(json["bankDetails"]),
+      createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
+      updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
+    );
+  }
+
+}
+
+class BankDetails {
+  BankDetails({
+    required this.id,
+    required this.vendor,
+    required this.accountNumber,
+    required this.routingNumber,
+    required this.bankName,
+    required this.bankHolderName,
+    required this.bankAddress,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.v,
+  });
+
+  final String? id;
+  final String? vendor;
+  final String? accountNumber;
+  final String? routingNumber;
+  final String? bankName;
+  final String? bankHolderName;
+  final String? bankAddress;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final int? v;
+
+  factory BankDetails.fromJson(Map<String, dynamic> json){
+    return BankDetails(
+      id: json["_id"],
+      vendor: json["vendor"],
+      accountNumber: json["accountNumber"],
+      routingNumber: json["routingNumber"],
+      bankName: json["bankName"],
+      bankHolderName: json["bankHolderName"],
+      bankAddress: json["bankAddress"],
+      createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
+      updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
+      v: json["__v"],
+    );
+  }
+
+}
+
+class Vendor {
+  Vendor({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.phoneNumber,
+    required this.profile,
+  });
+
+  final String? id;
+  final String? name;
+  final String? email;
+  final String? phoneNumber;
+  final String? profile;
+
+  factory Vendor.fromJson(Map<String, dynamic> json){
+    return Vendor(
+      id: json["_id"],
+      name: json["name"],
+      email: json["email"],
+      phoneNumber: json["phoneNumber"],
+      profile: json["profile"],
+    );
+  }
+
+}
+
+class Meta {
+  Meta({
+    required this.page,
+    required this.limit,
+    required this.total,
+    required this.totalPage,
+  });
+
+  final int? page;
+  final int? limit;
+  final int? total;
+  final int? totalPage;
+
+  factory Meta.fromJson(Map<String, dynamic> json){
+    return Meta(
+      page: json["page"],
+      limit: json["limit"],
+      total: json["total"],
+      totalPage: json["totalPage"],
+    );
+  }
+
+}
