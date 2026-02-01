@@ -13,7 +13,7 @@ class Api {
   static const forgetPassword = "$baseUrl/auth/forgot-password"; // done
   static const resetPassword = "$baseUrl/auth/reset-password"; // done
 
-  static const updateProfile = "$baseUrl/users/update-my-profile";  // problem with api
+  static const updateProfile = "$baseUrl/users/update-my-profile";  // done
   static const deleteProfile = "$baseUrl/users/delete-my-account"; // done
 
   //Common
@@ -43,9 +43,9 @@ class Api {
   static const myProduct = "$baseUrl/products/my-products?limit=1000000000000";//done
   static  updateProduct({required productId}) => "$baseUrl/products/$productId";
   static  deleteProduct({required productId}) => "$baseUrl/products/$productId"; // done
-  static  vendorOrder({required authorId}) => "$baseUrl/orders?author=$authorId";
-  static  deleteOrder({required orderId}) => "$baseUrl/orders/$orderId";
-  static  updateOrderStatus({required orderId}) => "$baseUrl/orders/$orderId";
+  static  vendorOrder({required authorId}) => "$baseUrl/orders?author=$authorId"; // done
+  static  deleteOrder({required orderId}) => "$baseUrl/orders/$orderId"; // no need
+  static  updateOrderStatus({required orderId}) => "$baseUrl/orders/$orderId"; // done
   static const addBankDetails = "$baseUrl/bank-details"; // done
   static const myBankDetails = "$baseUrl/bank-details/my-bank-details"; // done
   static const withdrawRequest = "$baseUrl/withdraw-request"; // done

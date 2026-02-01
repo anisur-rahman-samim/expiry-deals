@@ -3,6 +3,7 @@ import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/control
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
+import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -32,7 +33,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Upload Image(s)',
+              'Product Image',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -41,7 +42,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
             ),
             sh10,
 
-            /// IMAGE PICKER
+            /// Single Image Picker
             Obx(() => GestureDetector(
               onTap: controller.pickImage,
               child: Container(
@@ -54,36 +55,33 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
                     color: AppColors.grayLight,
                     width: 2,
                   ),
-                  image: controller.selectedImage.isNotEmpty
+                  image: controller.selectedImage.value != null
                       ? DecorationImage(
-                    image:
-                    FileImage(controller.selectedImage.first),
+                    image: FileImage(controller.selectedImage.value!),
                     fit: BoxFit.cover,
                   )
                       : null,
                 ),
-                child: controller.selectedImage.isEmpty
+                child: controller.selectedImage.value == null
                     ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.add_a_photo_outlined,
                       size: 48,
-                      color: AppColors.mainColor
-                          .withValues(alpha: 0.6),
+                      color: AppColors.mainColor.withOpacity(0.6),
                     ),
                     sh10,
                     Text(
-                      'Upload',
+                      'Upload Product Image',
                       style: TextStyle(
                         color: AppColors.mainColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
-                      'Tap to select image',
-                      style:
-                      TextStyle(color: AppColors.hintColor),
+                      'Tap to select one image',
+                      style: TextStyle(color: AppColors.hintColor),
                     ),
                   ],
                 )
@@ -93,7 +91,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
 
             sh20,
 
-            /// ITEM NAME
+            /// Item Name
             _buildLabel('Item Name'),
             _inputField(
               hint: 'e.g., Wireless Bluetooth Earbuds',
@@ -102,7 +100,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
 
             sh16,
 
-            /// ITEM DETAILS
+            /// Item Details
             _buildLabel('Item Details'),
             _inputField(
               hint: 'Describe your product...',
@@ -112,22 +110,18 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
 
             sh16,
 
-            /// CATEGORY
+            /// Category
             _buildLabel('Category'),
             Obx(() {
               final catCtrl = controller.categoryController;
 
-              // ✅ show loader only while loading
               if (catCtrl.isLoading.value) {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 10),
-                  child: Center(
-                    child: CircularProgressIndicator(color: AppColors.mainColor),
-                  ),
+                  child: Center(child: CircularProgressIndicator()),
                 );
               }
 
-              // ✅ if not loading but empty → show retry UI (NOT loader)
               if (catCtrl.categories.isEmpty) {
                 return Container(
                   padding: const EdgeInsets.all(14),
@@ -138,12 +132,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
                   ),
                   child: Row(
                     children: [
-                      Expanded(
-                        child: Text(
-                          "No categories found",
-                          style: TextStyle(color: AppColors.textColor),
-                        ),
-                      ),
+                      Expanded(child: Text("No categories found", style: TextStyle(color: AppColors.textColor))),
                       TextButton(
                         onPressed: () => catCtrl.fetchCategories(),
                         child: const Text("Retry"),
@@ -153,7 +142,6 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
                 );
               }
 
-              // ✅ make sure selectedCategoryId is valid
               final validSelected = catCtrl.categories.any((c) => c.id == controller.selectedCategoryId.value);
               final dropdownValue = validSelected ? controller.selectedCategoryId.value : (catCtrl.categories.first.id ?? '');
 
@@ -168,9 +156,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
                 }).toList(),
                 onChanged: (value) {
                   if (value == null) return;
-
                   controller.selectedCategoryId.value = value;
-
                   final selected = catCtrl.categories.firstWhereOrNull((c) => c.id == value);
                   controller.selectedCategoryName.value = selected?.name ?? '';
                 },
@@ -179,7 +165,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
 
             sh16,
 
-            /// PRICE
+            /// Price
             _buildLabel('Item Price'),
             _inputField(
               hint: '0.00',
@@ -189,7 +175,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
 
             sh16,
 
-            /// QUANTITY
+            /// Quantity
             _buildLabel('Item Quantity'),
             _inputField(
               hint: '1',
@@ -199,11 +185,10 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
 
             sh16,
 
-            /// EXPIRY DATE + AUTO DAYS
+            /// Expiry Date + Days
             _buildLabel('Expiry Date'),
             Row(
               children: [
-                /// DATE PICKER
                 Expanded(
                   child: GestureDetector(
                     onTap: () async {
@@ -211,49 +196,35 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
                         context: context,
                         initialDate: DateTime.now().add(const Duration(days: 1)),
                         firstDate: DateTime.now(),
-                        lastDate:
-                        DateTime.now().add(const Duration(days: 3650)),
+                        lastDate: DateTime.now().add(const Duration(days: 3650)),
                       );
 
                       if (pickedDate != null) {
                         controller.expiryDate.value = pickedDate;
 
                         final today = DateTime.now();
-                        final days = pickedDate
-                            .difference(
-                          DateTime(today.year, today.month, today.day),
-                        )
-                            .inDays;
-
+                        final days = pickedDate.difference(DateTime(today.year, today.month, today.day)).inDays;
                         controller.expiryDays.value = days.toString();
                       }
                     },
                     child: AbsorbPointer(
                       child: Obx(() {
-                        expiryDateController.text =
-                        controller.expiryDate.value == null
+                        expiryDateController.text = controller.expiryDate.value == null
                             ? ''
-                            : DateFormat('dd MMM yyyy')
-                            .format(controller.expiryDate.value!);
+                            : DateFormat('dd MMM yyyy').format(controller.expiryDate.value!);
 
                         return TextField(
                           controller: expiryDateController,
-                          decoration:
-                          _inputDecoration('Select expiry date'),
+                          decoration: _inputDecoration('Select expiry date'),
                         );
                       }),
                     ),
                   ),
                 ),
-
                 sw14,
-
-                /// AUTO DAYS (READ ONLY)
                 Expanded(
                   child: Obx(() {
-                    expiryDaysController.text =
-                        controller.expiryDays.value;
-
+                    expiryDaysController.text = controller.expiryDays.value;
                     return TextField(
                       controller: expiryDaysController,
                       enabled: false,
@@ -266,7 +237,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
 
             sh16,
 
-            /// DISCOUNT
+            /// Discount
             _buildLabel('Discount %'),
             _inputField(
               hint: '0',
@@ -276,16 +247,14 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
 
             sh40,
 
-            /// SAVE BUTTON
+            /// Save Button
             Obx(() => controller.isLoading.value
-                ? const Center(child: CircularProgressIndicator())
+                ? CustomLoaderButton()
                 : CustomCenterButton(
-                    title: "Save Product",
-                    width: Get.width,
-                    onTap: () {
-                      controller.addProduct(); // Call the addProduct function
-                    },
-                  )),
+              title: "Save Product",
+              width: Get.width,
+              onTap: controller.addProduct,
+            )),
 
             sh30,
           ],
@@ -294,7 +263,6 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
     );
   }
 
-  /// LABEL
   Widget _buildLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -309,7 +277,6 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
     );
   }
 
-  /// INPUT FIELD
   Widget _inputField({
     required String hint,
     int maxLines = 1,
@@ -324,15 +291,13 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
     );
   }
 
-  /// COMMON DECORATION
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
       hintStyle: TextStyle(color: AppColors.hintColor),
       filled: true,
       fillColor: Colors.white,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: AppColors.grayLight),
