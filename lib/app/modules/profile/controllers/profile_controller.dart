@@ -34,6 +34,8 @@ class ProfileController extends GetxController {
 
       if (response != null && response['success'] == true) {
         profileData.value = ProfileModel.fromJson(response);
+
+        LocalStorage.saveData(key: AppConstant.userId, data: response["data"]["_id"]);
       } else {
         Get.snackbar("Error", "Failed to fetch profile data.");
       }

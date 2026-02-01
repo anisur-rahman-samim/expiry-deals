@@ -1,41 +1,18 @@
-// vendor_order_controller.dart
-
+import 'dart:convert';
+import 'package:expiry_deals/app/data/api.dart';
+import 'package:expiry_deals/common/app_constant/app_constant.dart';
+import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-class OrderItem {
-  final String name;
-  final double price;
-  final int quantity;
-
-  OrderItem({required this.name, required this.price, required this.quantity});
-}
-
-class Order {
-  String id;
-  String status; // pending, processing, shipped, delivered, cancelled
-  DateTime orderDate;
-  List<OrderItem> items;
-  double total;
-  double shippingFee;
-  double tax;
-  String shippingAddress;
-
-  Order({
-    required this.id,
-    required this.status,
-    required this.orderDate,
-    required this.items,
-    required this.total,
-    required this.shippingFee,
-    required this.tax,
-    required this.shippingAddress,
-  });
-}
+import '../model/my_vendor_order_model.dart';
 
 class VendorOrderController extends GetxController {
   var isLoading = true.obs;
-  var orders = <Order>[].obs;
+  var orders = <MyVendorOrder>[].obs;
+  var errorMessage = ''.obs;
 
   @override
   void onInit() {
@@ -43,132 +20,151 @@ class VendorOrderController extends GetxController {
     fetchOrders();
   }
 
+  /// Fetch all vendor orders
   Future<void> fetchOrders() async {
     try {
       isLoading.value = true;
+      errorMessage.value = '';
 
-      // Simulate API delay
-      await Future.delayed(const Duration(seconds: 1));
+      String? token = LocalStorage.getData(key: AppConstant.token);
+      if (token == null || token.isEmpty) {
+        errorMessage.value = "Authentication token is missing.";
+        return;
+      }
 
-      // Dummy data - replace with real API call later
-      orders.assignAll([
-        Order(
-          id: 'ORD-2025-001',
-          status: 'pending',
-          orderDate: DateTime.now().subtract(const Duration(hours: 2)),
-          items: [
-            OrderItem(name: 'Wireless Bluetooth Earbuds', price: 49.99, quantity: 2),
-            OrderItem(name: 'Over-Ear Headphones', price: 89.99, quantity: 1),
-          ],
-          total: 189.97,
-          shippingFee: 8.99,
-          tax: 12.00,
-          shippingAddress: '123 Main St, New York, NY 10001',
-        ),
-        Order(
-          id: 'ORD-2025-002',
-          status: 'processing',
-          orderDate: DateTime.now().subtract(const Duration(days: 1)),
-          items: [
-            OrderItem(name: 'Floral Summer Maxi Dress', price: 74.99, quantity: 1),
-          ],
-          total: 82.99,
-          shippingFee: 5.00,
-          tax: 3.00,
-          shippingAddress: '456 Oak Avenue, Los Angeles, CA 90210',
-        ),
-        Order(
-          id: 'ORD-2025-003',
-          status: 'shipped',
-          orderDate: DateTime.now().subtract(const Duration(days: 2)),
-          items: [
-            OrderItem(name: 'Men\'s Slim Fit Denim Jacket', price: 89.99, quantity: 1),
-            OrderItem(name: 'High-Waist Mom Jeans', price: 54.99, quantity: 1),
-          ],
-          total: 152.98,
-          shippingFee: 0.00,
-          tax: 8.00,
-          shippingAddress: '789 Pine Road, Chicago, IL 60601',
-        ),
-        Order(
-          id: 'ORD-2025-004',
-          status: 'delivered',
-          orderDate: DateTime.now().subtract(const Duration(days: 5)),
-          items: [
-            OrderItem(name: 'Leather Crossbody Bag', price: 120.00, quantity: 1),
-          ],
-          total: 130.00,
-          shippingFee: 10.00,
-          tax: 0.00,
-          shippingAddress: '321 Elm Street, Miami, FL 33101',
-        ),
-        Order(
-          id: 'ORD-2025-005',
-          status: 'cancelled',
-          orderDate: DateTime.now().subtract(const Duration(hours: 6)),
-          items: [
-            OrderItem(name: 'Classic White Sneakers', price: 79.99, quantity: 1),
-          ],
-          total: 0.00,
-          shippingFee: 0.00,
-          tax: 0.00,
-          shippingAddress: '555 Cancelled Ave, Cancel City',
-        ),
-        Order(
-          id: 'ORD-2025-005',
-          status: 'cancelled',
-          orderDate: DateTime.now().subtract(const Duration(hours: 6)),
-          items: [
-            OrderItem(name: 'Classic White Sneakers', price: 79.99, quantity: 1),
-          ],
-          total: 0.00,
-          shippingFee: 0.00,
-          tax: 0.00,
-          shippingAddress: '555 Cancelled Ave, Cancel City',
-        ),
-        Order(
-          id: 'ORD-2025-005',
-          status: 'cancelled',
-          orderDate: DateTime.now().subtract(const Duration(hours: 6)),
-          items: [
-            OrderItem(name: 'Classic White Sneakers', price: 79.99, quantity: 1),
-          ],
-          total: 0.00,
-          shippingFee: 0.00,
-          tax: 0.00,
-          shippingAddress: '555 Cancelled Ave, Cancel City',
-        ),
-        Order(
-          id: 'ORD-2025-005',
-          status: 'cancelled',
-          orderDate: DateTime.now().subtract(const Duration(hours: 6)),
-          items: [
-            OrderItem(name: 'Classic White Sneakers', price: 79.99, quantity: 1),
-          ],
-          total: 0.00,
-          shippingFee: 0.00,
-          tax: 0.00,
-          shippingAddress: '555 Cancelled Ave, Cancel City',
-        ),
-      ]);
+      String? userId = LocalStorage.getData(key: AppConstant.userId);
+      if (userId == null || userId.isEmpty) {
+        errorMessage.value = "User ID is missing.";
+        return;
+      }
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+
+      final response = await http.get(
+        Uri.parse(Api.vendorOrder(authorId: userId)),
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        final model = MyVendorOrderModel.fromJson(jsonDecode(response.body));
+
+        if (model.success == true && model.data != null) {
+          orders.assignAll(model.data!.data);
+        } else {
+          errorMessage.value = model.message ?? "Failed to load orders";
+        }
+      } else {
+        errorMessage.value = "Server error: ${response.statusCode}";
+      }
+    } catch (e) {
+      errorMessage.value = "Something went wrong: $e";
     } finally {
       isLoading.value = false;
     }
   }
 
-  // Optional: Refresh orders (for pull-to-refresh)
+  /// Pull-to-refresh support
   Future<void> refreshOrders() async {
     await fetchOrders();
-    Get.snackbar('Refreshed', 'Order list updated', backgroundColor: Colors.green.withValues(alpha: 0.2),);
   }
 
-  // Optional: Update status via API (call this from details view)
-  Future<void> updateOrderStatus(String orderId, String newStatus) async {
-    final order = orders.firstWhere((o) => o.id == orderId);
-    order.status = newStatus.toLowerCase();
-    orders.refresh(); // Trigger UI update
+  /// Update order status (PATCH request)
+  Future<bool> updateOrderStatus(String orderId, String newStatus) async {
+    try {
+      String? token = LocalStorage.getData(key: AppConstant.token);
+      if (token == null || token.isEmpty) {
+        Get.snackbar('Error', 'Authentication token is missing');
+        return false;
+      }
 
-    // TODO: Call your real API here
-    // await ApiService.updateOrderStatus(orderId, newStatus);
+      if (orderId.isEmpty) {
+        Get.snackbar('Error', 'Order ID is missing');
+        return false;
+      }
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+
+      // Normalize status to match backend expected values
+      String backendStatus = newStatus.toLowerCase();
+      // You can add mapping if frontend uses different casing/names
+      // Example: if (newStatus == 'Delivered') backendStatus = 'delivered';
+
+
+
+      final body = jsonEncode({
+        "status": backendStatus,
+      });
+
+      final response = await http.patch(
+        Uri.parse(Api.updateOrderStatus(orderId: orderId)),
+        headers: headers,
+        body: body,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print(response.statusCode);
+        Get.back();
+        // Update local list
+        final index = orders.indexWhere((o) => o.id == orderId);
+        if (index != -1) {
+          final updatedOrder = orders[index];
+          // Create updated copy (immutable way)
+          orders[index] = MyVendorOrder(
+            billingDetails: updatedOrder.billingDetails,
+            id: updatedOrder.id,
+            user: updatedOrder.user,
+            author: updatedOrder.author,
+            items: updatedOrder.items,
+            totalPrice: updatedOrder.totalPrice,
+            status: backendStatus, // update status
+            isPaid: updatedOrder.isPaid,
+            isDeleted: updatedOrder.isDeleted,
+            datumId: updatedOrder.datumId,
+            tnxId: updatedOrder.tnxId,
+            createdAt: updatedOrder.createdAt,
+            updatedAt: DateTime.now(), // approximate
+          );
+          orders.refresh();
+        }
+
+        Get.snackbar(
+          'Success',
+          'Order status updated to ${newStatus.capitalizeFirst}',
+          backgroundColor: Colors.green.withOpacity(0.15),
+          colorText: Colors.green[800],
+        );
+
+        return true;
+      } else {
+        final errorBody = jsonDecode(response.body);
+        Get.snackbar(
+          'Failed',
+          errorBody['message'] ?? 'Failed to update status (${response.statusCode})',
+          backgroundColor: Colors.red.withOpacity(0.15),
+          colorText: Colors.red[800],
+        );
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to update status: $e');
+      return false;
+    }
+  }
+
+  // Helper methods
+  String formatDate(DateTime? date) {
+    if (date == null) return '—';
+    return DateFormat('dd MMM yyyy • hh:mm a').format(date);
+  }
+
+  String getStatusDisplay(String? status) {
+    if (status == null) return 'Unknown';
+    return status.capitalizeFirst ?? status;
   }
 }
