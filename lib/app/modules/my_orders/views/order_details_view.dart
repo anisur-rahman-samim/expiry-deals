@@ -119,7 +119,7 @@ class OrderDetailsView extends StatelessWidget {
                   ],
                 ),
               ),
-              Text('\$${(item.product!.price! * item.quantity!).toStringAsFixed(2)}', style: h3.copyWith(fontWeight: FontWeight.w600)),
+              Text('\$${(item.price! * item.quantity!).toStringAsFixed(2)}', style: h3.copyWith(fontWeight: FontWeight.w600)),
             ],
           );
         },
@@ -130,7 +130,20 @@ class OrderDetailsView extends StatelessWidget {
     return _card(
       Column(
         children: [
-        //  _priceRow('Subtotal', subtotal),
+        //  _priceRow('Tax', "8.25%"),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Tax", style: h4.copyWith(color: AppColors.black)),
+                Text(
+                  '8.25%',
+                  style: h2.copyWith(color: AppColors.mainColor),
+                ),
+              ],
+            ),
+          ),
           _priceRow('Total', order.totalPrice!, bold: true, color: AppColors.mainColor),
         ],
       ),

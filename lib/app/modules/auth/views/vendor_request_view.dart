@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:expiry_deals/app/modules/auth/views/location_picker_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
@@ -13,23 +12,22 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/vendor_request_controller.dart';
+import 'location_picker_view.dart';
 
 class VendorRequestView extends StatelessWidget {
-   VendorRequestView({super.key});
+  VendorRequestView({super.key});
 
   final VendorRequestController vendorRequestController = Get.put(VendorRequestController());
-   final TextEditingController nameController = TextEditingController();
-   final TextEditingController emailController = TextEditingController();
-   final TextEditingController shopNameController = TextEditingController();
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController shopNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final height = size.height;
     final width = size.width;
-
-
-
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -61,35 +59,23 @@ class VendorRequestView extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Content inside header
                 Padding(
                   padding: EdgeInsets.all(50),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       sh30,
-                      // Logo
                       Image.asset(AppImages.logoIcon, height: 70),
                       sh30,
-
-                      // Title
                       Text(
                         "Apply for Vendor",
-                        style: h1.copyWith(
-                          color: AppColors.white,
-                          fontSize: 30,
-                        ),
+                        style: h1.copyWith(color: AppColors.white, fontSize: 30),
                         textAlign: TextAlign.center,
                       ),
                       sh10,
-
-                      // Subtitle
                       Text(
                         "Join smart and secure selling made for you.",
-                        style: h2.copyWith(
-                          color: AppColors.white,
-                          fontSize: 14,
-                        ),
+                        style: h2.copyWith(color: AppColors.white, fontSize: 14),
                       ),
                     ],
                   ),
@@ -99,16 +85,12 @@ class VendorRequestView extends StatelessWidget {
 
             sh30,
 
-            // White Card Form
             Padding(
               padding: EdgeInsets.symmetric(horizontal: width * 0.1),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Full Name",
-                    style: h4.copyWith(fontWeight: FontWeight.w600),
-                  ),
+                  Text("Full Name", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   CustomTextField(
                     hintText: "Enter Your Name",
@@ -117,11 +99,7 @@ class VendorRequestView extends StatelessWidget {
                   ),
                   sh20,
 
-                  // Email Field
-                  Text(
-                    "Email Address",
-                    style: h4.copyWith(fontWeight: FontWeight.w600),
-                  ),
+                  Text("Email Address", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   CustomTextField(
                     hintText: "Enter Your Email",
@@ -130,110 +108,165 @@ class VendorRequestView extends StatelessWidget {
                   ),
                   sh20,
 
-
-                  // Address
-                  Text(
-                    "Shop Name",
-                    style: h4.copyWith(fontWeight: FontWeight.w600),
-                  ),
+                  Text("Shop Name", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   CustomTextField(
                     hintText: "Enter Your Shop Name",
                     controller: shopNameController,
                     width: Get.width,
                   ),
-
                   sh30,
 
-                  // Location picker (Google Map)
+                  // Location Preview + Picker
+                  Text("Shop Location", style: h4.copyWith(fontWeight: FontWeight.w600)),
+                  sh8,
                   GestureDetector(
                     onTap: () async {
+                      final LatLng? picked = await Get.to(
+                            () => LocationPickerPage(
+                          initialPosition: vendorRequestController.locationCoordinates.value[0] != 0.0 &&
+                              vendorRequestController.locationCoordinates.value[1] != 0.0
+                              ? LatLng(
+                            vendorRequestController.locationCoordinates.value[1], // lat
+                            vendorRequestController.locationCoordinates.value[0], // lng
+                          )
+                              : null,
+                        ),
+                      );
 
-                      LatLng selectedLocation = await showLocationPicker(context); // Implement this function for map picking
-                      vendorRequestController.selectLocation(selectedLocation);
+                      if (picked != null) {
+                        vendorRequestController.selectLocation(picked);
+                      }
                     },
                     child: Container(
                       height: 200,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: AppColors.grayLight.withValues(alpha: 0.1),
+                        color: AppColors.grayLight.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: AppColors.grayLight),
                       ),
                       child: Obx(() {
-                        return vendorRequestController.locationCoordinates.value != null
+                        final coords = vendorRequestController.locationCoordinates.value;
+                        final hasLocation = coords[0] != 0.0 && coords[1] != 0.0;
+
+                        return hasLocation
                             ? GoogleMap(
                           initialCameraPosition: CameraPosition(
-                            target: LatLng(
-                                vendorRequestController.locationCoordinates.value[0],
-                                vendorRequestController.locationCoordinates.value[1]),
-                            zoom: 10,
+                            target: LatLng(coords[1], coords[0]), // lat, lng
+                            zoom: 15,
                           ),
-                          onMapCreated: (GoogleMapController controller) {},
+                          markers: {
+                            Marker(
+                              markerId: const MarkerId('shop'),
+                              position: LatLng(coords[1], coords[0]),
+                            ),
+                          },
+                          zoomControlsEnabled: false,
+                          myLocationButtonEnabled: false,
+                          onMapCreated: (controller) {},
                         )
-                            : Icon(Icons.location_on, size: 50, color: AppColors.mainColor);
+                            : const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.location_on, size: 50, color: AppColors.mainColor),
+                              SizedBox(height: 8),
+                              Text("Tap to select location"),
+                            ],
+                          ),
+                        );
                       }),
                     ),
                   ),
 
-                  // Document upload button with image preview
+                  sh20,
+
+                  // Document Upload
+                  Text("Upload Document", style: h4.copyWith(fontWeight: FontWeight.w600)),
+                  sh8,
                   GestureDetector(
-                    onTap: () async {
-                      // Call the pickDocument method in the controller
-                      await vendorRequestController.pickDocument();
-                    },
+                    onTap: () => vendorRequestController.pickDocument(),
                     child: Obx(() {
+                      final file = vendorRequestController.documentFile.value;
                       return Container(
                         height: 150,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: AppColors.grayLight.withValues(alpha: 0.1),
+                          color: AppColors.grayLight.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: AppColors.grayLight),
                         ),
-                        child: Center(
-                          child: vendorRequestController.documentFile.value != null
-                              ? Image.file(
-                            vendorRequestController.documentFile.value!,
-                            fit: BoxFit.cover,
-                          )
-                              : Icon(Icons.cloud_upload, size: 50, color: AppColors.mainColor),
+                        child: file != null
+                            ? ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.file(file, fit: BoxFit.cover),
+                        )
+                            : const Center(
+                          child: Icon(Icons.cloud_upload, size: 50, color: AppColors.mainColor),
                         ),
                       );
                     }),
                   ),
 
-                  // Spacer
-                  sh20,
+                  Obx(() {
+                    final file = vendorRequestController.documentFile.value;
+                    if (file != null) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          file.path.split('/').last,
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }),
 
-                  // Sign Up Button
-                  Obx(() => vendorRequestController.isLoading.value
-                      ? CustomLoaderButton()
-                      : CustomCenterButton(
-                    title: "Sign Up",
-                    width: double.infinity,
-                    onTap: () {
-                      final name = nameController.text;
-                      final email = emailController.text;
-                      final shopName = shopNameController.text;
+                  sh30,
 
-                      // Check if document is selected
-                      if (vendorRequestController.documentFile.value != null) {
-                        print("not null");
+                  // Submit Button
+                  Obx(
+                        () => vendorRequestController.isLoading.value
+                        ? const CustomLoaderButton()
+                        : CustomCenterButton(
+                      title: "Submit Request",
+                      width: double.infinity,
+                      onTap: () {
+                        final name = nameController.text.trim();
+                        final email = emailController.text.trim();
+                        final shopName = shopNameController.text.trim();
+
+                        if (name.isEmpty || email.isEmpty || shopName.isEmpty) {
+                          Get.snackbar("Error", "Please fill all fields");
+                          return;
+                        }
+
+                        final coords = vendorRequestController.locationCoordinates.value;
+                        if (coords[0] == 0.0 && coords[1] == 0.0) {
+                          Get.snackbar("Error", "Please select a location");
+                          return;
+                        }
+
+                        if (vendorRequestController.documentFile.value == null) {
+                          Get.snackbar("Error", "Please upload a document");
+                          return;
+                        }
+
                         vendorRequestController.submitVendorRequest(
                           name: name,
                           email: email,
                           shopName: shopName,
                           document: vendorRequestController.documentFile.value!,
-                          locationCoordinates: vendorRequestController.locationCoordinates.value,
+                          locationCoordinates: coords,
                         );
-                      } else {
-                        Get.snackbar('Error', 'Please upload a document.');
-                      }
-                    },
-                  )),
+                      },
+                    ),
+                  ),
 
-                  sh30,
+                  sh40,
                 ],
               ),
             ),
@@ -241,11 +274,5 @@ class VendorRequestView extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<LatLng> showLocationPicker(BuildContext context) async {
-    // Implement location picker here. You can use google_maps_flutter to show map and return selected LatLng
-    // For now, we'll simulate by returning default coordinates
-    return LatLng(23.780803, 90.407960);  // Example coordinates
   }
 }

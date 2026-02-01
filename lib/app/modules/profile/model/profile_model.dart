@@ -68,7 +68,7 @@ class Data {
     final dynamic country;
     final dynamic zipCode;
     final bool? isDeleted;
-    final int? balance;
+    final dynamic balance;
     final dynamic expireAt;
     final DateTime? createdAt;
     final DateTime? updatedAt;
