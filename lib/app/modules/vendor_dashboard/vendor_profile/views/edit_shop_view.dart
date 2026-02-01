@@ -70,7 +70,7 @@ class EditShopView extends GetView {
                   ),
                 ],
               ),
-              child: CustomCenterButton(onTap: controller.saveShop,title: "SAVE CHANGES", width: Get.width),
+              child: CustomCenterButton(onTap: controller.updateShop,title: "SAVE CHANGES", width: Get.width),
             ),
           ),
 
