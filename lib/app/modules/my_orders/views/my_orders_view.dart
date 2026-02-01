@@ -14,10 +14,11 @@ class MyOrdersView extends GetView<MyOrdersController> {
   @override
   Widget build(BuildContext context) {
     Get.put(MyOrdersController());
+
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       appBar: AppBar(
-        title: Text('My Orders',  style: h2.copyWith(fontSize: 18)),
+        title: Text('My Orders', style: h2.copyWith(fontSize: 18)),
         centerTitle: true,
         backgroundColor: AppColors.bgColor,
         elevation: 0,
@@ -31,7 +32,7 @@ class MyOrdersView extends GetView<MyOrdersController> {
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.grayLight.withValues(alpha: 0.3),
+                color: AppColors.grayLight.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: TabBar(
@@ -46,7 +47,7 @@ class MyOrdersView extends GetView<MyOrdersController> {
                 tabs: const [
                   Tab(text: 'All'),
                   Tab(text: 'Pending'),
-                  Tab(text: 'Processing'),
+                  Tab(text: 'Ongoing'),
                   Tab(text: 'Delivered'),
                   Tab(text: 'Cancelled'),
                 ],
@@ -63,7 +64,7 @@ class MyOrdersView extends GetView<MyOrdersController> {
                   children: [
                     _buildList(controller.allOrders),
                     _buildList(controller.pendingOrders),
-                    _buildList(controller.processingOrders),
+                    _buildList(controller.ongoingOrders),
                     _buildList(controller.deliveredOrders),
                     _buildList(controller.cancelledOrders),
                   ],
@@ -76,24 +77,28 @@ class MyOrdersView extends GetView<MyOrdersController> {
     );
   }
 
-  // Build List of Orders based on the selected tab
   Widget _buildList(List<MyOrder> orders) {
     if (orders.isEmpty) {
       return RefreshIndicator(
         onRefresh: controller.fetchOrders,
-        child: ListView(physics: const AlwaysScrollableScrollPhysics(), children: [
-          SizedBox(height: Get.height * 0.2),
-          Center(
-            child: Column(
-              children: [
-                Icon(Icons.shopping_bag_outlined, size: 80, color: AppColors.gray),
-                const SizedBox(height: 16),
-                Text('No orders here', style: h2.copyWith(color: AppColors.textColor)),
-                Text('Time to start shopping!', style: h4.copyWith(color: AppColors.hintColor)),
-              ],
+        color: AppColors.mainColor,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(height: Get.height * 0.2),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.shopping_bag_outlined, size: 80, color: AppColors.gray),
+                  const SizedBox(height: 16),
+                  Text('No orders here', style: h2.copyWith(color: AppColors.textColor)),
+                  Text('Time to start shopping!', style: h4.copyWith(color: AppColors.hintColor)),
+                ],
+              ),
             ),
-          ),
-        ]),
+          ],
+        ),
       );
     }
 
@@ -108,16 +113,23 @@ class MyOrdersView extends GetView<MyOrdersController> {
     );
   }
 
-  // Build individual Order Card
   Widget _buildOrderCard(MyOrder order) {
     final color = _getStatusColor(order.status);
+    final statusText = _getStatusDisplay(order.status);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.grayLight),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -130,22 +142,44 @@ class MyOrdersView extends GetView<MyOrdersController> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Order ${order.datumId}', style: h3.copyWith(fontWeight: FontWeight.w600)),
+                  Text(
+                    'Order ${order.datumId ?? order.id?.substring(order.id!.length - 8) ?? '—'}',
+                    style: h3.copyWith(fontWeight: FontWeight.w600),
+                  ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(20), ),
-                    child: Text(order.status!.capitalizeFirst!, style: GoogleFonts.dmSans(color: color, fontWeight: FontWeight.w600, fontSize: 12)),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      statusText,
+                      style: GoogleFonts.dmSans(
+                        color: color,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
-              Text(DateFormat('dd MMM yyyy • hh:mm a').format(order.createdAt!), style: h5.copyWith(color: AppColors.hintColor)),
+              Text(
+                DateFormat('dd MMM yyyy • hh:mm a').format(order.createdAt!),
+                style: h5.copyWith(color: AppColors.hintColor),
+              ),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('${order.items.length} items', style: h4),
-                  Text('\$${order.totalPrice?.toStringAsFixed(2) }', style: h1.copyWith(color: AppColors.mainColor,fontSize: 20)),
+                  Text(
+                    '${order.items.length} item${order.items.length != 1 ? 's' : ''}',
+                    style: h4,
+                  ),
+                  Text(
+                    '\$${order.totalPrice?.toStringAsFixed(2) ?? '0.00'}',
+                    style: h1.copyWith(color: AppColors.mainColor, fontSize: 20),
+                  ),
                 ],
               ),
             ],
@@ -155,14 +189,34 @@ class MyOrdersView extends GetView<MyOrdersController> {
     );
   }
 
-  // Get the status color based on order status
   Color _getStatusColor(String? status) {
     switch (status?.toLowerCase()) {
-      case 'delivered': return AppColors.green;
+      case 'delivered':
+        return AppColors.green;
+      case 'ongoing':
+        return Colors.blue;
       case 'pending':
-      case 'processing': return AppColors.orange;
-      case 'cancelled': return AppColors.red;
-      default: return AppColors.gray;
+        return AppColors.orange;
+      case 'cancelled':
+        return AppColors.red;
+      default:
+        return AppColors.gray;
+    }
+  }
+
+  String _getStatusDisplay(String? status) {
+    if (status == null) return 'Unknown';
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'Pending';
+      case 'ongoing':
+        return 'Ongoing';
+      case 'delivered':
+        return 'Delivered';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status.capitalizeFirst ?? status;
     }
   }
 }

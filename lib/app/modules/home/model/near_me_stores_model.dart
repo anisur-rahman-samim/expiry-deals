@@ -1,8 +1,8 @@
 class NearMeStoresModel {
   NearMeStoresModel({
-    required this.success,
-    required this.message,
-    required this.data,
+     this.success,
+     this.message,
+     this.data,
   });
 
   final bool? success;
@@ -55,16 +55,14 @@ class NearMeStores {
     required this.createdAt,
     required this.updatedAt,
     required this.v,
-    required this.dist,
-    required this.distanceKm,
   });
 
   final String? id;
   final String? name;
-  final dynamic description;
-  final dynamic address;
-  final dynamic openingHours;
-  final dynamic openingDays;
+  final String? description;
+  final String? address;
+  final String? openingHours;
+  final String? openingDays;
   final String? logo;
   final String? banner;
   final String? document;
@@ -75,8 +73,6 @@ class NearMeStores {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final int? v;
-  final Dist? dist;
-  final double? distanceKm;
 
   factory NearMeStores.fromJson(Map<String, dynamic> json){
     return NearMeStores(
@@ -96,8 +92,6 @@ class NearMeStores {
       createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
       updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
       v: json["__v"],
-      dist: json["dist"] == null ? null : Dist.fromJson(json["dist"]),
-      distanceKm: json["distanceKm"],
     );
   }
 
@@ -115,8 +109,8 @@ class Author {
   final String? id;
   final String? name;
   final String? email;
-  final dynamic phoneNumber;
-  final dynamic profile;
+  final String? phoneNumber;
+  final String? profile;
 
   factory Author.fromJson(Map<String, dynamic> json){
     return Author(
@@ -125,21 +119,6 @@ class Author {
       email: json["email"],
       phoneNumber: json["phoneNumber"],
       profile: json["profile"],
-    );
-  }
-
-}
-
-class Dist {
-  Dist({
-    required this.calculated,
-  });
-
-  final double? calculated;
-
-  factory Dist.fromJson(Map<String, dynamic> json){
-    return Dist(
-      calculated: json["calculated"],
     );
   }
 

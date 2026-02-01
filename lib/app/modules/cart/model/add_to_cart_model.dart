@@ -92,11 +92,11 @@ class Product {
   final String? name;
   final String? details;
   final Category? category;
-  final double? price;
+  final dynamic price;
   final int? totalSell;
   final int? stock;
   final String? expiredAt;
-  final int? discount;
+  final dynamic discount;
   final bool? isDeleted;
   final DateTime? createdAt;
   final DateTime? updatedAt;

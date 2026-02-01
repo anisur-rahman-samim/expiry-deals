@@ -272,13 +272,13 @@ class HomeView extends GetView<HomeController> {
                      overflow: TextOverflow.ellipsis,
                    ),
                    const SizedBox(height: 6),
-                   Row(
-                     children: [
-                       Icon(Icons.location_on, size: 16, color: AppColors.hintColor),
-                       const SizedBox(width: 4),
-                       Text('${nearStores[index].distanceKm?.toStringAsFixed(2)} km away', style: h5.copyWith(color: AppColors.hintColor)),
-                     ],
-                   ),
+                   // Row(
+                   //   children: [
+                   //     Icon(Icons.location_on, size: 16, color: AppColors.hintColor),
+                   //     const SizedBox(width: 4),
+                   //    // Text('${nearStores[index].d?.toStringAsFixed(2)} km away', style: h5.copyWith(color: AppColors.hintColor)),
+                   //   ],
+                   // ),
                    const SizedBox(height: 8),
 
                  ],

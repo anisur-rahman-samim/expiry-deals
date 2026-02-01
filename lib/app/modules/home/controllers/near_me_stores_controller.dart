@@ -31,10 +31,10 @@ class NearMeStoresController extends GetxController {
         return;
       }
 
-      // 🔥 Get real location
-      // Position position = await getCurrentLocation();
-      // double latitude = position.latitude;
-      // double longitude = position.longitude;
+
+      Position position = await getCurrentLocation();
+      double latitude = position.latitude;
+      double longitude = position.longitude;
 
       var headers = {
         'Authorization': 'Bearer $token',
@@ -42,7 +42,7 @@ class NearMeStoresController extends GetxController {
 
       dynamic response = await BaseClient.handleResponse(
         await BaseClient.getRequest(
-          api: Api.allShop + "?latitude=23.777833&longitude=90.408542&limit=90000000000",
+          api: "${Api.allShop}?latitude=$latitude&longitude=$longitude&limit=90000000000",
           headers: headers,
         ),
       );

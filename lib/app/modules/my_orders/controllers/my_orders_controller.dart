@@ -1,40 +1,45 @@
-import 'dart:convert';
 import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/app/data/base_client.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:expiry_deals/app/modules/my_orders/model/my_order_model.dart';
 
 class MyOrdersController extends GetxController {
   var isLoading = true.obs;
+
+  // All orders (main list)
   var allOrders = <MyOrder>[].obs;
+
+  // Filtered lists for tabs
   var pendingOrders = <MyOrder>[].obs;
-  var processingOrders = <MyOrder>[].obs;
+  var ongoingOrders = <MyOrder>[].obs;
   var deliveredOrders = <MyOrder>[].obs;
   var cancelledOrders = <MyOrder>[].obs;
 
   @override
   void onInit() {
-    fetchOrders();
     super.onInit();
+    fetchOrders();
   }
 
   Future<void> fetchOrders() async {
-    isLoading(true);
-
-    String? token = LocalStorage.getData(key: AppConstant.token);
-    if (token == null || token.isEmpty) {
-      Get.snackbar('Error', 'Authentication token is missing.');
-      return;
-    }
-
-    var headers = {
-      'Authorization': 'Bearer $token',
-    };
-
     try {
-      var response = await BaseClient.handleResponse(
+      isLoading.value = true;
+
+      String? token = LocalStorage.getData(key: AppConstant.token);
+      if (token == null || token.trim().isEmpty) {
+        Get.snackbar('Error', 'Authentication token is missing');
+        return;
+      }
+
+      var headers = {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      };
+
+      final response = await BaseClient.handleResponse(
         await BaseClient.getRequest(
           api: Api.myOrders,
           headers: headers,
@@ -42,19 +47,52 @@ class MyOrdersController extends GetxController {
       );
 
       if (response != null && response['success'] == true) {
-        final orders = MyOrderModel.fromJson(response).data?.data ?? [];
+        final model = MyOrderModel.fromJson(response);
+        final orders = model.data?.data ?? [];
+
+        // Sort by createdAt (newest first)
+        orders.sort((a, b) {
+          final dateA = a.createdAt ?? DateTime(2000);
+          final dateB = b.createdAt ?? DateTime(2000);
+          return dateB.compareTo(dateA);
+        });
+
         allOrders.assignAll(orders);
-        pendingOrders.assignAll(orders.where((order) => order.status == 'pending'));
-        processingOrders.assignAll(orders.where((order) => order.status == 'processing'));
-        deliveredOrders.assignAll(orders.where((order) => order.status == 'delivered'));
-        cancelledOrders.assignAll(orders.where((order) => order.status == 'cancelled'));
+
+        // Filter using correct backend status values
+        pendingOrders.assignAll(
+          orders.where((o) => o.status?.toLowerCase() == 'pending').toList(),
+        );
+        ongoingOrders.assignAll(
+          orders.where((o) => o.status?.toLowerCase() == 'ongoing').toList(),
+        );
+        deliveredOrders.assignAll(
+          orders.where((o) => o.status?.toLowerCase() == 'delivered').toList(),
+        );
+        cancelledOrders.assignAll(
+          orders.where((o) => o.status?.toLowerCase() == 'cancelled').toList(),
+        );
       } else {
-        Get.snackbar('Error', 'Failed to fetch orders.');
+        Get.snackbar(
+          'Error',
+          response?['message'] ?? 'Failed to fetch orders',
+          backgroundColor: Colors.red[100],
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      print("Fetch orders error: $e");
+      Get.snackbar(
+        'Error',
+        'Something went wrong: $e',
+        backgroundColor: Colors.red[100],
+      );
     } finally {
-      isLoading(false);
+      isLoading.value = false;
     }
+  }
+
+  // Optional: Call this when you want to refresh (pull-to-refresh)
+  Future<void> refreshOrders() async {
+    await fetchOrders();
   }
 }

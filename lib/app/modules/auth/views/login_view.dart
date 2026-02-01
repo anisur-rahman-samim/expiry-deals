@@ -17,9 +17,12 @@ import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
 
 class LoginView extends StatelessWidget {
- final bool? isVendor;
-  const LoginView({super.key,this.isVendor = false});
+  final bool? isVendor;
+   LoginView({super.key, this.isVendor = false});
 
+  // Controllers are class members — created only once
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -27,12 +30,7 @@ class LoginView extends StatelessWidget {
     final height = size.height;
     final width = size.width;
 
-    // Get the AuthController instance
     final AuthController authController = Get.put(AuthController());
-
-    // Define TextEditingControllers for email and password
-    final TextEditingController emailController = TextEditingController(text: "samimcse7@gmail.com");
-    final TextEditingController passwordController = TextEditingController(text: "#473Y2GLXN2");
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -64,25 +62,19 @@ class LoginView extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Content inside header
                 Padding(
                   padding: EdgeInsets.all(50),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       sh30,
-                      // Logo
                       Image.asset(AppImages.logoIcon, height: 70),
                       sh30,
-
-                      // Title
                       Text(
                         "Welcome Back!",
                         style: h1.copyWith(color: AppColors.white, fontSize: 34),
                       ),
                       sh10,
-
-                      // Subtitle
                       Text(
                         "Sign in to continue your journey with Trusten.",
                         style: h2.copyWith(color: AppColors.white, fontSize: 14),
@@ -95,27 +87,24 @@ class LoginView extends StatelessWidget {
 
             sh30,
 
-            // White Card Form
             Padding(
               padding: EdgeInsets.symmetric(horizontal: width * 0.1),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Email Field
                   Text("Email Address", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   CustomTextField(
-                    controller: emailController,
+                    controller: emailController, // ← now using persistent controller
                     hintText: "Enter Your Email",
                     width: Get.width,
                   ),
                   sh20,
 
-                  // Password Field
                   Text("Password", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   CustomTextField(
-                    controller: passwordController,
+                    controller: passwordController, // ← persistent controller
                     hintText: "Enter Your Password",
                     width: Get.width,
                     obscureText: true,
@@ -133,22 +122,18 @@ class LoginView extends StatelessWidget {
                   ),
                   sh30,
 
-                  // Login Button
                   Obx(() {
                     return CustomCenterButton(
                       title: authController.isLoading.value ? "Logging in..." : "Login",
                       width: double.infinity,
                       onTap: () {
-                        // Call the login function when the login button is pressed
-                        String email = emailController.text;
-                        String password = passwordController.text;
+                        String email = emailController.text.trim();
+                        String password = passwordController.text.trim();
 
                         if (email.isEmpty || password.isEmpty) {
-                          // Show an error if the fields are empty
-                  
                           kSnackBar(message: 'Please fill in all fields', bgColor: AppColors.failedColor);
                         } else {
-                          authController.login(email: email, password: password,);
+                          authController.login(email: email, password: password);
                         }
                       },
                     );
@@ -156,7 +141,6 @@ class LoginView extends StatelessWidget {
 
                   sh30,
 
-                  // Or Divider
                   Row(
                     children: [
                       Expanded(child: Divider(color: Colors.grey[300])),
@@ -170,12 +154,10 @@ class LoginView extends StatelessWidget {
 
                   sh30,
 
-                  // Sign Up Link
-               isVendor == true? Center(
+                  isVendor == true
+                      ? Center(
                     child: TextButton(
-                      onPressed: () {
-                        Get.to(() => VendorRequestView());
-                      },
+                      onPressed: () => Get.to(() => VendorRequestView()),
                       child: RichText(
                         text: TextSpan(
                           style: h3,
@@ -192,11 +174,10 @@ class LoginView extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ) :   Center(
+                  )
+                      : Center(
                     child: TextButton(
-                      onPressed: () {
-                        Get.to(() => SignupView());
-                      },
+                      onPressed: () => Get.to(() => SignupView()),
                       child: RichText(
                         text: TextSpan(
                           style: h3,
