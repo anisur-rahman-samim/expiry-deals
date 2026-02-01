@@ -48,8 +48,8 @@ class Api {
   static  updateOrderStatus({required orderId}) => "$baseUrl/orders/$orderId";
   static const addBankDetails = "$baseUrl/bank-details"; // done
   static const myBankDetails = "$baseUrl/bank-details/my-bank-details"; // done
-  static const withdrawRequest = "$baseUrl/withdraw-request";
-  static const myWithdrawRequest = "$baseUrl/withdraw-request/my-request";
+  static const withdrawRequest = "$baseUrl/withdraw-request"; // done
+  static const myWithdrawRequest = "$baseUrl/withdraw-request/my-request"; // done
   static const addShop = "$baseUrl/shop/update-my-shop"; // done
   static const myShop = "$baseUrl/shop/my-shop"; // done
   static const vendorRequest = "$baseUrl/vendor-request"; // done // lat lang nisse na

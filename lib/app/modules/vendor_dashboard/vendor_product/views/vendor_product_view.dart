@@ -1,3 +1,4 @@
+import 'package:expiry_deals/app/modules/product_details/views/product_details_view.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/views/vendor_add_product_view.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/views/vendor_edit_product_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
