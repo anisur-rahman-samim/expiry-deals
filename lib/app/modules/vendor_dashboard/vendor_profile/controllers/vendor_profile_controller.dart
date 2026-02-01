@@ -1,26 +1,22 @@
 import 'dart:io';
 
 import 'package:expiry_deals/app/data/api.dart';
+import 'package:expiry_deals/app/data/base_client.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/model/my_shop_model.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-
-
-
 import 'dart:convert';
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
+
 
 class EditShopController extends GetxController {
   var isLoading = false.obs;
+
+  var myShop = MyShopModel().obs;
 
   final nameController = TextEditingController();
   final descController = TextEditingController();
@@ -44,12 +40,7 @@ class EditShopController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
-    nameController.text = "Sunrise Boutique";
-    descController.text =
-    "A cozy boutique offering handmade crafts and local art.";
-    addressController.text = "123 Market Street, Springfield";
- //   selectedDays.value = ["sat", "sun"];
+    fetchMyShop();
   }
 
   Future<void> pickImage(bool isBanner) async {
@@ -141,6 +132,8 @@ class EditShopController extends GetxController {
 
       if (response.statusCode == 200 ||
           response.statusCode == 201) {
+        await   fetchMyShop();
+        Get.back();
         Get.snackbar(
           "Success",
           "Shop updated successfully",
@@ -163,6 +156,52 @@ class EditShopController extends GetxController {
         backgroundColor: Colors.red.shade700,
         colorText: Colors.white,
       );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// ─────────────────────────────────────────────
+  /// GET SHOP
+  /// ─────────────────────────────────────────────
+  Future<void> fetchMyShop() async {
+    try {
+      String? token = LocalStorage.getData(key: AppConstant.token);
+      if (token == null || token.isEmpty) {
+        throw "Authentication token is missing.";
+      }
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+
+      var response = await BaseClient.handleResponse(
+        await BaseClient.getRequest(api: Api.myShop, headers: headers),
+      );
+
+      if (response != null && response['success'] == true) {
+        myShop.value = MyShopModel.fromJson(response);
+        var data = myShop.value.data;
+
+        nameController.text = data?.name ?? "";
+            descController.text = data?.description ?? "";
+            addressController.text = data?.address ?? "";
+
+        selectedOpeningHours.value = data?.openingHours ?? "";
+
+        selectedDays.value = data!.openingDays!
+            .split(',')
+            .map((e) => e.trim().toLowerCase())
+            .toList();
+
+        shopLocation.value =  LatLng(data!.location!.coordinates[0], data.location!.coordinates[1]);
+
+      } else {
+        Get.snackbar("Error", "Failed to fetch bank data.");
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
     } finally {
       isLoading.value = false;
     }

@@ -50,7 +50,7 @@ class Api {
   static const myWithdrawRequest = "$baseUrl/withdraw-request/my-request";
   static const addShop = "$baseUrl/shop/update-my-shop";
   static const myShop = "$baseUrl/shop/my-shop";
-  static const vendorRequest = "$baseUrl/vendor-request";
+  static const vendorRequest = "$baseUrl/vendor-request"; // done // lat lang nisse na
   static const stripeConnect = "$baseUrl/stripe/connect";
 
 

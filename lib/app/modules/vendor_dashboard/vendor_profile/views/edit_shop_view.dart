@@ -1,6 +1,7 @@
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/controllers/vendor_profile_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
+import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -70,7 +71,7 @@ class EditShopView extends GetView {
                   ),
                 ],
               ),
-              child: CustomCenterButton(onTap: controller.updateShop,title: "SAVE CHANGES", width: Get.width),
+              child: Obx(() => controller.isLoading.value ? CustomLoaderButton() : CustomCenterButton(onTap: controller.updateShop,title: "SAVE CHANGES", width: Get.width),)
             ),
           ),
 
@@ -91,14 +92,16 @@ class EditShopView extends GetView {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.grey.shade300),
               color: Colors.grey.shade50,
-              image: controller.bannerImage.value != null
+              image: controller.bannerImage.value != null || controller.myShop.value.data?.banner != null
                   ? DecorationImage(
-                image: FileImage(controller.bannerImage.value!),
+                image: controller.bannerImage.value != null
+                    ? FileImage(controller.bannerImage.value!)
+                    : NetworkImage(controller.myShop.value.data?.banner ?? ''),
                 fit: BoxFit.cover,
               )
                   : null,
             ),
-            child: controller.bannerImage.value == null
+            child: controller.bannerImage.value == null && controller.myShop.value.data?.banner == null
                 ? const Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -134,16 +137,28 @@ class EditShopView extends GetView {
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.grey.shade300),
                   color: Colors.grey.shade50,
-                  image: controller.logoImage.value != null
+                  image: controller.logoImage.value != null || controller.myShop.value.data?.logo != null
                       ? DecorationImage(
-                    image: FileImage(controller.logoImage.value!),
+                    image: controller.logoImage.value != null
+                        ? FileImage(controller.logoImage.value!)
+                        : NetworkImage(controller.myShop.value.data?.logo ?? ''),
                     fit: BoxFit.cover,
                   )
                       : null,
                 ),
-                child: controller.logoImage.value == null
+                child: controller.logoImage.value == null && controller.myShop.value.data?.logo == null
                     ? const Icon(Icons.add_business, size: 36, color: Colors.grey)
-                    : null,
+                    : Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.black54,
+                      radius: 18,
+                      child: Icon(Icons.edit, size: 20, color: Colors.white),
+                    ),
+                  ),
+                ),
               )),
             ),
             const SizedBox(width: 20),
@@ -168,6 +183,7 @@ class EditShopView extends GetView {
       ],
     );
   }
+
 
   Widget _buildCard({required Widget child}) {
     return Container(
