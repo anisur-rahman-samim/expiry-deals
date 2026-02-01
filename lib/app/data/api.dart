@@ -52,6 +52,7 @@ class Api {
   static const myShop = "$baseUrl/shop/my-shop";
   static const vendorRequest = "$baseUrl/vendor-request"; // done // lat lang nisse na
   static const stripeConnect = "$baseUrl/stripe/connect";
+  static const vendorDashboard = "$baseUrl/payments/vendor-dashboard-data";
 
 
 
