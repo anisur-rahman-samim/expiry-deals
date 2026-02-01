@@ -112,4 +112,36 @@ class CartController extends GetxController {
       isLoading(false);
     }
   }
+  Future<void> cartEmpty() async {
+    try {
+      isLoading(true);
+
+      var token = LocalStorage.getData(key: AppConstant.token);
+      if (token == null || token.isEmpty) {
+        Get.snackbar('Error', 'Authentication token is missing.');
+        return;
+      }
+
+      var headers = {
+        'Authorization': 'Bearer $token',
+      };
+
+      dynamic response = await BaseClient.handleResponse(
+        await BaseClient.deleteRequest(
+          api: Api.cartEmpty
+
+        ),
+      );
+
+      if (response != null && response['success'] == true) {
+        await fetchAddToCart();
+      } else {
+        Get.snackbar('Error', 'Failed to fetch addToCart.');
+      }
+    } catch (e) {
+      Get.snackbar('Error', e.toString());
+    } finally {
+      isLoading(false);
+    }
+  }
 }

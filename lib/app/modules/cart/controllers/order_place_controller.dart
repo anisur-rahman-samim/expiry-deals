@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:expiry_deals/app/modules/cart/controllers/cart_controller.dart';
 import 'package:expiry_deals/app/modules/cart/views/cart_view.dart';
 import 'package:expiry_deals/app/modules/order_success/views/order_success_view.dart';
 import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
@@ -12,6 +13,8 @@ import 'package:flutter/material.dart';
 
 class OrderPlaceController extends GetxController {
   var isLoading = false.obs;
+
+  final CartController cartController = Get.put(CartController());
 
   // Method to create an order
   Future<void> createOrder({
@@ -65,6 +68,8 @@ class OrderPlaceController extends GetxController {
       if (response != null) {
         if (response["success"] == true) {
           Get.offAll(() => OrderSuccessView());
+
+          cartController.cartEmpty();
   
           kSnackBar(message: 'Order placed successfully', bgColor: AppColors.green);
         } else {

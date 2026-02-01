@@ -28,6 +28,7 @@ class Api {
   static  categoryProducts({required categoryId}) => "$baseUrl/products?category=$categoryId"; // done
   static const allShop = "$baseUrl/shop"; // done
   static const myOrders = "$baseUrl/orders/my-orders"; // done
+  static const cartEmpty = "$baseUrl/add-to-card/empty"; //
   static  shopWiseProduct({required shopId}) => "$baseUrl/products/author/$shopId"; // done
   static  shopById({required shopId}) => "$baseUrl/shop/$shopId"; // done
   static  productById({required productId}) => "$baseUrl/products/$productId"; // done
