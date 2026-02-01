@@ -7,6 +7,7 @@ import 'package:expiry_deals/app/modules/profile/controllers/profile_controller.
 import 'package:expiry_deals/app/modules/terms_conditions/views/terms_conditions_view.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/views/bank_details_view.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/views/edit_shop_view.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/views/withdraw_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
@@ -165,6 +166,44 @@ class VendorProfileView extends GetView {
                       ),
                       subtitle: Text(
                         "Setup your bank information",
+                        style: h3.copyWith(color: AppColors.gray, fontSize: 12),
+                      ),
+                    ).animate().fadeIn(
+                      duration: 600.ms,
+                      delay: 100.ms,
+                      curve: Curves.easeInOut,
+                    ).slideY(
+                      begin: 0.3,
+                      end: 0.0,
+                      duration: 600.ms,
+                      delay: 100.ms,
+                      curve: Curves.easeInOut,
+                    ).shake(
+                      duration: 800.ms,
+                      delay: 100.ms,
+                      hz: 2,
+                      rotation: 0.05,
+                    ),
+                  ),
+
+                  sh16,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      onTap: () {
+                        Get.to(() => WithdrawalView());
+                      },
+                      leading: Image.asset(AppImages.profile, scale: 4,color: AppColors.mainColor,),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      title: Text(
+                          "Withdraw",
+                          style: h2
+                      ),
+                      subtitle: Text(
+                        "Withdraw your payments",
                         style: h3.copyWith(color: AppColors.gray, fontSize: 12),
                       ),
                     ).animate().fadeIn(
