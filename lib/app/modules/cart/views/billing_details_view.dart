@@ -40,7 +40,7 @@ class _BillingDetailsViewState extends State<BillingDetailsView> {
       backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.white,
-        title: const Text('Order Details'),
+        title: const Text('Billing Details'),
         centerTitle: true,
       ),
       body: Padding(
@@ -102,8 +102,9 @@ class _BillingDetailsViewState extends State<BillingDetailsView> {
                 ? CustomLoaderButton()
                 : CustomCenterButton(
               onTap: () {
+
                 orderPlaceController.createOrder(
-                  authorId: widget.authorId,  // Replace with actual author ID
+                  authorId: widget.authorId,
                   items: widget.items,
                   totalPrice: widget.totalPrice,
                   address: addressController.text,
@@ -111,6 +112,7 @@ class _BillingDetailsViewState extends State<BillingDetailsView> {
                   state: stateController.text,
                   zipCode: zipCodeController.text,
                   country: countryController.text,
+                  paymentMethod: _paymentMethod.toString(),
                 );
               },
               title: "Place Order",
