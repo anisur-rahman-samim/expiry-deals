@@ -209,6 +209,15 @@ class _StoreViewState extends State<StoreView> {
                   ),
                 ),
 
+                        Positioned(
+              top: 16, left: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(20)),
+                child: Text('-${productList[index].discount}% OFF', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
+            ),
+
               ],
             ),
             Padding(
@@ -220,7 +229,9 @@ class _StoreViewState extends State<StoreView> {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      Text('\$${productList[index].discount ?? ""}', style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold)),
+                      Text(
+                         '\$${((productList[index].price ?? 0) * (1 - (productList[index].discount ?? 0) / 100)).toStringAsFixed(2)}',
+                      style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold)),
                    sw5,
                       Text('\$${productList[index].price ?? ""}' ,style: h3.copyWith(color: AppColors.gray, fontWeight: FontWeight.bold)),
                     ],

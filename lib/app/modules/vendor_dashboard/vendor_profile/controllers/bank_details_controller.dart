@@ -84,7 +84,7 @@ class BankDetailsController extends GetxController {
         Get.snackbar("Error", "Failed to fetch bank data.");
       }
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+     // Get.snackbar("Error", e.toString());
     } finally {
       isLoading.value = false;
     }
@@ -126,7 +126,7 @@ class BankDetailsController extends GetxController {
       isLoading(false);
     } finally {
       isLoading(false);
-      isLoading.value = false;
+    
     }
   }
 

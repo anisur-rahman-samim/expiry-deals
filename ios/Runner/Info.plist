@@ -24,8 +24,6 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<key>GMSApiKey</key>
-	<string>AIzaSyC9cIXgAFN2LCR7mZwqBOB6ZZD8cBzCaio</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
@@ -36,6 +34,19 @@
 	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
+
+<!-- Camera Permission -->
+<key>NSCameraUsageDescription</key>
+<string>Camera access is required to take product photos.</string>
+
+<!-- Photo Library Permission (required for image_picker) -->
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Photo library access is required to select product images.</string>
+
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>This app saves images to your photo library.</string>
+
+
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>

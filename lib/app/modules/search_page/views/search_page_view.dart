@@ -89,6 +89,7 @@ class SearchPageView extends StatelessWidget {
           childAspectRatio: 0.78,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
+ 
         ),
         itemCount: controller.searchProducts.length,
         itemBuilder: (context, index) {
@@ -144,7 +145,7 @@ class SearchPageView extends StatelessWidget {
                   Text(
                     product.name ?? 'Product Name',
                     style: h4,
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),

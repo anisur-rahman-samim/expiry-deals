@@ -16,6 +16,28 @@ import '../../vendor_dashboard/views/vendor_dashboard_view.dart';
 class AuthController extends GetxController {
   var isLoading = false.obs;
 
+    // ────────────────────────────────────────────────
+  //  Form Controllers (for signup screen)
+  // ────────────────────────────────────────────────
+  final nameController            = TextEditingController();
+  final emailController           = TextEditingController();
+
+  final passwordController        = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+  final addressController         = TextEditingController();
+
+  @override
+  void onClose() {
+    nameController.dispose();
+    emailController.dispose();
+
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    addressController.dispose();
+    super.onClose();
+  }
+
+
   // Login function
   Future<void> login({required String email, required String password}) async {
     try {
@@ -69,13 +91,7 @@ class AuthController extends GetxController {
   }
 
   // Registration function
-  Future<void> registration({
-    required String name,
-    required String email,
-    required String phone,
-    required String password,
-    required String address,
-  }) async {
+  Future<void> registration() async {
     try {
       isLoading(true);
 
@@ -84,11 +100,10 @@ class AuthController extends GetxController {
       };
 
       var body = {
-        'name': name,
-        'email': email,
-        'phoneNumber': phone,
-        'password': password,
-        'address': address,
+        'name': nameController.text,
+        'email': emailController.text.trim(),
+        'password': passwordController.text,
+        'address': addressController.text,
       };
 
       // Sending request to the server for registration

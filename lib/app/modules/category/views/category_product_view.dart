@@ -133,7 +133,7 @@ class _CategoryProductViewState extends State<CategoryProductView> {
                   Text(
                     product[index].name ?? "",
                     style: h4.copyWith(fontWeight: FontWeight.w600),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
 

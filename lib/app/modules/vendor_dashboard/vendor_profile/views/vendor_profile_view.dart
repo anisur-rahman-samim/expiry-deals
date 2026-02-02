@@ -1,6 +1,7 @@
 
 import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/app/modules/change_password/views/change_password_view.dart';
+import 'package:expiry_deals/app/modules/choose_role/views/choose_role_view.dart';
 import 'package:expiry_deals/app/modules/edit_profile/views/edit_profile_view.dart';
 import 'package:expiry_deals/app/modules/privacy_policy/views/privacy_policy_view.dart';
 import 'package:expiry_deals/app/modules/profile/controllers/profile_controller.dart';
@@ -371,7 +372,7 @@ class VendorProfileView extends GetView {
                                     GestureDetector(
                                       onTap: () {
                                         LocalStorage.removeData(key: AppConstant.token);
-                                        Get.to(() => LoginView());
+                                        Get.to(() => ChooseRoleView());
                                       },
                                       child: Container(
                                         height: 50,

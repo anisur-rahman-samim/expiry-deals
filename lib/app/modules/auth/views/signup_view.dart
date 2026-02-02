@@ -4,13 +4,11 @@ import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
-import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
 import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -20,30 +18,18 @@ class SignupView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final height = size.height;
-    final width = size.width;
-
-    // TextEditingControllers for the form fields
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController phoneController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-    final TextEditingController confirmPasswordController =
-        TextEditingController();
-    final TextEditingController addressController = TextEditingController();
-
-    final AuthController authController = Get.put(AuthController());
+    final auth = Get.find<AuthController>();
 
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Orange Header with Curved Bottom
+            // Header
             Stack(
               children: [
                 Container(
-                  height: height * 0.38,
+                  height: size.height * 0.38,
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [AppColors.mainColor, AppColors.secColor],
@@ -60,41 +46,27 @@ class SignupView extends StatelessWidget {
                     height: 50,
                     decoration: const BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(40),
-                      ),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
                     ),
                   ),
                 ),
-                // Content inside header
                 Padding(
-                  padding: EdgeInsets.all(50),
+                  padding: const EdgeInsets.all(50),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       sh30,
-                      // Logo
                       Image.asset(AppImages.logoIcon, height: 70),
                       sh30,
-
-                      // Title
                       Text(
                         "Create Your Account",
-                        style: h1.copyWith(
-                          color: AppColors.white,
-                          fontSize: 30,
-                        ),
+                        style: h1.copyWith(color: AppColors.white, fontSize: 30),
                         textAlign: TextAlign.center,
                       ),
                       sh10,
-
-                      // Subtitle
                       Text(
                         "Join smart and secure shopping made for you.",
-                        style: h2.copyWith(
-                          color: AppColors.white,
-                          fontSize: 14,
-                        ),
+                        style: h2.copyWith(color: AppColors.white, fontSize: 14),
                       ),
                     ],
                   ),
@@ -104,123 +76,79 @@ class SignupView extends StatelessWidget {
 
             sh30,
 
-            // White Card Form
+            // Form
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: width * 0.1),
+              padding: EdgeInsets.symmetric(horizontal: size.width * 0.1),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Full Name",
-                    style: h4.copyWith(fontWeight: FontWeight.w600),
-                  ),
+                  Text("Full Name", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   CustomTextField(
                     hintText: "Enter Your Name",
-                    controller: nameController,
+                    controller: auth.nameController,
                     width: Get.width,
                   ),
                   sh20,
 
-                  // Email Field
-                  Text(
-                    "Email Address",
-                    style: h4.copyWith(fontWeight: FontWeight.w600),
-                  ),
+                  Text("Email Address", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   CustomTextField(
                     hintText: "Enter Your Email",
-                    controller: emailController,
+                    controller: auth.emailController,
                     width: Get.width,
                   ),
                   sh20,
 
-                  // Address
-                  Text(
-                    "Address",
-                    style: h4.copyWith(fontWeight: FontWeight.w600),
-                  ),
+              
+
+                  Text("Address", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   CustomTextField(
                     hintText: "Enter Your Address",
-                    controller: addressController,
+                    controller: auth.addressController,
                     width: Get.width,
                   ),
                   sh20,
 
-                  // Password Field
-                  Text(
-                    "Password",
-                    style: h4.copyWith(fontWeight: FontWeight.w600),
-                  ),
+                  Text("Password", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   CustomTextField(
                     hintText: "Enter Your Password",
-                    controller: passwordController,
+                    controller: auth.passwordController,
                     width: Get.width,
                     obscureText: true,
                   ),
                   sh20,
 
-                  // Confirm Password Field
-                  Text(
-                    "Confirm Password",
-                    style: h4.copyWith(fontWeight: FontWeight.w600),
-                  ),
+                  Text("Confirm Password", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   CustomTextField(
                     hintText: "Enter Your Confirm Password",
-                    controller: confirmPasswordController,
+                    controller: auth.confirmPasswordController,
                     width: Get.width,
                     obscureText: true,
                   ),
                   sh30,
 
                   // Sign Up Button
-                 Obx(() =>  authController.isLoading.value
-                      ? CustomLoaderButton()
+                  Obx(() => auth.isLoading.value
+                      ? const CustomLoaderButton()
                       : CustomCenterButton(
                           title: "Sign Up",
                           width: double.infinity,
-                          onTap: () {
-                            final name = nameController.text;
-                            final email = emailController.text;
-                            final phone = phoneController.text;
-                            final password = passwordController.text;
-                            final confirmPassword =
-                                confirmPasswordController.text;
-                            final address = addressController.text;
-
-                            // Call the registration API
-                            if (password == confirmPassword) {
-                              authController.registration(
-                                name: name,
-                                email: email,
-                                phone: phone,
-                                password: password,
-                                address: address,
-                              );
-                            } else {
-                              kSnackBar(
-                                message: "Password is not match",
-                                bgColor: AppColors.failedColor,
-                              );
-                            }
-                          },
-                        ),),
+                          onTap: () => auth.registration(),
+                        )),
 
                   sh30,
 
-                  // Or Divider
+                  // Divider + Sign in link
                   Row(
                     children: [
                       Expanded(child: Divider(color: Colors.grey[300])),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          "Or",
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
+                        child: Text("Or", style: TextStyle(color: Colors.grey[600])),
                       ),
                       Expanded(child: Divider(color: Colors.grey[300])),
                     ],
@@ -228,12 +156,9 @@ class SignupView extends StatelessWidget {
 
                   sh30,
 
-                  // Sign Up Link
                   Center(
                     child: TextButton(
-                      onPressed: () {
-                        Get.to(() => LoginView());
-                      },
+                      onPressed: () => Get.to(() =>  LoginView()),
                       child: RichText(
                         text: TextSpan(
                           style: h3,

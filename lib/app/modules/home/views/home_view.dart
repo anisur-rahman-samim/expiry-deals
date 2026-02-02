@@ -368,7 +368,7 @@ class HomeView extends GetView<HomeController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(productList[index].name ?? "", style: GoogleFonts.dmSans(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                    Text(productList[index].name ?? "", style: GoogleFonts.dmSans(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),maxLines: 1,overflow: TextOverflow.ellipsis,),
                     Text(productList[index].author?.shop?.name ?? "", style: h5.copyWith(color: Colors.white70)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

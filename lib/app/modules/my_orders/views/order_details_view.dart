@@ -308,11 +308,8 @@ class OrderDetailsView extends StatelessWidget {
         Expanded(
           child: Text(
             order.billingDetails != null
-                ? "${order.billingDetails!.address ?? ''}, "
-                "${order.billingDetails!.city ?? ''}, "
-                "${order.billingDetails!.state ?? ''} "
-                "${order.billingDetails!.zipCode ?? ''}, "
-                "${order.billingDetails!.country ?? ''}"
+                ? order.billingDetails!.address ?? ''
+              
                 : "No address available",
             style: h4,
           ),

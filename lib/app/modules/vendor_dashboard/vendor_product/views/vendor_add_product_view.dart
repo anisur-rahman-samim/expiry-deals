@@ -169,7 +169,7 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
             _buildLabel('Item Price'),
             _inputField(
               hint: '0.00',
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
               onChanged: (v) => controller.price.value = v,
             ),
 

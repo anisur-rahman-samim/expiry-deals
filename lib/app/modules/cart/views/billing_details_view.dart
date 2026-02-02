@@ -1,4 +1,5 @@
 import 'package:expiry_deals/app/modules/cart/controllers/order_place_controller.dart';
+import 'package:expiry_deals/app/modules/edit_profile/controllers/edit_profile_controller.dart';
 import 'package:expiry_deals/app/modules/order_success/views/order_success_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
@@ -26,16 +27,23 @@ class BillingDetailsView extends StatefulWidget {
 
 class _BillingDetailsViewState extends State<BillingDetailsView> {
   final TextEditingController addressController = TextEditingController();
-  final TextEditingController cityController = TextEditingController();
-  final TextEditingController stateController = TextEditingController();
-  final TextEditingController zipCodeController = TextEditingController();
-  final TextEditingController countryController = TextEditingController();
+  // final TextEditingController cityController = TextEditingController();
+  // final TextEditingController stateController = TextEditingController();
+  // final TextEditingController zipCodeController = TextEditingController();
+  // final TextEditingController countryController = TextEditingController();
+ final EditProfileController controller = Get.put(EditProfileController());
 
   final OrderPlaceController orderPlaceController = Get.put(OrderPlaceController());
   int _paymentMethod = 1; // Default to Cash on Delivery
 
   @override
   Widget build(BuildContext context) {
+       ever(controller.profileData, (_) {
+      final data = controller.profileData.value.data;
+      if (data != null) {
+        addressController.text = data.address ?? '';
+      }
+    });
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -50,28 +58,29 @@ class _BillingDetailsViewState extends State<BillingDetailsView> {
             CustomTextField(
               controller: addressController,
               hintText: 'Enter your address',  width: Get.width,
+              maxLines: 3,
             ),
             const SizedBox(height: 16),
-            CustomTextField(
-              controller: cityController,
-              hintText: 'Enter your city', width: Get.width,
-            ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              controller: stateController,
-              hintText: 'Enter your state', width: Get.width,
-            ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              controller: zipCodeController,
-              hintText: 'Enter your zip code', width: Get.width,
-            ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              controller: countryController,
-              hintText: 'Enter your country', width: Get.width,
-            ),
-            const SizedBox(height: 16),
+            // CustomTextField(
+            //   controller: cityController,
+            //   hintText: 'Enter your city', width: Get.width,
+            // ),
+            // const SizedBox(height: 16),
+            // CustomTextField(
+            //   controller: stateController,
+            //   hintText: 'Enter your state', width: Get.width,
+            // ),
+            // const SizedBox(height: 16),
+            // CustomTextField(
+            //   controller: zipCodeController,
+            //   hintText: 'Enter your zip code', width: Get.width,
+            // ),
+            // const SizedBox(height: 16),
+            // CustomTextField(
+            //   controller: countryController,
+            //   hintText: 'Enter your country', width: Get.width,
+            // ),
+            // const SizedBox(height: 16),
 
             // Payment Method Selection
             RadioListTile<int>(
@@ -108,10 +117,10 @@ class _BillingDetailsViewState extends State<BillingDetailsView> {
                   items: widget.items,
                   totalPrice: widget.totalPrice,
                   address: addressController.text,
-                  city: cityController.text,
-                  state: stateController.text,
-                  zipCode: zipCodeController.text,
-                  country: countryController.text,
+                  city: addressController.text,
+                  state: addressController.text,
+                  zipCode: addressController.text,
+                  country: addressController.text,
                   paymentMethod: _paymentMethod.toString(),
                 );
               },

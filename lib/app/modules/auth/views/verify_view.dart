@@ -171,7 +171,7 @@ class _VerifyViewState extends State<VerifyView> {
                  onTap: () {
                    if (pinController.text.length == 6) {
                      // Call the verifyOtp function
-                     authController.verifyOtp(pinController.text, widget.isSignUp!);
+                     authController.verifyOtp( pinController.text, widget.isSignUp!);
                    } else {
                      Get.snackbar('Error', 'Please enter 6-digit code');
                    }
