@@ -331,17 +331,19 @@ class EditShopView extends GetView {
   }
 
   Widget _buildDropdown({
-    required String value,
+    required String? value,
     required List<String> items,
     required String label,
   }) {
-    return DropdownButtonFormField<String>(
+    return DropdownButtonFormField<String?>(
       value: value,
-      items: items
-          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-          .toList(),
+      hint: const Text("Select opening hours"), // shown when value == null
+      items: items.map((e) => DropdownMenuItem<String?>(
+        value: e,
+        child: Text(e),
+      )).toList(),
       onChanged: (v) {
-        if (v != null) controller.selectedOpeningHours.value = v;
+        controller.selectedOpeningHours.value = v;
       },
       decoration: InputDecoration(
         labelText: label,

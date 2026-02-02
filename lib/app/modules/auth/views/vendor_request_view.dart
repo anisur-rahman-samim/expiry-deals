@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
@@ -17,7 +18,7 @@ import 'location_picker_view.dart';
 class VendorRequestView extends StatelessWidget {
   VendorRequestView({super.key});
 
-  final VendorRequestController vendorRequestController = Get.put(VendorRequestController());
+  final VendorRequestController controller = Get.put(VendorRequestController());
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -34,7 +35,7 @@ class VendorRequestView extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Orange Header with Curved Bottom
+            // Header (unchanged)
             Stack(
               children: [
                 Container(
@@ -60,7 +61,7 @@ class VendorRequestView extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(50),
+                  padding: const EdgeInsets.all(50),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -105,6 +106,7 @@ class VendorRequestView extends StatelessWidget {
                     hintText: "Enter Your Email",
                     controller: emailController,
                     width: Get.width,
+                  //  keyboardType: TextInputType.emailAddress,
                   ),
                   sh20,
 
@@ -117,25 +119,28 @@ class VendorRequestView extends StatelessWidget {
                   ),
                   sh30,
 
-                  // Location Preview + Picker
+                  // ──────────────────────────────────────────────
+                  // Location section – FIXED logic & LatLng order
+                  // ──────────────────────────────────────────────
                   Text("Shop Location", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   GestureDetector(
                     onTap: () async {
+                      LatLng? initialPos;
+
+                      if (controller.latitude.value != 0.0 && controller.longitude.value != 0.0) {
+                        initialPos = LatLng(
+                          controller.latitude.value,   // ← latitude first
+                          controller.longitude.value,  // ← longitude second
+                        );
+                      }
+
                       final LatLng? picked = await Get.to(
-                            () => LocationPickerPage(
-                          initialPosition: vendorRequestController.locationCoordinates.value[0] != 0.0 &&
-                              vendorRequestController.locationCoordinates.value[1] != 0.0
-                              ? LatLng(
-                            vendorRequestController.locationCoordinates.value[1], // lat
-                            vendorRequestController.locationCoordinates.value[0], // lng
-                          )
-                              : null,
-                        ),
+                            () => LocationPickerPage(initialPosition: initialPos),
                       );
 
                       if (picked != null) {
-                        vendorRequestController.selectLocation(picked);
+                        controller.selectLocation(picked);
                       }
                     },
                     child: Container(
@@ -147,34 +152,41 @@ class VendorRequestView extends StatelessWidget {
                         border: Border.all(color: AppColors.grayLight),
                       ),
                       child: Obx(() {
-                        final coords = vendorRequestController.locationCoordinates.value;
-                        final hasLocation = coords[0] != 0.0 && coords[1] != 0.0;
+                        final hasLocation = controller.latitude.value != 0.0 &&
+                            controller.longitude.value != 0.0;
 
-                        return hasLocation
-                            ? GoogleMap(
+                        if (!hasLocation) {
+                          return const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.location_on, size: 50, color: AppColors.mainColor),
+                                SizedBox(height: 8),
+                                Text("Tap to select location"),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return GoogleMap(
                           initialCameraPosition: CameraPosition(
-                            target: LatLng(coords[1], coords[0]), // lat, lng
+                            target: LatLng(
+                              controller.latitude.value,
+                              controller.longitude.value,
+                            ),
                             zoom: 15,
                           ),
                           markers: {
                             Marker(
                               markerId: const MarkerId('shop'),
-                              position: LatLng(coords[1], coords[0]),
+                              position: LatLng(
+                                controller.latitude.value,
+                                controller.longitude.value,
+                              ),
                             ),
                           },
                           zoomControlsEnabled: false,
                           myLocationButtonEnabled: false,
-                          onMapCreated: (controller) {},
-                        )
-                            : const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.location_on, size: 50, color: AppColors.mainColor),
-                              SizedBox(height: 8),
-                              Text("Tap to select location"),
-                            ],
-                          ),
                         );
                       }),
                     ),
@@ -182,13 +194,13 @@ class VendorRequestView extends StatelessWidget {
 
                   sh20,
 
-                  // Document Upload
+                  // Document Upload (unchanged – good)
                   Text("Upload Document", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
                   GestureDetector(
-                    onTap: () => vendorRequestController.pickDocument(),
+                    onTap: controller.pickDocument,
                     child: Obx(() {
-                      final file = vendorRequestController.documentFile.value;
+                      final file = controller.documentFile.value;
                       return Container(
                         height: 150,
                         width: double.infinity,
@@ -210,15 +222,26 @@ class VendorRequestView extends StatelessWidget {
                   ),
 
                   Obx(() {
-                    final file = vendorRequestController.documentFile.value;
+                    final file = controller.documentFile.value;
                     if (file != null) {
                       return Padding(
                         padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          file.path.split('/').last,
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                file.path.split(Platform.pathSeparator).last,
+                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close, size: 18, color: Colors.red),
+                              onPressed: () => controller.documentFile.value = null,
+                              tooltip: 'Remove document',
+                            ),
+                          ],
                         ),
                       );
                     }
@@ -229,7 +252,7 @@ class VendorRequestView extends StatelessWidget {
 
                   // Submit Button
                   Obx(
-                        () => vendorRequestController.isLoading.value
+                        () => controller.isLoading.value
                         ? const CustomLoaderButton()
                         : CustomCenterButton(
                       title: "Submit Request",
@@ -244,23 +267,25 @@ class VendorRequestView extends StatelessWidget {
                           return;
                         }
 
-                        final coords = vendorRequestController.locationCoordinates.value;
-                        if (coords[0] == 0.0 && coords[1] == 0.0) {
+                        if (!email.contains('@') || !email.contains('.')) {
+                          Get.snackbar("Error", "Please enter a valid email");
+                          return;
+                        }
+
+                        if (controller.latitude.value == 0.0 || controller.longitude.value == 0.0) {
                           Get.snackbar("Error", "Please select a location");
                           return;
                         }
 
-                        if (vendorRequestController.documentFile.value == null) {
+                        if (controller.documentFile.value == null) {
                           Get.snackbar("Error", "Please upload a document");
                           return;
                         }
 
-                        vendorRequestController.submitVendorRequest(
+                        controller.submitVendorRequest(
                           name: name,
                           email: email,
                           shopName: shopName,
-                          document: vendorRequestController.documentFile.value!,
-                          locationCoordinates: coords,
                         );
                       },
                     ),

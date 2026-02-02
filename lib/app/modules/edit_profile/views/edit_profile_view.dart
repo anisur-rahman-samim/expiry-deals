@@ -62,7 +62,7 @@ class EditProfileView extends GetView {
                       } else if (profilePicUrl != null && profilePicUrl.isNotEmpty) {
                         imageProvider = NetworkImage(profilePicUrl);
                       } else {
-                        imageProvider = const AssetImage(AppImages.noImage);
+                        imageProvider = const NetworkImage(AppImages.noImage);
                       }
 
                       return Container(

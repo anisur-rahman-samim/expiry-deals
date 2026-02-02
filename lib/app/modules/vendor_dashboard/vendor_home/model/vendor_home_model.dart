@@ -26,8 +26,8 @@ class Data {
     required this.monthlyIncome,
   });
 
-  final double? totalIncome;
-  final int? totalProducts;
+  final dynamic totalIncome;
+  final dynamic totalProducts;
   final List<MonthlyIncome> monthlyIncome;
 
   factory Data.fromJson(Map<String, dynamic> json){

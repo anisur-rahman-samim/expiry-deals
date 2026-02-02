@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/app/data/base_client.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/model/my_shop_model.dart';
@@ -12,7 +11,6 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-
 class EditShopController extends GetxController {
   var isLoading = false.obs;
 
@@ -22,16 +20,26 @@ class EditShopController extends GetxController {
   final descController = TextEditingController();
   final addressController = TextEditingController();
 
-  final Rx<String> selectedOpeningHours = '9:00 AM - 10:00 PM'.obs;
+  // Changed to nullable
+  final Rx<String?> selectedOpeningHours = Rx<String?>(null);
+
   final RxList<String> selectedDays = <String>[].obs;
 
   final Rx<File?> bannerImage = Rx<File?>(null);
   final Rx<File?> logoImage = Rx<File?>(null);
 
   final daysOfWeek = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
   GoogleMapController? mapController;
-  final Rx<LatLng> shopLocation =
-      const LatLng(40.73061, -73.935242).obs;
+  final Rx<LatLng> shopLocation = const LatLng(40.73061, -73.935242).obs;
+
+  final List<String> allowedHours = [
+    "8:00 AM - 9:00 PM",
+    "9:00 AM - 10:00 PM",
+    "10:00 AM - 11:00 PM",
+    "11:00 AM - 12:00 AM",
+    "Custom hours...",
+  ];
 
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -57,17 +65,11 @@ class EditShopController extends GetxController {
     shopLocation.value = pos;
   }
 
-  /// ─────────────────────────────────────────────
-  /// PATCH SHOP (MULTIPART)
-  /// ─────────────────────────────────────────────
   Future<void> updateShop() async {
     isLoading.value = true;
 
     try {
-      final uri = Uri.parse(
-        Api.addShop
-      );
-
+      final uri = Uri.parse(Api.addShop);
       String? token = LocalStorage.getData(key: AppConstant.token);
       if (token == null || token.isEmpty) {
         throw "Authentication token is missing.";
@@ -75,12 +77,14 @@ class EditShopController extends GetxController {
 
       final request = http.MultipartRequest("PATCH", uri);
 
-      /// ── DATA FIELD (JSON STRING) ──────────────
+      // Prepare data – use fallback if null
+      final hoursToSend = selectedOpeningHours.value ?? allowedHours.first;
+
       final data = {
         "name": nameController.text.trim(),
         "description": descController.text.trim(),
         "address": addressController.text.trim(),
-        "openingHours": selectedOpeningHours.value,
+        "openingHours": hoursToSend,
         "openingDays": selectedDays.join(', '),
         "location": {
           "type": "Point",
@@ -95,44 +99,33 @@ class EditShopController extends GetxController {
 
       debugPrint("PATCH data: ${request.fields['data']}");
 
-      /// ── LOGO FILE ─────────────────────────────
-      if (logoImage.value != null &&
-          await logoImage.value!.exists()) {
+      // Logo
+      if (logoImage.value != null && await logoImage.value!.exists()) {
         request.files.add(
-          await http.MultipartFile.fromPath(
-            'logo',
-            logoImage.value!.path,
-          ),
+          await http.MultipartFile.fromPath('logo', logoImage.value!.path),
         );
       }
 
-      /// ── BANNER FILE ───────────────────────────
-      if (bannerImage.value != null &&
-          await bannerImage.value!.exists()) {
+      // Banner
+      if (bannerImage.value != null && await bannerImage.value!.exists()) {
         request.files.add(
-          await http.MultipartFile.fromPath(
-            'banner',
-            bannerImage.value!.path,
-          ),
+          await http.MultipartFile.fromPath('banner', bannerImage.value!.path),
         );
       }
 
-      /// ── HEADERS (ADD TOKEN IF NEEDED) ─────────
       request.headers.addAll({
         "Accept": "application/json",
         "Authorization": "Bearer $token",
       });
 
       final response = await request.send();
-      final responseBody =
-      await response.stream.bytesToString();
+      final responseBody = await response.stream.bytesToString();
 
       debugPrint("Status Code: ${response.statusCode}");
       debugPrint("Response: $responseBody");
 
-      if (response.statusCode == 200 ||
-          response.statusCode == 201) {
-        await   fetchMyShop();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        await fetchMyShop();
         Get.back();
         Get.snackbar(
           "Success",
@@ -150,20 +143,12 @@ class EditShopController extends GetxController {
       }
     } catch (e, stack) {
       debugPrint("Update error: $e\n$stack");
-      Get.snackbar(
-        "Error",
-        "Something went wrong",
-        backgroundColor: Colors.red.shade700,
-        colorText: Colors.white,
-      );
+      Get.snackbar("Error", "Something went wrong");
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// ─────────────────────────────────────────────
-  /// GET SHOP
-  /// ─────────────────────────────────────────────
   Future<void> fetchMyShop() async {
     try {
       String? token = LocalStorage.getData(key: AppConstant.token);
@@ -185,25 +170,41 @@ class EditShopController extends GetxController {
         var data = myShop.value.data;
 
         nameController.text = data?.name ?? "";
-            descController.text = data?.description ?? "";
-            addressController.text = data?.address ?? "";
+        descController.text = data?.description ?? "";
+        addressController.text = data?.address ?? "";
 
-        selectedOpeningHours.value = data?.openingHours ?? "";
+        // Safe handling for opening hours
+        final backendHours = data?.openingHours?.trim();
+        if (backendHours != null && allowedHours.contains(backendHours)) {
+          selectedOpeningHours.value = backendHours;
+        } else {
+          selectedOpeningHours.value = null; // Will show placeholder
+        }
 
-        selectedDays.value = data!.openingDays!
-            .split(',')
-            .map((e) => e.trim().toLowerCase())
-            .toList();
+        // Opening days
+        if (data?.openingDays != null && data!.openingDays!.isNotEmpty) {
+          selectedDays.value = data.openingDays!
+              .split(',')
+              .map((e) => e.trim().toLowerCase())
+              .where((day) => daysOfWeek.contains(day))
+              .toList();
+        } else {
+          selectedDays.clear();
+        }
 
-        shopLocation.value =  LatLng(data!.location!.coordinates[0], data.location!.coordinates[1]);
-
+        // Location – assuming coordinates are [lng, lat]
+        if (data?.location?.coordinates != null &&
+            data!.location!.coordinates.length == 2) {
+          shopLocation.value = LatLng(
+            data.location!.coordinates[1], // latitude
+            data.location!.coordinates[0], // longitude
+          );
+        }
       } else {
-        Get.snackbar("Error", "Failed to fetch bank data.");
+        Get.snackbar("Error", "Failed to fetch shop data.");
       }
     } catch (e) {
       Get.snackbar("Error", e.toString());
-    } finally {
-      isLoading.value = false;
     }
   }
 
@@ -215,4 +216,3 @@ class EditShopController extends GetxController {
     super.onClose();
   }
 }
-
