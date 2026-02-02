@@ -1,4 +1,4 @@
-package com.example.expriy_deals
+package com.expriydeals.app
 
 import io.flutter.embedding.android.FlutterActivity
 
