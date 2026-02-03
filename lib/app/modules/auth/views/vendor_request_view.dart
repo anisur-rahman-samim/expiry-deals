@@ -128,10 +128,11 @@ class VendorRequestView extends StatelessWidget {
                     onTap: () async {
                       LatLng? initialPos;
 
+                      // Just used to center the map in picker — not blocking the navigation
                       if (controller.latitude.value != 0.0 && controller.longitude.value != 0.0) {
                         initialPos = LatLng(
-                          controller.latitude.value,   // ← latitude first
-                          controller.longitude.value,  // ← longitude second
+                          controller.latitude.value,
+                          controller.longitude.value,
                         );
                       }
 
@@ -168,25 +169,49 @@ class VendorRequestView extends StatelessWidget {
                           );
                         }
 
-                        return GoogleMap(
-                          initialCameraPosition: CameraPosition(
-                            target: LatLng(
-                              controller.latitude.value,
-                              controller.longitude.value,
+                        // ← When location exists → still allow tap to change it
+                        return Stack(
+                          children: [
+                            GoogleMap(
+                              initialCameraPosition: CameraPosition(
+                                target: LatLng(
+                                  controller.latitude.value,
+                                  controller.longitude.value,
+                                ),
+                                zoom: 15,
+                              ),
+                              markers: {
+                                Marker(
+                                  markerId: const MarkerId('shop'),
+                                  position: LatLng(
+                                    controller.latitude.value,
+                                    controller.longitude.value,
+                                  ),
+                                ),
+                              },
+                              zoomControlsEnabled: false,
+                              myLocationButtonEnabled: false,
                             ),
-                            zoom: 15,
-                          ),
-                          markers: {
-                            Marker(
-                              markerId: const MarkerId('shop'),
-                              position: LatLng(
-                                controller.latitude.value,
-                                controller.longitude.value,
+                            // Optional: small overlay hint
+                            Positioned(
+                              bottom: 12,
+                              left: 0,
+                              right: 0,
+                              child: Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.6),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: const Text(
+                                    "Tap to change location",
+                                    style: TextStyle(color: Colors.white, fontSize: 13),
+                                  ),
+                                ),
                               ),
                             ),
-                          },
-                          zoomControlsEnabled: false,
-                          myLocationButtonEnabled: false,
+                          ],
                         );
                       }),
                     ),

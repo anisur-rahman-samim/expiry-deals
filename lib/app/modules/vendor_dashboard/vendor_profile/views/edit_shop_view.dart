@@ -2,6 +2,8 @@ import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/control
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_loader.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -259,43 +261,56 @@ class EditShopView extends GetView {
   }
 
   Widget _buildLocationSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("Shop Location", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 16),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: SizedBox(
-            height: 240,
-            child: Obx(
-                  () => GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: controller.shopLocation.value,
-                  zoom: 15.5,
-                ),
-                onMapCreated: controller.onMapCreated,
-                markers: {
-                  Marker(
-                    markerId: const MarkerId("shop"),
-                    position: controller.shopLocation.value,
+    return GestureDetector(
+      onTap: controller.openLocationPicker,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: SizedBox(
+          height: 240,
+          child: Stack(
+            children: [
+              Obx(
+                    () => GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target: controller.shopLocation.value,
+                    zoom: 15.5,
                   ),
-                },
-                onTap: controller.updateLocation,
-                myLocationButtonEnabled: true,
-                zoomControlsEnabled: false,
+                  onMapCreated: controller.onMapCreated,
+                  markers: {
+                    Marker(
+                      markerId: const MarkerId("shop"),
+                      position: controller.shopLocation.value,
+                    ),
+                  },
+                  myLocationButtonEnabled: false,
+                  zoomControlsEnabled: false,
+                  gestureRecognizers: {
+                    Factory<OneSequenceGestureRecognizer>(
+                          () => EagerGestureRecognizer(),
+                    ),
+                  },
+                ),
               ),
-            ),
+              // Hint overlay
+              Positioned.fill(
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: const Text(
+                      "Tap to adjust location",
+                      style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 16),
-        Obx(
-              () => Text(
-            "Lat: ${controller.shopLocation.value.latitude.toStringAsFixed(6)}    Lng: ${controller.shopLocation.value.longitude.toStringAsFixed(6)}",
-            style: const TextStyle(color: Colors.grey, fontSize: 13),
-          ),
-        ),
-      ],
+      ),
     );
   }
 

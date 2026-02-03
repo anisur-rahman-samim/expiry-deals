@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/app/data/base_client.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/model/my_shop_model.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/views/full_screen_map_view.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,6 @@ class EditShopController extends GetxController {
   final descController = TextEditingController();
   final addressController = TextEditingController();
 
-  // Changed to nullable
   final Rx<String?> selectedOpeningHours = Rx<String?>(null);
 
   final RxList<String> selectedDays = <String>[].obs;
@@ -31,7 +31,7 @@ class EditShopController extends GetxController {
   final daysOfWeek = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
   GoogleMapController? mapController;
-  final Rx<LatLng> shopLocation = const LatLng(40.73061, -73.935242).obs;
+  final Rx<LatLng> shopLocation = const LatLng(23.8103, 90.4125).obs; // Default: Dhaka
 
   final List<String> allowedHours = [
     "8:00 AM - 9:00 PM",
@@ -43,6 +43,14 @@ class EditShopController extends GetxController {
 
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    // Optional: animate to current shop location on creation
+    if (shopLocation.value != const LatLng(23.8103, 90.4125)) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        mapController?.animateCamera(
+          CameraUpdate.newLatLng(shopLocation.value),
+        );
+      });
+    }
   }
 
   @override
@@ -61,8 +69,21 @@ class EditShopController extends GetxController {
     }
   }
 
-  void updateLocation(LatLng pos) {
-    shopLocation.value = pos;
+  // ── Open full-screen location picker ─────────────────────────────────────
+  Future<void> openLocationPicker() async {
+    final picked = await Get.to(
+          () => FullScreenLocationPicker(initialPosition: shopLocation.value),
+      transition: Transition.fadeIn,
+      duration: const Duration(milliseconds: 350),
+    );
+
+    if (picked != null && picked is LatLng) {
+      shopLocation.value = picked;
+      // Smoothly animate the small preview map to new position
+      mapController?.animateCamera(
+        CameraUpdate.newLatLng(picked),
+      );
+    }
   }
 
   Future<void> updateShop() async {
@@ -77,7 +98,6 @@ class EditShopController extends GetxController {
 
       final request = http.MultipartRequest("PATCH", uri);
 
-      // Prepare data – use fallback if null
       final hoursToSend = selectedOpeningHours.value ?? allowedHours.first;
 
       final data = {
@@ -89,15 +109,13 @@ class EditShopController extends GetxController {
         "location": {
           "type": "Point",
           "coordinates": [
-            shopLocation.value.longitude,
-            shopLocation.value.latitude,
+            shopLocation.value.longitude,  // lng first (GeoJSON standard)
+            shopLocation.value.latitude,   // lat second
           ],
         },
       };
 
       request.fields['data'] = jsonEncode(data);
-
-      debugPrint("PATCH data: ${request.fields['data']}");
 
       // Logo
       if (logoImage.value != null && await logoImage.value!.exists()) {
@@ -121,29 +139,17 @@ class EditShopController extends GetxController {
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
 
-      debugPrint("Status Code: ${response.statusCode}");
-      debugPrint("Response: $responseBody");
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         await fetchMyShop();
         Get.back();
-        Get.snackbar(
-          "Success",
-          "Shop updated successfully",
-          backgroundColor: Colors.green.shade700,
-          colorText: Colors.white,
-        );
+        Get.snackbar("Success", "Shop updated successfully",
+            backgroundColor: Colors.green.shade700, colorText: Colors.white);
       } else {
-        Get.snackbar(
-          "Error",
-          "Failed (${response.statusCode})",
-          backgroundColor: Colors.red.shade700,
-          colorText: Colors.white,
-        );
+        Get.snackbar("Error", "Failed (${response.statusCode})",
+            backgroundColor: Colors.red.shade700, colorText: Colors.white);
       }
-    } catch (e, stack) {
-      debugPrint("Update error: $e\n$stack");
-      Get.snackbar("Error", "Something went wrong");
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
     } finally {
       isLoading.value = false;
     }
@@ -173,15 +179,13 @@ class EditShopController extends GetxController {
         descController.text = data?.description ?? "";
         addressController.text = data?.address ?? "";
 
-        // Safe handling for opening hours
         final backendHours = data?.openingHours?.trim();
         if (backendHours != null && allowedHours.contains(backendHours)) {
           selectedOpeningHours.value = backendHours;
         } else {
-          selectedOpeningHours.value = null; // Will show placeholder
+          selectedOpeningHours.value = null;
         }
 
-        // Opening days
         if (data?.openingDays != null && data!.openingDays!.isNotEmpty) {
           selectedDays.value = data.openingDays!
               .split(',')
@@ -192,7 +196,6 @@ class EditShopController extends GetxController {
           selectedDays.clear();
         }
 
-        // Location – assuming coordinates are [lng, lat]
         if (data?.location?.coordinates != null &&
             data!.location!.coordinates.length == 2) {
           shopLocation.value = LatLng(
@@ -213,6 +216,9 @@ class EditShopController extends GetxController {
     nameController.dispose();
     descController.dispose();
     addressController.dispose();
+    mapController?.dispose();
     super.onClose();
   }
 }
+
+
