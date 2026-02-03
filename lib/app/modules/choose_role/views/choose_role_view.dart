@@ -40,8 +40,8 @@ class ChooseRoleView extends StatelessWidget {
                   // Main Illustration
                   Image.asset(
                     AppImages.roleSelect,
-                   // height: 320,
-                    fit: BoxFit.contain,
+                    height: Get.height / 2,
+                    fit: BoxFit.cover,
                   ),
 
                   sh40,

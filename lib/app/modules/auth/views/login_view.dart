@@ -64,22 +64,25 @@ class LoginView extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.all(50),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      sh30,
-                      Image.asset(AppImages.logoIcon, height: 70),
-                      sh30,
-                      Text(
-                        "Welcome Back!",
-                        style: h1.copyWith(color: AppColors.white, fontSize: 34),
-                      ),
-                      sh10,
-                      Text(
-                        "Sign in to continue your journey with Trusten.",
-                        style: h2.copyWith(color: AppColors.white, fontSize: 14),
-                      ),
-                    ],
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        sh30,
+                        Image.asset(AppImages.logoIcon, height: 70),
+                        sh30,
+                        Text(
+                          "Welcome Back!",
+                          style: h1.copyWith(color: AppColors.white, fontSize: 34),
+                        ),
+                        sh10,
+                        Text(
+                          "Sign in to continue your journey with Trusten.",
+                          style: h2.copyWith(color: AppColors.white, fontSize: 14),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

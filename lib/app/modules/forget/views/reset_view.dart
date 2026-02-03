@@ -62,27 +62,29 @@ class ResetView extends StatelessWidget {
                 // Content inside header
                 Padding(
                   padding: EdgeInsets.all(50),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      sh30,
-                      // Logo
-                      Image.asset(AppImages.logoIcon, height: 70),
-                      sh30,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        sh30,
+                        // Logo
+                        Image.asset(AppImages.logoIcon, height: 70),
+                        sh30,
 
-                      // Title
-                      Text(
-                          "Set New Password",
-                          textAlign: TextAlign.center,
-                          style: h1.copyWith(color: AppColors.white, fontSize: 30)
-                      ),
-                      sh10,
-                      Text(
-                          "Update your password to complete the reset process.",
-                          textAlign: TextAlign.center,
-                          style: h3.copyWith(color: AppColors.white, fontSize: 14)
-                      ),
-                    ],
+                        // Title
+                        Text(
+                            "Set New Password",
+                            textAlign: TextAlign.center,
+                            style: h1.copyWith(color: AppColors.white, fontSize: 30)
+                        ),
+                        sh10,
+                        Text(
+                            "Update your password to complete the reset process.",
+                            textAlign: TextAlign.center,
+                            style: h3.copyWith(color: AppColors.white, fontSize: 14)
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

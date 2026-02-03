@@ -56,29 +56,31 @@ class ForgetView extends StatelessWidget {
                 // Content inside header
                 Padding(
                   padding: EdgeInsets.all(50),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      sh30,
-                      // Logo
-                      Image.asset(AppImages.logoIcon, height: 70),
-                      sh30,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        sh30,
+                        // Logo
+                        Image.asset(AppImages.logoIcon, height: 70),
+                        sh30,
 
-                      // Title
-                      Text(
-                        "Verify It's You",
-                        style: h1.copyWith(color: AppColors.white, fontSize: 28),
-                        textAlign: TextAlign.center,
-                      ),
-                      sh10,
-                      Text(
-                          "Please provide the email address associated with your account.",
+                        // Title
+                        Text(
+                          "Verify It's You",
+                          style: h1.copyWith(color: AppColors.white, fontSize: 28),
                           textAlign: TextAlign.center,
-                          style: h3.copyWith(color: AppColors.white, fontSize: 14)
-                      ),
-                      sh10,
+                        ),
+                        sh10,
+                        Text(
+                            "Please provide the email address associated with your account.",
+                            textAlign: TextAlign.center,
+                            style: h3.copyWith(color: AppColors.white, fontSize: 14)
+                        ),
+                        sh10,
 
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],

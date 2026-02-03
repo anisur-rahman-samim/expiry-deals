@@ -107,23 +107,25 @@ class _VerifyViewState extends State<VerifyView> {
                 SafeArea(
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: width * 0.1),
-                    child: Column(
-                      children: [
-                        sh50,
-                        Image.asset(AppImages.logoWhite, height: 80),
-                        sh40,
-                        Text(
-                          "Confirm It’s Really You.",
-                          textAlign: TextAlign.center,
-                          style: h1.copyWith(color: AppColors.white, fontSize: 30),
-                        ),
-                        sh16,
-                        Text(
-                            "Enter the 6-digit code sent to your email.",
+                    child: Center(
+                      child: Column(
+                        children: [
+                          sh50,
+                          Image.asset(AppImages.logoWhite, height: 80),
+                          sh40,
+                          Text(
+                            "Confirm It’s Really You.",
                             textAlign: TextAlign.center,
-                            style: h2.copyWith(color: AppColors.white, fontSize: 14)
-                        ),
-                      ],
+                            style: h1.copyWith(color: AppColors.white, fontSize: 30),
+                          ),
+                          sh16,
+                          Text(
+                              "Enter the 6-digit code sent to your email.",
+                              textAlign: TextAlign.center,
+                              style: h2.copyWith(color: AppColors.white, fontSize: 14)
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

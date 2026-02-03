@@ -62,23 +62,25 @@ class VendorRequestView extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(50),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      sh30,
-                      Image.asset(AppImages.logoIcon, height: 70),
-                      sh30,
-                      Text(
-                        "Apply for Vendor",
-                        style: h1.copyWith(color: AppColors.white, fontSize: 30),
-                        textAlign: TextAlign.center,
-                      ),
-                      sh10,
-                      Text(
-                        "Join smart and secure selling made for you.",
-                        style: h2.copyWith(color: AppColors.white, fontSize: 14),
-                      ),
-                    ],
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        sh30,
+                        Image.asset(AppImages.logoIcon, height: 70),
+                        sh30,
+                        Text(
+                          "Apply for Vendor",
+                          style: h1.copyWith(color: AppColors.white, fontSize: 30),
+                          textAlign: TextAlign.center,
+                        ),
+                        sh10,
+                        Text(
+                          "Join smart and secure selling made for you.",
+                          style: h2.copyWith(color: AppColors.white, fontSize: 14),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
