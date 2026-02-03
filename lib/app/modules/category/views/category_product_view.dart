@@ -55,7 +55,7 @@ class _CategoryProductViewState extends State<CategoryProductView> {
 
       ),
       body: Obx(() => categoryProductController.isLoading.value ? Center(child: SpinKitDualRing(
-        color: AppColors.white,
+        color: AppColors.mainColor,
         size: 30.0,
       ),) :  categoryProductController.categoryProducts.isEmpty? Center(child: Text("Product not available"),) : RefreshIndicator(
         onRefresh: () async => await Future.delayed(const Duration(seconds: 1)),

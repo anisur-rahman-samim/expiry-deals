@@ -1,7 +1,7 @@
 class Api {
   /// base url
  // static const baseUrl = "http://10.10.10.27:7000/api/v1";
-  static const baseUrl = "http://103.186.20.117:9000/api/v1";
+  static const baseUrl = "https://api.expirydeals.online/api/v1";
 
   ///auth
   static const login = "$baseUrl/auth/login"; //done
@@ -29,6 +29,7 @@ class Api {
   static  categoryProducts({required categoryId}) => "$baseUrl/products?category=$categoryId"; // done
   static const allShop = "$baseUrl/shop"; // done
   static const myOrders = "$baseUrl/orders/my-orders"; // done
+  static  singleOrder({required orderId}) => "$baseUrl/orders/$orderId"; // done
   static const cartEmpty = "$baseUrl/add-to-card/empty"; //done
   static  shopWiseProduct({required shopId}) => "$baseUrl/products/author/$shopId"; // done
   static  shopById({required shopId}) => "$baseUrl/shop/$shopId"; // done
@@ -42,6 +43,7 @@ class Api {
   static const addProduct = "$baseUrl/products"; // done
   static const myProduct = "$baseUrl/products/my-products?limit=1000000000000";//done
   static  updateProduct({required productId}) => "$baseUrl/products/$productId"; // done
+
   static  deleteProduct({required productId}) => "$baseUrl/products/$productId"; // done
   static  vendorOrder({required authorId}) => "$baseUrl/orders?author=$authorId"; // done
   static  deleteOrder({required orderId}) => "$baseUrl/orders/$orderId"; // no need

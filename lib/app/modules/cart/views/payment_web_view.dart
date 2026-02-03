@@ -1,100 +1,93 @@
-import 'package:expiry_deals/app/modules/order_success/views/order_success_view.dart';
-import 'package:expiry_deals/common/app_color/app_colors.dart';
-import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
+
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:get/get.dart';
 
+import '../../../../common/app_color/app_colors.dart';
+import '../../../../common/app_text_style/styles.dart';
+import '../controllers/payment_controller.dart';
 
-class PaymentWebView extends StatefulWidget {
-  final String paymentUrl;
-  final String orderId;
-
-  const PaymentWebView({
-    super.key,
-    required this.paymentUrl,
-    required this.orderId,
-  });
+class PaymentView extends StatefulWidget {
+  String? paymentUrl;
+  PaymentView({super.key, this.paymentUrl});
 
   @override
-  State<PaymentWebView> createState() => _PaymentWebViewState();
+  _PaymentViewState createState() => _PaymentViewState();
 }
 
-class _PaymentWebViewState extends State<PaymentWebView> {
-  late final WebViewController _controller;
+class _PaymentViewState extends State<PaymentView> {
+  late WebViewController _controller;
   bool _isLoading = true;
+
+  final PaymentController paymentController = Get.put(PaymentController());
 
   @override
   void initState() {
     super.initState();
-    // For Android hybrid composition (newer versions)
-    // WebView.platform = SurfaceAndroidWebView(); // usually not needed anymore in 2025+
+    if (widget.paymentUrl == null || widget.paymentUrl!.isEmpty) {
+      print('Error: Invalid payment URL');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Invalid payment URL')),
+        );
+        Navigator.pop(context);
+      });
+      return;
+    }
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
-          onProgress: (int progress) {
-            // You can show progress bar if you want
-          },
           onPageStarted: (String url) {
+            print('Page started loading: $url');
             setState(() => _isLoading = true);
           },
           onPageFinished: (String url) {
+            print('Page finished loading: $url');
             setState(() => _isLoading = false);
+            if (url.contains('confirm-payment')) {
+              print('Calling paymentDone with URL: $url');
+              paymentController.paymentDone(paymentApi: url);
+            }
           },
           onWebResourceError: (WebResourceError error) {
-            debugPrint('Web resource error: ${error.description}');
+            print('WebView error: ${error.description}');
+            setState(() => _isLoading = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to load payment page: ${error.description}')),
+            );
           },
           onNavigationRequest: (NavigationRequest request) {
-            // ──────────────────────────────────────────────
-            // This is the key part — intercept your redirect URLs
-            // ──────────────────────────────────────────────
-            if (request.url.contains('/payment/success')) {
-              _handlePaymentResult(success: true);
-              return NavigationDecision.prevent;
+            print('Navigating to: ${request.url}');
+            if (request.url.contains('success') ||
+                request.url.contains('cancel') ||
+                request.url.contains('error')) {
+              print('Payment redirect URL: ${request.url}');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Payment redirect: ${request.url}')),
+              );
+              Navigator.pop(context);
             }
-            if (request.url.contains('/payment/failed') ||
-                request.url.contains('/payment/cancel')) {
-              _handlePaymentResult(success: false);
-              return NavigationDecision.prevent;
-            }
-
-            // Allow all other navigations
             return NavigationDecision.navigate;
           },
         ),
       )
-      ..loadRequest(Uri.parse(widget.paymentUrl));
-  }
-
-  Future<void> _handlePaymentResult({required bool success}) async {
-    // Optional: call your backend to verify the payment status
-    // (very strongly recommended for security)
-    // e.g. await verifyPaymentOnBackend(widget.orderId, success);
-
-    if (!mounted) return;
-
-    if (success) {
-      Get.offAll(() => OrderSuccessView());
-      kSnackBar(message: 'Payment successful!', bgColor: AppColors.green);
-    } else {
-      // You can go back to cart or show failed page
-      Get.back(); // or Get.offAll(() => FailedView());
-      kSnackBar(message: 'Payment failed or cancelled.', bgColor: AppColors.failedColor);
-    }
+      ..loadRequest(Uri.parse(widget.paymentUrl!));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Complete Payment')),
+      backgroundColor: AppColors.bgColor,
+      appBar: AppBar(
+        backgroundColor: AppColors.bgColor,
+        title: Text('Payment', style: h2.copyWith(fontSize: 18)),
+      ),
       body: Stack(
         children: [
           WebViewWidget(controller: _controller),
-          if (_isLoading)
-            const Center(child: CircularProgressIndicator()),
+          if (_isLoading) const Center(child: CircularProgressIndicator()),
         ],
       ),
     );

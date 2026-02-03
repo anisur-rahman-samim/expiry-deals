@@ -71,6 +71,8 @@ class OrderPlaceController extends GetxController {
 
       if (response != null) {
         if (response["success"] == true) {
+
+          debugPrint("orderID:   ${response["data"]["_id"]}");
           cartController.cartEmpty();
           if(paymentMethod == "1"){
             Get.offAll(() => OrderSuccessView());
@@ -132,11 +134,9 @@ class OrderPlaceController extends GetxController {
       if (response != null) {
         if (response["success"] == true) {
           paymentUrl.value = response["data"];
+          print("payment url>>>>> ${paymentUrl.value}");
           //paymentUrl will be open a webview then after payment will be redeirect a api. after this api call responce is success then will be route successview page or failview page.
-          Get.to(() => PaymentWebView(
-            paymentUrl: paymentUrl.value,
-            orderId: orderId,
-          ));
+          Get.to(() =>     PaymentView(paymentUrl: paymentUrl.value));
         } else {
 
           kSnackBar(message: 'Failed to place order.', bgColor: AppColors.failedColor);
@@ -151,5 +151,8 @@ class OrderPlaceController extends GetxController {
       isLoading(false);
     }
   }
+
+
+
 }
 
