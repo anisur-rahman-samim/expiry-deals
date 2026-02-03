@@ -30,7 +30,7 @@ class PaymentController extends GetxController {
 
       print('Response body: $responseBody');
       if (responseBody != null) {
-        bool isTruePayment = responseBody['success'] == true ||
+        bool isTruePayment = responseBody['success'] == false ||
             responseBody['success'] == 'true' ||
             responseBody['status'] == 'success';
         if (isTruePayment) {
