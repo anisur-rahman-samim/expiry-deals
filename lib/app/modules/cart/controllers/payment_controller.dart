@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:expiry_deals/app/modules/order_success/views/order_success_view.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,35 +19,35 @@ class PaymentController extends GetxController {
   Future<void> paymentDone({required String paymentApi}) async {
     try {
       isLoading(true);
-      var headers = {
+
+      final token = LocalStorage.getData(key: AppConstant.token);
+      if (token == null) throw 'No auth token found';
+
+      final headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${LocalStorage.getData(key: AppConstant.token)}',
+        'Authorization': 'Bearer $token',
       };
-      print('Making request to: $paymentApi');
+
+      print('Verifying payment → $paymentApi');
       print('Headers: $headers');
 
-      dynamic responseBody = await BaseClient.handleResponse(
-        await BaseClient.getRequest(api: paymentApi, headers: headers),
-      );
+      final response = await BaseClient.getRequest(api: paymentApi, headers: headers);
 
-      print('Response body: $responseBody');
-      if (responseBody != null) {
-        bool isTruePayment = responseBody['success'] == false ||
-            responseBody['success'] == 'true' ||
-            responseBody['status'] == 'success';
-        if (isTruePayment) {
+      print('Status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
-          Get.to(() => OrderSuccessView());
-        } else {
-          Get.back();
-          kSnackBar(message: "Payment failed!", bgColor: AppColors.orange);
-        }
+      // First priority: check HTTP status
+      if (response.statusCode == 200) {
+        Get.to(() => OrderSuccessView());
+
       } else {
-        throw 'Failed payment: Response body is null';
+        Get.back();
+        kSnackBar(message: "Payment verified but status not success", bgColor: AppColors.orange);
       }
     } catch (e) {
-      debugPrint("Catch Error:::::: $e");
+      debugPrint("Payment verification error: $e");
       kSnackBar(message: "Payment error: $e", bgColor: AppColors.orange);
+      Get.back();
     } finally {
       isLoading(false);
     }
