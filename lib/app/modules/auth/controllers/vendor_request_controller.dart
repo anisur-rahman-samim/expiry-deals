@@ -110,8 +110,12 @@ class VendorRequestController extends GetxController {
         debugPrint('Server error ${streamedResponse.statusCode}: $responseBody');
         Get.snackbar(
           'Error',
-          'Failed (${streamedResponse.statusCode})\n${responseBody.substring(0, responseBody.length.clamp(0, 150))}...',
+          'Server error ${streamedResponse.statusCode}',
         );
+        // Get.snackbar(
+        //   'Error',
+        //   'Failed (${streamedResponse.statusCode})\n${responseBody.substring(0, responseBody.length.clamp(0, 150))}...',
+        // );
       }
     } catch (e, stackTrace) {
       debugPrint('Submit exception: $e\n$stackTrace');

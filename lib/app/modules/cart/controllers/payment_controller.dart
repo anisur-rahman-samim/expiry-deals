@@ -36,9 +36,9 @@ class PaymentController extends GetxController {
       print('Status code: ${response.statusCode}');
       print('Response body: ${response.body}');
 
-      // First priority: check HTTP status
+      // First priority: check HTTP status filagal955@newtrea.com
       if (response.statusCode == 200) {
-        Get.to(() => OrderSuccessView());
+        Get.to(() => OrderSuccessView()); // #O34KW6KCRC
 
       } else {
         Get.back();
