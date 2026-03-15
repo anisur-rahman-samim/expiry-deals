@@ -1,10 +1,14 @@
 
 import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/app/modules/change_password/views/change_password_view.dart';
+import 'package:expiry_deals/app/modules/choose_role/views/choose_role_view.dart';
 import 'package:expiry_deals/app/modules/edit_profile/views/edit_profile_view.dart';
 import 'package:expiry_deals/app/modules/privacy_policy/views/privacy_policy_view.dart';
+import 'package:expiry_deals/app/modules/profile/controllers/profile_controller.dart';
 import 'package:expiry_deals/app/modules/terms_conditions/views/terms_conditions_view.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/views/bank_details_view.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/views/edit_shop_view.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/views/withdraw_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
@@ -16,7 +20,9 @@ import 'package:get/get.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class VendorProfileView extends GetView {
-  const VendorProfileView({super.key});
+   VendorProfileView({super.key});
+
+  final ProfileController controller = Get.put(ProfileController());
 
 
   @override
@@ -34,42 +40,37 @@ class VendorProfileView extends GetView {
           padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
-              Container(
-                width: Get.width,
-                decoration: BoxDecoration(
-                  //  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundImage:  NetworkImage("https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png") as ImageProvider,
+              /// Profile Image & Name
+              Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final user = controller.profileData.value.data;
+                return Column(
+                  children: [
+                    // Profile Image
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundImage: NetworkImage(
+                          user?.profile ?? AppImages.noImage
                       ),
-                      sw10,
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("John Doe",
-                            style: h2,
-                          ),
-                          Text("johndoe@mail.com",
-                            style: h3,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ).animate().scaleXY(
-                begin: 0.8,
-                end: 1.0,
-                duration: 600.ms,
-                curve: Curves.bounceOut,
-              ),
+                    ),
+                    sw10,
+
+                    // User Name & Email
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(user?.name ?? 'No Name', style: h2),
+                        Text(user?.email ?? 'No Email', style: h3),
+                      ],
+                    ),
+                  ],
+                );
+              }),
+
               sh30,
               Column(
                 children: [
@@ -128,6 +129,82 @@ class VendorProfileView extends GetView {
                       ),
                       subtitle: Text(
                         "Change shop picture, number, email",
+                        style: h3.copyWith(color: AppColors.gray, fontSize: 12),
+                      ),
+                    ).animate().fadeIn(
+                      duration: 600.ms,
+                      delay: 100.ms,
+                      curve: Curves.easeInOut,
+                    ).slideY(
+                      begin: 0.3,
+                      end: 0.0,
+                      duration: 600.ms,
+                      delay: 100.ms,
+                      curve: Curves.easeInOut,
+                    ).shake(
+                      duration: 800.ms,
+                      delay: 100.ms,
+                      hz: 2,
+                      rotation: 0.05,
+                    ),
+                  ),
+
+  sh16,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      onTap: () {
+                        Get.to(() => BankDetailsView());
+                      },
+                      leading: Image.asset(AppImages.profile, scale: 4,color: AppColors.mainColor,),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      title: Text(
+                          "Bank Details",
+                          style: h2
+                      ),
+                      subtitle: Text(
+                        "Setup your bank information",
+                        style: h3.copyWith(color: AppColors.gray, fontSize: 12),
+                      ),
+                    ).animate().fadeIn(
+                      duration: 600.ms,
+                      delay: 100.ms,
+                      curve: Curves.easeInOut,
+                    ).slideY(
+                      begin: 0.3,
+                      end: 0.0,
+                      duration: 600.ms,
+                      delay: 100.ms,
+                      curve: Curves.easeInOut,
+                    ).shake(
+                      duration: 800.ms,
+                      delay: 100.ms,
+                      hz: 2,
+                      rotation: 0.05,
+                    ),
+                  ),
+
+                  sh16,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      onTap: () {
+                        Get.to(() => WithdrawalView());
+                      },
+                      leading: Image.asset(AppImages.profile, scale: 4,color: AppColors.mainColor,),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      title: Text(
+                          "Withdraw",
+                          style: h2
+                      ),
+                      subtitle: Text(
+                        "Withdraw your payments",
                         style: h3.copyWith(color: AppColors.gray, fontSize: 12),
                       ),
                     ).animate().fadeIn(
@@ -295,7 +372,7 @@ class VendorProfileView extends GetView {
                                     GestureDetector(
                                       onTap: () {
                                         LocalStorage.removeData(key: AppConstant.token);
-                                        Get.to(() => LoginView());
+                                        Get.to(() => ChooseRoleView());
                                       },
                                       child: Container(
                                         height: 50,

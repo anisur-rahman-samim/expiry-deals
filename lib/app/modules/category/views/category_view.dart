@@ -1,5 +1,6 @@
 // category_view.dart
 import 'package:expiry_deals/app/modules/category/views/category_product_view.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/model/category_model.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,23 +8,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 class CategoryView extends StatelessWidget {
-  const CategoryView({super.key});
+  final List<Category> categoryList;
+  const CategoryView({super.key, required this.categoryList});
 
-  // Category Data: name + icon + color (optional)
-  final List<Map<String, dynamic>> categories = const [
-    {'name': 'T-Shirts', 'icon': Icons.checkroom, 'color': Colors.orange},
-    {'name': 'Shirts', 'icon': Icons.checkroom_outlined, 'color': Colors.blue},
-    {'name': 'Jeans', 'icon': Icons.checkroom_rounded, 'color': Colors.indigo},
-    {'name': 'Shoes', 'icon': Icons.shopping_bag, 'color': Colors.purple},
-    {'name': 'Dresses', 'icon': Icons.accessibility_new, 'color': Colors.pink},
-    {'name': 'Jackets', 'icon': Icons.ac_unit, 'color': Colors.red},
-    {'name': 'Bags', 'icon': Icons.shopping_basket, 'color': Colors.green},
-    {'name': 'Watches', 'icon': Icons.watch_later, 'color': Colors.teal},
-    {'name': 'Sunglasses', 'icon': Icons.visibility, 'color': Colors.amber},
-    {'name': 'Jewelry', 'icon': Icons.diamond, 'color': Colors.cyan},
-    {'name': 'Hats', 'icon': Icons.person_outline, 'color': Colors.brown},
-    {'name': 'Belts', 'icon': Icons.linear_scale, 'color': Colors.grey},
-  ];
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -48,13 +40,14 @@ class CategoryView extends StatelessWidget {
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
           ),
-          itemCount: categories.length,
+          itemCount: categoryList.length,
           itemBuilder: (context, index) {
-            final category = categories[index];
+            final category = categoryList[index];
             return _categoryGridItem(
-              name: category['name'],
-              icon: category['icon'],
-              color: category['color'],
+              id: category.id ?? "",
+              name: category.name ?? "",
+              icon: category.banner ?? "",
+              color: AppColors.grayLight,
             );
           },
         ),
@@ -63,13 +56,14 @@ class CategoryView extends StatelessWidget {
   }
 
   Widget _categoryGridItem({
+    required String id,
     required String name,
-    required IconData icon,
+    required String icon,
     required Color color,
   }) {
     return GestureDetector(
       onTap: () {
-        Get.to(() =>  CategoryProductView(), arguments: name);
+        Get.to(() =>  CategoryProductView(categoryId: id,), arguments: name);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -94,11 +88,7 @@ class CategoryView extends StatelessWidget {
                 color: color.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: 32,
-                color: color,
-              ),
+              child: Image.network(icon,scale: 1,)
             ),
             const SizedBox(height: 12),
 

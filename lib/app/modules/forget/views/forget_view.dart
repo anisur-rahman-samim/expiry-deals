@@ -1,12 +1,12 @@
-// app/modules/auth/login/views/login_view.dart
 import 'package:expiry_deals/app/modules/auth/views/verify_view.dart';
+import 'package:expiry_deals/app/modules/forget/controllers/forget_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
+import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,6 +18,10 @@ class ForgetView extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final height = size.height;
     final width = size.width;
+
+    final TextEditingController emailController = TextEditingController();
+
+    final ForgetController forgetController = Get.put(ForgetController());
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -52,29 +56,31 @@ class ForgetView extends StatelessWidget {
                 // Content inside header
                 Padding(
                   padding: EdgeInsets.all(50),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      sh30,
-                      // Logo
-                      Image.asset(AppImages.logoIcon, height: 70),
-                      sh30,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        sh30,
+                        // Logo
+                        Image.asset(AppImages.logoIcon, height: 70),
+                        sh30,
 
-                      // Title
-                      Text(
+                        // Title
+                        Text(
                           "Verify It's You",
                           style: h1.copyWith(color: AppColors.white, fontSize: 28),
-                        textAlign: TextAlign.center,
-                      ),
-                      sh10,
-                      Text(
-                          "Please provide the email address associated with your account.",
                           textAlign: TextAlign.center,
-                          style: h3.copyWith(color: AppColors.white, fontSize: 14)
-                      ),
-                      sh10,
+                        ),
+                        sh10,
+                        Text(
+                            "Please provide the email address associated with your account.",
+                            textAlign: TextAlign.center,
+                            style: h3.copyWith(color: AppColors.white, fontSize: 14)
+                        ),
+                        sh10,
 
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -91,17 +97,17 @@ class ForgetView extends StatelessWidget {
                   // Email Field
                   Text("Email Address", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
-                  CustomTextField(hintText: "Enter Your Email",width: Get.width),
+                  CustomTextField(hintText: "Enter Your Email",controller: emailController,width: Get.width),
                   sh20,
 
                   // Login Button
-                  CustomCenterButton(
-                    title: "Continue",
-                    width: double.infinity,
-                    onTap: () {
-                     Get.to(() => VerifyView(isSignUp: false,));
-                    },
-                  ),
+                 Obx(() => forgetController.isLoading.value? CustomLoaderButton() : CustomCenterButton(
+                   title: "Continue",
+                   width: double.infinity,
+                   onTap: () {
+                     forgetController.forgetPassword(email: emailController.text);
+                   },
+                 ),),
 
 
                   sh50,

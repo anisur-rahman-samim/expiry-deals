@@ -10,6 +10,7 @@ class AppConstant {
   static const roleApi = 'roleApi';
   static const signUpToken = 'signUpToken';
   static const forgotToken = 'forgotToken';
+  static const otpToken = 'otpToken';
   static const fcmToken = 'fcmToken';
   static const onboarding = 'onboarding';
 

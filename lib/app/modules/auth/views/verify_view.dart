@@ -1,13 +1,13 @@
-// app/modules/auth/forget/views/forget_view.dart
+import 'package:expiry_deals/app/modules/auth/controllers/auth_controller.dart';
 import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/app/modules/forget/views/reset_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
-import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
+import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,8 +23,10 @@ class VerifyView extends StatefulWidget {
 
 class _VerifyViewState extends State<VerifyView> {
   final TextEditingController pinController = TextEditingController();
+  final AuthController authController = Get.put(AuthController());
   int countdown = 60;
   bool canResend = false;
+
   @override
   void initState() {
     super.initState();
@@ -50,7 +52,8 @@ class _VerifyViewState extends State<VerifyView> {
     });
     startTimer();
     // TODO: Call your resend API here
-    Get.snackbar("Success", "Verification code sent!");
+    Get.find<AuthController>().resendOtp();
+    kSnackBar(message: "Verification code sent!", bgColor: AppColors.failedColor);
   }
 
   final defaultPinTheme = PinTheme(
@@ -104,23 +107,25 @@ class _VerifyViewState extends State<VerifyView> {
                 SafeArea(
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: width * 0.1),
-                    child: Column(
-                      children: [
-                        sh50,
-                        Image.asset(AppImages.logoWhite, height: 80),
-                        sh40,
-                        Text(
-                          "Confirm It’s Really You.",
-                          textAlign: TextAlign.center,
-                          style: h1.copyWith(color: AppColors.white, fontSize: 30),
-                        ),
-                        sh16,
-                        Text(
-                            "Enter the 6-digit code sent to your email.",
+                    child: Center(
+                      child: Column(
+                        children: [
+                          sh50,
+                          Image.asset(AppImages.logoWhite, height: 80),
+                          sh40,
+                          Text(
+                            "Confirm It’s Really You.",
                             textAlign: TextAlign.center,
-                            style: h2.copyWith(color: AppColors.white, fontSize: 14)
-                        ),
-                      ],
+                            style: h1.copyWith(color: AppColors.white, fontSize: 30),
+                          ),
+                          sh16,
+                          Text(
+                              "Enter the 6-digit code sent to your email.",
+                              textAlign: TextAlign.center,
+                              style: h2.copyWith(color: AppColors.white, fontSize: 14)
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -155,39 +160,25 @@ class _VerifyViewState extends State<VerifyView> {
                     cursor: Container(width: 2, color: AppColors.mainColor),
                     onCompleted: (pin) {
                       // Auto submit when 6 digits entered
-                      //  Get.toNamed('/reset-password');
+                   //   authController.verifyOtp(pin);
                     },
                   ),
 
                   sh50,
 
                   // Verify Button
-                  CustomCenterButton(
-                    title: "Verify Email",
-                    width: double.infinity,
-                    onTap: () {
-                      if (pinController.text.length == 6) {
-                        kSnackBar(message: "OTP Verify Successfully", bgColor: AppColors.green);
-                        if(widget.isSignUp == true){
-                            Get.to(() => LoginView());
-                        }else{
-                          Get.to(() => ResetView());
-                        }
-
-
-                      } else {
-
-                        Get.showSnackbar(
-                          GetSnackBar(
-                            title: "Error",
-                            message: "Please enter 6-digit code",
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-
-                      }
-                    },
-                  ),
+               Obx(() =>    authController.isLoading.value ? CustomLoaderButton() :  CustomCenterButton(
+                 title:  "Verify Email",
+                 width: double.infinity,
+                 onTap: () {
+                   if (pinController.text.length == 6) {
+                     // Call the verifyOtp function
+                     authController.verifyOtp( pinController.text, widget.isSignUp!);
+                   } else {
+                     Get.snackbar('Error', 'Please enter 6-digit code');
+                   }
+                 },
+               ),),
 
                   sh30,
 

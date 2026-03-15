@@ -1,5 +1,5 @@
-// app/modules/auth/login/views/login_view.dart
 import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
+import 'package:expiry_deals/app/modules/forget/controllers/reset_password_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
@@ -7,21 +7,27 @@ import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
+import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
 import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 class ResetView extends StatelessWidget {
-  const ResetView({super.key});
+   ResetView({super.key});
+
+  final ResetPasswordController resetPasswordController = Get.put(ResetPasswordController());
+   final TextEditingController newPasswordController = TextEditingController();
+   final TextEditingController confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final height = size.height;
     final width = size.width;
+
+
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -56,29 +62,29 @@ class ResetView extends StatelessWidget {
                 // Content inside header
                 Padding(
                   padding: EdgeInsets.all(50),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      sh30,
-                      // Logo
-                      Image.asset(AppImages.logoIcon, height: 70),
-                      sh30,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        sh30,
+                        // Logo
+                        Image.asset(AppImages.logoIcon, height: 70),
+                        sh30,
 
-                      // Title
-                      Text(
-                          "Set New Password",
-                          textAlign: TextAlign.center,
-                          style: h1.copyWith(color: AppColors.white, fontSize: 30)
-                      ),
-                      sh10,
-                      Text(
-                          "Update your password to complete the reset process.",
-                          textAlign: TextAlign.center,
-                          style: h3.copyWith(color: AppColors.white, fontSize: 14)
-                      ),
-                      
-
-                    ],
+                        // Title
+                        Text(
+                            "Set New Password",
+                            textAlign: TextAlign.center,
+                            style: h1.copyWith(color: AppColors.white, fontSize: 30)
+                        ),
+                        sh10,
+                        Text(
+                            "Update your password to complete the reset process.",
+                            textAlign: TextAlign.center,
+                            style: h3.copyWith(color: AppColors.white, fontSize: 14)
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -95,24 +101,26 @@ class ResetView extends StatelessWidget {
                   // Password Field
                   Text("Password", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
-                  CustomTextField(hintText: "Enter Your Password",width: Get.width,obscureText: true,),
+                  CustomTextField(controller: newPasswordController,hintText: "Enter Your Password",width: Get.width,obscureText: true,),
                   sh20,
                   // Password Field
                   Text("Confirm Password", style: h4.copyWith(fontWeight: FontWeight.w600)),
                   sh8,
-                  CustomTextField(hintText: "Enter Your Confirm Password",width: Get.width,obscureText: true,),
+                  CustomTextField(controller: confirmPasswordController,hintText: "Enter Your Confirm Password",width: Get.width,obscureText: true,),
 
                   sh30,
 
-                  // Login Button
-                  CustomCenterButton(
-                    title: "Save",
-                    width: double.infinity,
-                    onTap: () {
-                      kSnackBar(message: "Set New Password Successfully", bgColor: AppColors.green);
-                        Get.to(() => LoginView());
-                    },
-                  ),
+                  // Save Button
+                 Obx(() => resetPasswordController.isLoading.value ? CustomLoaderButton(): CustomCenterButton(
+                   title: "Save",
+                   width: double.infinity,
+                   onTap: () {
+                     resetPasswordController.resetPassword(
+                       newPassword: newPasswordController.text,
+                       confirmPassword: confirmPasswordController.text,
+                     );
+                   },
+                 ),),
                   sh50,
                 ],
               ),

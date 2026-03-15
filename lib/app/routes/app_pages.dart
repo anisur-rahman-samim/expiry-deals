@@ -141,12 +141,12 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PRODUCT_DETAILS,
-      page: () => ProductDetailsView(),
+      page: () => ProductDetailsView(productId: "",),
       binding: ProductDetailsBinding(),
     ),
     GetPage(
       name: _Paths.STORE,
-      page: () => const StoreView(),
+      page: () =>  StoreView(shopId: '', authorId: '',),
       binding: StoreBinding(),
     ),
     GetPage(
@@ -161,7 +161,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.CATEGORY,
-      page: () => const CategoryView(),
+      page: () =>  CategoryView(categoryList: [],),
       binding: CategoryBinding(),
     ),
     GetPage(

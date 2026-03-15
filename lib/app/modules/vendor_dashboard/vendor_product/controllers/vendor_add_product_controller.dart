@@ -1,18 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/controllers/category_controller.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/controllers/vendor_product_controller.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:expiry_deals/app/data/api.dart';
-import 'package:expiry_deals/app/data/base_client.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/model/category_model.dart';
 
 class VendorAddProductController extends GetxController {
   var isLoading = false.obs;
-  final selectedImage = RxList<File>(); // To store selected images
+  final VendorProductController vendorProductController = Get.put(
+    VendorProductController(),
+  );
+  final selectedImage = Rxn<File>(); // ← Only one image (Rxn = nullable observable)
+
   final itemName = ''.obs;
   final itemDetails = ''.obs;
   final selectedCategoryId = ''.obs;
@@ -30,6 +34,8 @@ class VendorAddProductController extends GetxController {
   void onInit() {
     super.onInit();
     categoryController = Get.put(CategoryDataController());
+
+    // Auto select first category if none selected
     ever(categoryController.categories, (_) {
       if (categoryController.categories.isNotEmpty && selectedCategoryId.value.isEmpty) {
         final first = categoryController.categories.first;
@@ -39,114 +45,128 @@ class VendorAddProductController extends GetxController {
     });
   }
 
+  /// Pick only ONE image
   Future<void> pickImage() async {
     final picker = ImagePicker();
-    final pickedFiles = await picker.pickMultiImage(imageQuality: 85);
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
 
-    if (pickedFiles != null && pickedFiles.isNotEmpty) {
-      selectedImage.clear();  // Clear previous images if any
-      for (var pickedFile in pickedFiles) {
-        selectedImage.add(File(pickedFile.path));
-      }
+    if (pickedFile != null) {
+      selectedImage.value = File(pickedFile.path);
+      Get.snackbar('Success', 'Image selected', duration: const Duration(seconds: 2));
     }
   }
 
-  // Function to add product with image upload
   Future<void> addProduct() async {
-    if (_validateFields()) {
-      try {
-        // Prepare data for API request
-        String? token = LocalStorage.getData(key: AppConstant.token);
-        if (token == null || token.isEmpty) {
-          throw 'No authentication token found';
-        }
+    if (!_validateFields()) return;
 
-        var headers = {
-          'Authorization': 'Bearer $token',
-        };
+    try {
+      isLoading.value = true;
 
-        isLoading.value = true;
-
-        var uri = Uri.parse(Api.addProduct);
-        var request = http.MultipartRequest('POST', uri)
-          ..headers.addAll(headers)
-          ..fields['data'] = _getProductDataJson(); // Pass product data as JSON string
-
-        // Add images to the request
-        for (var file in selectedImage) {
-          request.files.add(await http.MultipartFile.fromPath('images', file.path));
-        }
-
-        // Send the request
-        var response = await request.send();
-
-        if (response.statusCode == 200) {
-        //  Get.snackbar('Success', 'Product added successfully');
-          print("Product added successfully");
-          // Clear fields after successful submission
-          clearFields();
-          isLoading.value = false;
-        } else {
-        //  Get.snackbar('Error', 'Failed to add product. Please try again.');
-        }
-      } catch (e) {
-        isLoading.value = false;
-        print(e);
-      //  Get.snackbar('Error', e.toString());
+      String? token = LocalStorage.getData(key: AppConstant.token);
+      if (token == null || token.isEmpty) {
+        Get.snackbar('Error', 'Authentication token not found');
+        return;
       }
+
+      var uri = Uri.parse(Api.addProduct);
+
+      var request = http.MultipartRequest('POST', uri);
+
+      // Headers — Do NOT set 'Content-Type' manually for MultipartRequest
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // Add product data as JSON string in 'data' field
+      request.fields['data'] = _getProductDataJson();
+
+      // Add single image (most APIs expect 'image' for single file)
+      if (selectedImage.value != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'images', // ← try 'image' or 'images' — depends on backend
+            selectedImage.value!.path,
+            filename: selectedImage.value!.path.split('/').last,
+          ),
+        );
+      }
+
+      // Send request
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      isLoading.value = false;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        await vendorProductController.fetchProducts();
+        clearFields();
+        Get.back();
+        Get.snackbar('Success', 'Product added successfully!', backgroundColor: Colors.green[100]);
+
+      } else {
+        try {
+          final errorBody = jsonDecode(response.body);
+          Get.snackbar(
+            'Error ${response.statusCode}',
+            errorBody['message'] ?? 'Failed to add product',
+            backgroundColor: Colors.red[100],
+          );
+        } catch (_) {
+          Get.snackbar('Error ${response.statusCode}', response.body.isNotEmpty ? response.body : 'No response body');
+        }
+        print("Server response: ${response.statusCode} - ${response.body}");
+      }
+    } catch (e) {
+      isLoading.value = false;
+      Get.snackbar('Exception', e.toString());
+      print("Exception during add product: $e");
     }
   }
 
-  // Helper function to validate fields
   bool _validateFields() {
-    if (itemName.value.isEmpty) {
-      Get.snackbar('Error', 'Please enter a product name.');
+    if (itemName.value.trim().isEmpty) {
+      Get.snackbar('Error', 'Product name is required');
       return false;
     }
-    if (itemDetails.value.isEmpty) {
-      Get.snackbar('Error', 'Please enter product details.');
+    if (itemDetails.value.trim().isEmpty) {
+      Get.snackbar('Error', 'Product details are required');
       return false;
     }
-    if (price.value.isEmpty || double.tryParse(price.value) == null) {
-      Get.snackbar('Error', 'Please enter a valid price.');
+    if (selectedCategoryId.value.isEmpty) {
+      Get.snackbar('Error', 'Please select a category');
       return false;
     }
-    if (quantity.value.isEmpty || int.tryParse(quantity.value) == null) {
-      Get.snackbar('Error', 'Please enter a valid quantity.');
+    if (price.value.isEmpty || double.tryParse(price.value) == null || double.parse(price.value) <= 0) {
+      Get.snackbar('Error', 'Enter a valid price');
       return false;
     }
-    if (expiryDays.value.isEmpty || int.tryParse(expiryDays.value) == null) {
-      Get.snackbar('Error', 'Please enter a valid expiry period.');
+    if (quantity.value.isEmpty || int.tryParse(quantity.value) == null || int.parse(quantity.value) <= 0) {
+      Get.snackbar('Error', 'Enter a valid quantity');
       return false;
     }
-    if (discountPercent.value.isEmpty || double.tryParse(discountPercent.value) == null) {
-      Get.snackbar('Error', 'Please enter a valid discount percentage.');
+    if (expiryDate.value == null) {
+      Get.snackbar('Error', 'Please select expiry date');
       return false;
     }
-    if (selectedImage.isEmpty) {
-      Get.snackbar('Error', 'Please pick at least one image for the product.');
+    if (selectedImage.value == null) {
+      Get.snackbar('Error', 'Product image is required');
       return false;
     }
     return true;
   }
 
-  // Helper function to prepare the product data JSON
   String _getProductDataJson() {
-    final productData = {
-      "name": itemName.value,
-      "details": itemDetails.value,
+    final data = {
+      "name": itemName.value.trim(),
+      "details": itemDetails.value.trim(),
       "category": selectedCategoryId.value,
-      "price": price.value,
-      "quantity": quantity.value,
+      "price": double.tryParse(price.value) ?? 0.0,
+      "quantity": int.tryParse(quantity.value) ?? 0,
+      "stock": int.tryParse(quantity.value) ?? 0,
       "expiredAt": expiryDate.value?.toIso8601String(),
-      "discount": discountPercent.value,
-      "stock": quantity.value,
+      "discount": double.tryParse(discountPercent.value) ?? 0.0,
     };
-
-    return jsonEncode(productData);
+    return jsonEncode(data);
   }
 
-  // Clear fields after successful product creation
   void clearFields() {
     itemName.value = '';
     itemDetails.value = '';
@@ -156,6 +176,7 @@ class VendorAddProductController extends GetxController {
     quantity.value = '';
     expiryDays.value = '';
     discountPercent.value = '';
-    selectedImage.clear();
+    expiryDate.value = null;
+    selectedImage.value = null;
   }
 }

@@ -1,30 +1,19 @@
-// search_page_view.dart
+import 'package:expiry_deals/app/modules/home/controllers/search_product_controller.dart';
+import 'package:expiry_deals/app/modules/home/model/search_product_model.dart' as searchProduct;
+import 'package:expiry_deals/app/modules/product_details/views/product_details_view.dart';
 import 'package:expiry_deals/app/modules/search_page/controllers/search_page_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
+import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 
 class SearchPageView extends StatelessWidget {
-   SearchPageView({super.key});
+  SearchPageView({super.key});
 
-   final SearchPageController controller = Get.put(SearchPageController());
-
-   final recommendedProductImageList =[
-     "https://img.freepik.com/free-photo/young-attractive-woman-blue-winter-jacket_1303-20115.jpg?semt=ais_hybrid&w=740&q=80",
-     "https://media.istockphoto.com/id/641684768/photo/pretty-girl-in-a-leather-jacket-on-white-background.jpg?s=612x612&w=is&k=20&c=p1Cbfw4L-mKS3eRGpk4DD3QQi3XvdqH2Ot28aOBR2xQ=",
-     "https://www.dhresource.com/webp/m/0x0/f2/albu/g21/M00/1F/F5/rBVaq2DCDRGABLbyAADQ8DkUmO8389.jpg"
-         "https://www.dhresource.com/webp/m/0x0/f2/albu/g21/M00/1F/F5/rBVaq2DCDRGABLbyAADQ8DkUmO8389.jpg",
-     "https://i.pinimg.com/736x/af/38/16/af3816f775f479ab6fb7dfaf30d3e553.jpg",
-     "https://img.freepik.com/free-photo/woman-leaning-white-wooden-board-talking-phone-while-smiling_1157-2023.jpg?semt=ais_hybrid&w=740&q=80",
-     "https://img.freepik.com/free-photo/young-attractive-woman-blue-winter-jacket_1303-20115.jpg?semt=ais_hybrid&w=740&q=80",
-     "https://media.istockphoto.com/id/641684768/photo/pretty-girl-in-a-leather-jacket-on-white-background.jpg?s=612x612&w=is&k=20&c=p1Cbfw4L-mKS3eRGpk4DD3QQi3XvdqH2Ot28aOBR2xQ=",
-     "https://www.dhresource.com/webp/m/0x0/f2/albu/g21/M00/1F/F5/rBVaq2DCDRGABLbyAADQ8DkUmO8389.jpg",
-     "https://i.pinimg.com/736x/af/38/16/af3816f775f479ab6fb7dfaf30d3e553.jpg",
-     "https://img.freepik.com/free-photo/woman-leaning-white-wooden-board-talking-phone-while-smiling_1157-2023.jpg?semt=ais_hybrid&w=740&q=80",
-
-   ];
+  final SearchProductController controller = Get.put(SearchProductController());
 
   @override
   Widget build(BuildContext context) {
@@ -35,18 +24,18 @@ class SearchPageView extends StatelessWidget {
         elevation: 0,
         title: _buildSearchBar(),
         centerTitle: false,
-
       ),
       body: Obx(() {
-        if (controller.searchQuery.value.isEmpty) {
-          return _buildSearchHome();
-        }
-
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator(color: AppColors.mainColor));
         }
 
-        if (controller.searchResults.isEmpty) {
+        if (controller.searchQuery.value.isEmpty) {
+          // If search query is empty, show all products
+          return _buildSearchResults();
+        }
+
+        if (controller.searchProducts.isEmpty) {
           return _buildEmptyResults();
         }
 
@@ -55,6 +44,7 @@ class SearchPageView extends StatelessWidget {
     );
   }
 
+  // Search Bar widget
   Widget _buildSearchBar() {
     return Container(
       height: 48,
@@ -83,73 +73,11 @@ class SearchPageView extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchHome() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
 
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Trending Now', style: h2.copyWith(fontSize: 18)),
-            //  TextButton(onPressed: () {}, child: Text('See all', style: h4.copyWith(color: AppColors.mainColor))),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            childAspectRatio: 0.78,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            children: List.generate(6, (i) => _trendingProductCard(index: i)),
-          ),
-        ],
-      ),
-    );
-  }
 
 
-  Widget _trendingProductCard({required int index}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 6))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            child: Image.network(
-              recommendedProductImageList[index],
-              height: 140,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Leather Jacket', style: h4, maxLines: 1, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 6),
-                Text('\$89.99', style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
+  // Show search results based on user query
   Widget _buildSearchResults() {
     return RefreshIndicator(
       onRefresh: () async => await Future.delayed(const Duration(seconds: 1)),
@@ -161,72 +89,89 @@ class SearchPageView extends StatelessWidget {
           childAspectRatio: 0.78,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
+ 
         ),
-        itemCount: controller.searchResults.length,
+        itemCount: controller.searchProducts.length,
         itemBuilder: (context, index) {
-          final product = controller.searchResults[index];
-          return _productCard(product);
+          final product = controller.searchProducts[index];
+          return productCard(product);
         },
       ),
     );
   }
 
-  Widget _productCard(dynamic product) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 6))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                child: Image.network(
-                  product['image'] ?? 'https://via.placeholder.com/300',
-                  height: 140,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Positioned(
-                top: 10,
-                right: 10,
-                child: CircleAvatar(
-                  radius: 18,
-                  backgroundColor: Colors.white.withValues(alpha: 0.9),
-                  child: const Icon(Icons.favorite_border, size: 20),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+  // Display individual product card
+  Widget productCard(searchProduct.SearchProduct product) {
+    return GestureDetector(
+      onTap: (){
+        Get.to(() => ProductDetailsView(productId: product.id ?? ""));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 6))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
               children: [
-                Text(
-                  product['title'] ?? 'Product Name',
-                  style: h4,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '\$${product['price']?.toStringAsFixed(2) ?? '0.00'}',
-                  style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold),
+                ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                      child: Image.network(
+                        product.images.isNotEmpty ? product.images[0].url ?? AppImages.noImage : AppImages.noImage,
+                        height: 140,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+
+                Positioned(
+                  top: 16, left: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(20)),
+                    child: Text('-${product.discount}% OFF', style: GoogleFonts.dmSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name ?? 'Product Name',
+                    style: h4,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                 Row(
+                   children: [
+                     Text(
+                       '\$${((product.price ?? 0) * (1 - (product.discount ?? 0) / 100)).toStringAsFixed(2)}',
+                       style: h3.copyWith(color: AppColors.mainColor, fontWeight: FontWeight.bold),
+                     ),
+                     sw5,
+                     Text(
+                       '\$${product.price?.toStringAsFixed(2) ?? '0.00'}',
+                       style: h3.copyWith(color: AppColors.gray, fontWeight: FontWeight.bold),
+                     ),
+                   ],
+                 )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
+  // Show message when no products are found
   Widget _buildEmptyResults() {
     return RefreshIndicator(
       onRefresh: () async {},

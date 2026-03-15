@@ -1,10 +1,17 @@
 // vendor_home_view.dart
 
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_order/controllers/vendor_order_controller.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_order/model/my_vendor_order_model.dart';
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_order/views/vendor_order_details_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import '../../vendor_order/views/vendor_order_view.dart';
 import '../controllers/vendor_home_controller.dart';
 
 
@@ -13,7 +20,9 @@ class VendorHomeView extends GetView<VendorHomeController> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the already existing VendorOrderController
     Get.put(VendorHomeController());
+    final orderController = Get.put(VendorOrderController(), permanent: true);
 
     return Scaffold(
       backgroundColor: AppColors.bgColor,
@@ -26,51 +35,79 @@ class VendorHomeView extends GetView<VendorHomeController> {
       ),
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: controller.fetchDashboardData,
-          child: Obx(() => ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              // Welcome
-              Text(
-                'Welcome back, Vendor!',
-                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textColor,
-                ),
-              ),
-              sh8,
-              Text(
-                  "Here's your store performance at a glance",
-                  style: TextStyle(color: AppColors.hintColor, fontSize: 14)),
-              sh20,
+          // Refresh both controllers if needed
+          onRefresh: () async {
+            await orderController.refreshOrders();
+         //   await controller.refreshDashboard(); // if home controller has own data
+          },
+          color: AppColors.mainColor,
+          child: Obx(() {
+            // You can show loading from orderController too
+            if (orderController.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-              // Stats Cards
-              _buildStatsRow(),
-              sh30,
+            final recentOrders = orderController.orders;
 
-              // Earnings Summary + Dropdown
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Earnings Summary',
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textColor,
-                    ),
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                // Welcome
+                Text(
+                  'Welcome back, Vendor!',
+                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textColor,
                   ),
-                  _buildPeriodDropdown(),
-                ],
-              ),
-              sh16,
+                ),
+                sh8,
+                Text(
+                  "Here's your store performance at a glance",
+                  style: TextStyle(color: AppColors.hintColor, fontSize: 14),
+                ),
+                sh20,
 
-              // Chart Card
-              _buildEarningsChartCard(),
+                // Stats Cards
+                _buildStatsRow(),
+                sh30,
 
-              sh40,
-            ],
-          )),
+                // Recent Orders Section
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Recent Orders',
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textColor,
+                      ),
+                    ),
+                    if (recentOrders.isNotEmpty)
+                      TextButton(
+                        onPressed: () => Get.to(() => VendorOrderView()),
+                        child: Text(
+                          'View All',
+                          style: TextStyle(color: AppColors.mainColor),
+                        ),
+                      ),
+                  ],
+                ),
+                sh16,
+
+                // Show last 6 orders (most recent first)
+                if (recentOrders.isEmpty)
+                  _buildEmptyOrders()
+                else
+                  ...recentOrders
+                      .take(6)
+                      .map((order) => _buildRecentOrderCard(order))
+                      .toList(),
+
+                sh40,
+              ],
+            );
+          }),
         ),
       ),
     );
@@ -81,19 +118,26 @@ class VendorHomeView extends GetView<VendorHomeController> {
       children: [
         Row(
           children: [
-            Expanded(child: _statCard("Total Revenue", controller.totalRevenue.value, Icons.account_balance_wallet, AppColors.mainColor)),
+            Expanded(
+              child: _statCard(
+                "Total Revenue",
+                controller.totalRevenue.value,
+                Icons.account_balance_wallet_rounded,
+                AppColors.mainColor,
+              ),
+            ),
             sw10,
-            Expanded(child: _statCard("Total Orders", controller.totalOrders.value, Icons.shopping_cart, AppColors.green)),
+            Expanded(
+              child: _statCard(
+                "Total Products",
+                controller.totalProducts.value,
+                Icons.inventory_2_rounded,
+                AppColors.green,
+              ),
+            ),
           ],
         ),
-        sh10,
-        Row(
-          children: [
-            Expanded(child: _statCard("Active Products", controller.activeProducts.value, Icons.inventory_2, AppColors.orange)),
-            sw10,
-            Expanded(child: _statCard("Pending Orders", controller.pendingOrders.value, Icons.pending_actions, AppColors.red)),
-          ],
-        ),
+
       ],
     );
   }
@@ -106,10 +150,10 @@ class VendorHomeView extends GetView<VendorHomeController> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Column(
@@ -119,146 +163,18 @@ class VendorHomeView extends GetView<VendorHomeController> {
           sh14,
           Text(
             value,
-            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.textColor),
+            style: GoogleFonts.dmSans(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textColor,
+            ),
           ),
           sh5,
-          Text(title, style: TextStyle(fontSize: 13, color: AppColors.hintColor)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPeriodDropdown() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.grayLight),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))
-        ],
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-            value: controller.selectedPeriod.value,
-            icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.mainColor),
-            iconSize: 24,
-            elevation: 4,
-            borderRadius: BorderRadius.circular(12),
-            dropdownColor: AppColors.white,
-            style: TextStyle(color: AppColors.textColor, fontWeight: FontWeight.w600),
-        onChanged: (String? newValue) {
-          if (newValue != null) controller.changePeriod(newValue);
-        },
-        items: const [
-          DropdownMenuItem(value: 'weekly', child: Text('This Week')),
-          DropdownMenuItem(value: 'monthly', child: Text('This Month')),
-          DropdownMenuItem(value: 'yearly', child: Text('This Year')),
-        ],
-      ),
-    ),
-    );
-  }
-
-  Widget _buildEarningsChartCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 16, offset: const Offset(0, 6))
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                controller.currentPeriodEarnings.value,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.mainColor,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.green.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  controller.currentPeriodGrowth.value,
-                  style: TextStyle(color: AppColors.green, fontWeight: FontWeight.bold, fontSize: 13),
-                ),
-              ),
-            ],
-          ),
-          sh8,
-          Text(_getPeriodSubtitle(), style: TextStyle(color: AppColors.hintColor, fontSize: 13)),
-          sh20,
-
-          // Chart
-          SizedBox(
-            height: controller.selectedPeriod.value == 'yearly' ? 260 : 230,
-            child: LineChart(
-              LineChartData(
-                gridData: const FlGridData(show: false),
-                titlesData: FlTitlesData(
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 38,
-                      interval: 1,
-                      getTitlesWidget: (value, meta) {
-                        final labels = _getBottomLabels();
-                        final index = value.toInt();
-                        if (index < 0 || index >= labels.length) return const SizedBox.shrink();
-                        return SideTitleWidget(
-                          meta: meta,
-                          space: 10,
-                          child: Text(
-                            labels[index],
-                            style: TextStyle(fontSize: 12, color: AppColors.hintColor),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                borderData: FlBorderData(show: false),
-                lineTouchData: LineTouchData(
-                  enabled: true,
-                  touchTooltipData: LineTouchTooltipData(
-                  //  tooltipBgColor: AppColors.blackNav.withOpacity(0.9),
-                  //  tooltipRoundedRadius: 8,
-                    getTooltipItems: (spots) => spots.map((spot) => LineTooltipItem(
-                      '\$${(spot.y/1000).toStringAsFixed(1)}k',
-                      const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    )).toList(),
-                  ),
-                ),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: controller.earningsSpots,
-                    isCurved: true,
-                    color: AppColors.mainColor,
-                    barWidth: 5,
-                    dotData: const FlDotData(show: true),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: AppColors.mainColor.withValues(alpha: 0.15),
-                    ),
-                  ),
-                ],
-              ),
+          Text(
+            title,
+            style: GoogleFonts.dmSans(
+              fontSize: 14,
+              color: AppColors.hintColor,
             ),
           ),
         ],
@@ -266,24 +182,110 @@ class VendorHomeView extends GetView<VendorHomeController> {
     );
   }
 
-  String _getPeriodSubtitle() {
-    switch (controller.selectedPeriod.value) {
-      case 'weekly': return 'Last 7 days';
-      case 'monthly': return 'Last 30 days';
-      case 'yearly': return 'Last 12 months';
-      default: return '';
+  Widget _buildRecentOrderCard(MyVendorOrder order) {
+    final date = DateFormat('dd MMM yyyy • hh:mm a').format(order.createdAt ?? DateTime.now());
+    final statusColor = _getStatusColor(order.status ?? '');
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      color: AppColors.white,
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => Get.to(() => VendorOrderDetailsView(order: order)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Order ${order.datumId ?? order.id?.substring(order.id!.length - 5) ?? '—'}',
+                    style: GoogleFonts.dmSans(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: statusColor.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      (order.status ?? 'Unknown').capitalizeFirst ?? 'Unknown',
+                      style: TextStyle(
+                        color: statusColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              sh8,
+              Text(
+                date,
+                style: TextStyle(color: AppColors.hintColor, fontSize: 13),
+              ),
+              sh10,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${order.items.length} item${order.items.length != 1 ? 's' : ''}',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  Text(
+                    '\$${order.totalPrice?.toStringAsFixed(2) ?? '0.00'}',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.mainColor,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyOrders() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 32),
+      child: Center(
+        child: Column(
+          children: [
+            Icon(Icons.receipt_long_outlined, size: 60, color: Colors.grey[400]),
+            sh16,
+            Text(
+              'No recent orders yet',
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'delivered':
+        return AppColors.green;
+      case 'ongoing':
+        return Colors.blue;
+      case 'pending':
+        return AppColors.orange;
+      case 'cancelled':
+        return AppColors.red;
+      default:
+        return AppColors.gray;
     }
   }
 
-  List<String> _getBottomLabels() {
-    switch (controller.selectedPeriod.value) {
-      case 'weekly':
-        return const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      case 'monthly':
-      case 'yearly':
-        return const ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      default:
-        return [];
-    }
-  }
+// Your existing _buildStatsRow() and _statCard() ...
+// ...
 }

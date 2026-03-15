@@ -1,67 +1,59 @@
-// Model
+import 'dart:convert';
+
 import 'package:get/get.dart';
+import 'package:expiry_deals/app/data/api.dart';
+import 'package:expiry_deals/app/data/base_client.dart';
+import 'package:expiry_deals/common/helper/local_store.dart';
+import 'package:expiry_deals/common/app_constant/app_constant.dart';
 
-class AppNotification {
-  final String id;
-  final String title;
-  final String body;
-  final String type; // message, order, promo, etc.
-  final DateTime createdAt;
-  bool isRead;
+import '../model/notification_model.dart';
 
-  AppNotification({
-    required this.id,
-    required this.title,
-    required this.body,
-    this.type = 'general',
-    required this.createdAt,
-    this.isRead = false,
-  });
-}
 
-// In NotificationsController
 class NotificationsController extends GetxController {
-  var notifications = <AppNotification>[].obs;
-  var isLoading = true.obs;
+  var isLoading = false.obs;
+
+  var notificationList = <NotificationList>[].obs;
 
   @override
   void onInit() {
-    fetchNotifications();
     super.onInit();
+    fetchNotifications();
   }
 
+
+  // Fetch products from the server
   Future<void> fetchNotifications() async {
     try {
       isLoading(true);
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
 
-      // Sample data
-      notifications.assignAll([
-        AppNotification(
-          id: '1',
-          title: 'New Message',
-          body: 'John Doe sent you a new message',
-          type: 'message',
-          createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
+      var token = LocalStorage.getData(key: AppConstant.token);
+      if (token == null || token.isEmpty) {
+        Get.snackbar('Error', 'Authentication token is missing.');
+        return;
+      }
+
+      var headers = {
+        'Authorization': 'Bearer $token',
+      };
+
+      dynamic response = await BaseClient.handleResponse(
+        await BaseClient.getRequest(
+          api: Api.notifications + "?limit=9000000000",
+          headers: headers,
         ),
-        AppNotification(
-          id: '2',
-          title: 'Order Delivered!',
-          body: 'Your order #12345 has been delivered successfully',
-          type: 'order',
-          createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-          isRead: true,
-        ),
-      ]);
+      );
+
+      if (response != null && response['success'] == true) {
+        // Map the API response to the ProductModel and assign it to the product list
+        notificationList.assignAll(NotificationModel.fromJson(response).data ?? []);
+      } else {
+        Get.snackbar('Error', 'Failed to fetch notification.');
+      }
+    } catch (e) {
+      Get.snackbar('Error', e.toString());
     } finally {
       isLoading(false);
     }
   }
 
-  void markAsRead(String id) {
-    final notif = notifications.firstWhere((n) => n.id == id);
-    notif.isRead = true;
-    notifications.refresh();
-  }
 }

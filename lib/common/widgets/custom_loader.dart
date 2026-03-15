@@ -9,11 +9,22 @@ class CustomLoaderButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  Container(
-      height: 43,
+      height: 50,
       width: Get.width,
       decoration: BoxDecoration(
-        color: Color(0xff0F1A2E),
-        borderRadius: BorderRadius.circular(6),
+       gradient:  const LinearGradient(
+            colors: [AppColors.mainColor, AppColors.secColor],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+        borderRadius: BorderRadius.circular(30),
+         boxShadow:  [
+            BoxShadow(
+              color: AppColors.mainColor.withValues(alpha: 0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+              ]
       ),
       child: Center(child: SpinKitDualRing(
         color: AppColors.white,
@@ -23,15 +34,4 @@ class CustomLoaderButton extends StatelessWidget {
   }
 }
 
-class CustomLoader extends StatelessWidget {
-  final Color color;
-  const CustomLoader({super.key, required this.color});
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: SpinKitDualRing(
-      color: color,
-      size: 30.0,
-    ),);
-  }
-}

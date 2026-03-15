@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../controllers/notifications_controller.dart';
+import '../model/notification_model.dart';
 
 
 
@@ -30,7 +31,7 @@ class NotificationsView extends GetView {
           );
         }
 
-        if (controller.notifications.isEmpty) {
+        if (controller.notificationList.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -53,19 +54,17 @@ class NotificationsView extends GetView {
           color: AppColors.mainColor,
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: controller.notifications.length,
+            itemCount: controller.notificationList.length,
             itemBuilder: (context, index) {
-              final notification = controller.notifications[index];
-              final isUnread = notification.isRead == false;
+              final notification = controller.notificationList[index];
+
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: isUnread
-                      ? Border.all(color: AppColors.mainColor, width: 2)
-                      : Border.all(color: AppColors.grayLight),
+                  border: Border.all(color: AppColors.grayLight),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.04),
@@ -76,7 +75,6 @@ class NotificationsView extends GetView {
                 ),
                 child: ListTile(
                   onTap: () {
-                    controller.markAsRead(notification.id);
                     _showNotificationDialog(context, notification);
                   },
                   contentPadding: const EdgeInsets.all(16),
@@ -84,48 +82,37 @@ class NotificationsView extends GetView {
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: isUnread ? AppColors.mainColor : AppColors.grayLight,
+                      color:  AppColors.grayLight,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      _getIconForType(notification.type),
+                      Icons.message_rounded,
                       color: Colors.white,
                       size: 28,
                     ),
                   ),
                   title: Text(
-                    notification.title,
-                    style: isUnread
-                        ? h3.copyWith(fontWeight: FontWeight.w700, color: AppColors.black)
-                        : h3,
+                    notification.message ?? "",
+                    style:h3,
                   ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 4),
                       Text(
-                        notification.body,
+                        notification.description ?? "",
                         style: h4.copyWith(color: AppColors.textColor.withValues(alpha: 0.8),),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        _formatDate(notification.createdAt),
+                        _formatDate(notification.createdAt!),
                         style: h5.copyWith(color: AppColors.hintColor),
                       ),
                     ],
                   ),
-                  trailing: isUnread
-                      ? Container(
-                    width: 12,
-                    height: 12,
-                    decoration: const BoxDecoration(
-                      color: AppColors.mainColor,
-                      shape: BoxShape.circle,
-                    ),
-                  )
-                      : null,
+
                 ),
               );
             },
@@ -136,7 +123,7 @@ class NotificationsView extends GetView {
   }
 
   // Show full notification in popup
-  void _showNotificationDialog(BuildContext context, AppNotification notification) {
+  void _showNotificationDialog(BuildContext context, NotificationList notification) {
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -160,7 +147,7 @@ class NotificationsView extends GetView {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      _getIconForType(notification.type),
+                     Icons.message,
                       color: Colors.white,
                       size: 32,
                     ),
@@ -170,9 +157,9 @@ class NotificationsView extends GetView {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(notification.title, style: h2),
+                        Text(notification.message ?? "", style: h2),
                         Text(
-                          _formatDate(notification.createdAt),
+                          _formatDate(notification.createdAt!),
                           style: h5.copyWith(color: AppColors.hintColor),
                         ),
                       ],
@@ -182,7 +169,7 @@ class NotificationsView extends GetView {
               ),
               const SizedBox(height: 20),
               Text(
-                notification.body,
+                notification.description ?? "",
                 style: h3.copyWith(height: 1.6, color: AppColors.textColor),
               ),
               const SizedBox(height: 24),
