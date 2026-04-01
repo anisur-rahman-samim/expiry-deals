@@ -1,3 +1,4 @@
+import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/app/modules/category/views/category_product_view.dart';
 import 'package:expiry_deals/app/modules/category/views/category_view.dart';
 import 'package:expiry_deals/app/modules/home/controllers/near_me_stores_controller.dart';
@@ -6,10 +7,13 @@ import 'package:expiry_deals/app/modules/home/controllers/special_product_contro
 import 'package:expiry_deals/app/modules/home/model/near_me_stores_model.dart';
 import 'package:expiry_deals/app/modules/home/model/product_model.dart' as allProduct;
 import 'package:expiry_deals/app/modules/home/model/special_product_model.dart' as sProduct;
+import 'package:expiry_deals/app/modules/home/widgets/near_me_map_preview.dart';
+import 'package:expiry_deals/app/modules/home/widgets/near_me_shimmer_placeholder.dart';
 import 'package:expiry_deals/app/modules/product_details/views/product_details_view.dart';
 import 'package:expiry_deals/app/modules/profile/controllers/profile_controller.dart';
 import 'package:expiry_deals/app/modules/search_page/views/search_page_view.dart';
 import 'package:expiry_deals/app/modules/store/views/store_view.dart';
+import 'package:expiry_deals/app/routes/app_pages.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/controllers/category_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
@@ -144,19 +148,7 @@ class HomeView extends GetView<HomeController> {
               const SizedBox(height: 32),
 
               // === Near Me Stores Section ===
-              _sectionHeader('Near Me Stores', () {
-                // Navigate to all stores near me
-              }),
-              const SizedBox(height: 16),
-
-              SizedBox(
-                height: 100,
-                child: Obx(() => nearMeStoresController.nearMeStores.isEmpty ? Center(child: Text("No Store Available"),) : ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: nearMeStoresController.nearMeStores.length,
-                  itemBuilder: (context, index) => _nearMeStoreCard(nearStores: nearMeStoresController.nearMeStores, index: index),
-                ),)
-              ),
+              _nearMeStoresSection(),
               const SizedBox(height: 32),
 
               // === Recommended for You ===
@@ -222,7 +214,177 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-   Widget _nearMeStoreCard({required List<NearMeStores> nearStores, required int index}) {
+  Widget _nearMeStoresSection() {
+    return Obx(() {
+      final c = nearMeStoresController;
+
+      if (c.isHomeNearMeLoading.value) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Near Me Stores', style: h2.copyWith(fontSize: 18)),
+            const SizedBox(height: 16),
+            const NearMeShimmerPlaceholder(),
+          ],
+        );
+      }
+
+      Widget headerActions() {
+        return Row(
+          children: [
+            Expanded(
+              child: Text('Near Me Stores', style: h2.copyWith(fontSize: 18)),
+            ),
+            TextButton(
+              onPressed: () => Get.toNamed(
+                Routes.NEAR_ME_MAP,
+                arguments: const {'browseAll': false},
+              ),
+              child: Text(
+                'View on map',
+                style: h4.copyWith(color: AppColors.mainColor),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Get.toNamed(
+                Routes.NEAR_ME_MAP,
+                arguments: const {'browseAll': true},
+              ),
+              child: Text(
+                'View all',
+                style: h4.copyWith(color: AppColors.mainColor),
+              ),
+            ),
+          ],
+        );
+      }
+
+      switch (c.homeNearMeStatus.value) {
+        case NearMeDisplayStatus.needsAuth:
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              headerActions(),
+              const SizedBox(height: 12),
+              Text(
+                'Sign in to see stores near you.',
+                style: h4.copyWith(color: AppColors.hintColor),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => Get.to(() => LoginView()),
+                child: Text('Sign in', style: h4.copyWith(color: AppColors.mainColor)),
+              ),
+            ],
+          );
+        case NearMeDisplayStatus.locationDenied:
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              headerActions(),
+              const SizedBox(height: 12),
+              Text(
+                'Turn on location to see stores near you.',
+                style: h4.copyWith(color: AppColors.hintColor),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => c.fetchNearMeStores(),
+                icon: const Icon(Icons.refresh_rounded, size: 20),
+                label: const Text('Retry'),
+              ),
+            ],
+          );
+        case NearMeDisplayStatus.loadFailed:
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              headerActions(),
+              const SizedBox(height: 12),
+              Text(
+                c.lastErrorMessage.value.isNotEmpty
+                    ? c.lastErrorMessage.value
+                    : 'Could not load nearby stores.',
+                style: h4.copyWith(color: AppColors.hintColor),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => c.fetchNearMeStores(),
+                icon: const Icon(Icons.refresh_rounded, size: 20),
+                label: const Text('Retry'),
+              ),
+            ],
+          );
+        case NearMeDisplayStatus.noShopsNearby:
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              headerActions(),
+              const SizedBox(height: 12),
+              Text(
+                'No shops in your area yet.',
+                style: h4.copyWith(color: AppColors.hintColor),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => Get.toNamed(
+                  Routes.NEAR_ME_MAP,
+                  arguments: const {'browseAll': true},
+                ),
+                child: Text(
+                  'Browse all stores',
+                  style: h4.copyWith(
+                    color: AppColors.mainColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          );
+        case NearMeDisplayStatus.ready:
+          final stores = c.nearMeStores;
+          if (stores.isEmpty) {
+            return const SizedBox.shrink();
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              headerActions(),
+              const SizedBox(height: 12),
+              NearMeMapPreview(controller: c, stores: stores.toList()),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: stores.length,
+                  itemBuilder: (context, index) => _nearMeStoreCard(
+                    nearStores: stores,
+                    index: index,
+                    ctrl: c,
+                  ),
+                ),
+              ),
+            ],
+          );
+        case NearMeDisplayStatus.loading:
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Near Me Stores', style: h2.copyWith(fontSize: 18)),
+              const SizedBox(height: 16),
+              const NearMeShimmerPlaceholder(),
+            ],
+          );
+      }
+    });
+  }
+
+   Widget _nearMeStoreCard({
+    required List<NearMeStores> nearStores,
+    required int index,
+    required NearMeStoresController ctrl,
+  }) {
      return GestureDetector(
        onTap: (){
          Get.to(() => StoreView(shopId: nearStores[index].id ?? "", authorId: nearStores[index].author?.id ?? "",));
@@ -272,13 +434,11 @@ class HomeView extends GetView<HomeController> {
                      overflow: TextOverflow.ellipsis,
                    ),
                    const SizedBox(height: 6),
-                   // Row(
-                   //   children: [
-                   //     Icon(Icons.location_on, size: 16, color: AppColors.hintColor),
-                   //     const SizedBox(width: 4),
-                   //    // Text('${nearStores[index].d?.toStringAsFixed(2)} km away', style: h5.copyWith(color: AppColors.hintColor)),
-                   //   ],
-                   // ),
+                   if (ctrl.distanceLabel(nearStores[index]).isNotEmpty)
+                     Text(
+                       ctrl.distanceLabel(nearStores[index]),
+                       style: h5.copyWith(color: AppColors.hintColor),
+                     ),
                    const SizedBox(height: 8),
 
                  ],

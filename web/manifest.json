@@ -1,6 +1,6 @@
 {
-    "name": "expriy_deals",
-    "short_name": "expriy_deals",
+    "name": "Expiry Deals",
+    "short_name": "Expiry Deals",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

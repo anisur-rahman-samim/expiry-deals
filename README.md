@@ -1,4 +1,4 @@
-# expriy_deals
+# Expiry Deals
 
 A new Flutter project.
 

@@ -9,9 +9,13 @@
 
 
     <application
-        android:label="Expriy Deals"
+        android:label="Expiry Deals"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!-- Google Maps SDK: must be under application (not inside activity). -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyD8GADkzFXVuxGPtVU4-6vjfXIkc-06gFY"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -29,8 +33,6 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
-              <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyD8GADkzFXVuxGPtVU4-6vjfXIkc-06gFY"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

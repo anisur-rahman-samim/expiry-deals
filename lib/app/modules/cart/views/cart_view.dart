@@ -23,7 +23,12 @@ class _CartViewState extends State<CartView> {
   @override
   void initState() {
     super.initState();
-    controller.fetchAddToCart(); // Safe to call here
+    // Skip redundant GET if cart was just refreshed (e.g. Buy now from product).
+    if (controller.cartItems.isEmpty) {
+      controller.fetchAddToCart();
+    } else {
+      controller.calculateTotal();
+    }
   }
 
   @override

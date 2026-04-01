@@ -1,5 +1,8 @@
 class AppConstant {
-
+  /// Same key as in `AndroidManifest.xml`, `AppDelegate.swift`, and `web/index.html`.
+  /// Used for Places Autocomplete / Details from Dart. Enable **Places API** on this key.
+  static const googleMapsApiKey =
+      'AIzaSyD8GADkzFXVuxGPtVU4-6vjfXIkc-06gFY';
 
   ///user id
   static const userId = 'userId';

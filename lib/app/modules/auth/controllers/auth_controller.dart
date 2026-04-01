@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
+import 'package:expiry_deals/app/modules/auth/views/location_picker_view.dart';
 import 'package:expiry_deals/app/modules/auth/views/verify_view.dart';
 import 'package:expiry_deals/app/modules/forget/views/reset_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
@@ -10,6 +11,7 @@ import 'package:expiry_deals/app/data/base_client.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../dashboard/views/dashboard_view.dart';
 import '../../vendor_dashboard/views/vendor_dashboard_view.dart';
 
@@ -25,6 +27,39 @@ class AuthController extends GetxController {
   final passwordController        = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final addressController         = TextEditingController();
+
+  /// Recent signup address pick (re-centers map on next open).
+  final signupPickLat = Rxn<double>();
+  final signupPickLng = Rxn<double>();
+
+  void applySignupLocation(LocationPickResult result) {
+    final line = (result.formattedAddress ?? '').trim();
+    addressController.text = line.isNotEmpty
+        ? line
+        : '${result.latLng.latitude.toStringAsFixed(5)}, ${result.latLng.longitude.toStringAsFixed(5)}';
+    signupPickLat.value = result.latLng.latitude;
+    signupPickLng.value = result.latLng.longitude;
+  }
+
+  Future<void> openSignupAddressPicker() async {
+    LatLng? initial;
+    final la = signupPickLat.value;
+    final ln = signupPickLng.value;
+    if (la != null && ln != null) {
+      initial = LatLng(la, ln);
+    }
+    final picked = await Get.to<LocationPickResult?>(
+      () => LocationPickerPage(
+        initialPosition: initial,
+        initialAddress: addressController.text.trim().isEmpty
+            ? null
+            : addressController.text.trim(),
+      ),
+    );
+    if (picked != null) {
+      applySignupLocation(picked);
+    }
+  }
 
   @override
   void onClose() {
@@ -66,6 +101,15 @@ class AuthController extends GetxController {
         LocalStorage.saveData(key: AppConstant.token, data: response['data']['accessToken']);
         LocalStorage.saveData(key: AppConstant.role, data: response['data']['user']['role']);
 
+        // Needed for vendor orders API: GET /orders?author=<userId>
+        final user = response['data']?['user'];
+        if (user is Map) {
+          final id = user['_id'] ?? user['id'];
+          if (id != null) {
+            LocalStorage.saveData(key: AppConstant.userId, data: id.toString());
+          }
+        }
+
         String role = LocalStorage.getData(key: AppConstant.role);
 
         // Navigate to the appropriate dashboard based on the role
@@ -92,6 +136,14 @@ class AuthController extends GetxController {
 
   // Registration function
   Future<void> registration() async {
+    if (addressController.text.trim().isEmpty) {
+      kSnackBar(
+        message: 'Pick your address on the map (or type it in the field).',
+        bgColor: AppColors.failedColor,
+      );
+      return;
+    }
+
     try {
       isLoading(true);
 
@@ -103,7 +155,7 @@ class AuthController extends GetxController {
         'name': nameController.text,
         'email': emailController.text.trim(),
         'password': passwordController.text,
-        'address': addressController.text,
+        'address': addressController.text.trim(),
       };
 
       // Sending request to the server for registration

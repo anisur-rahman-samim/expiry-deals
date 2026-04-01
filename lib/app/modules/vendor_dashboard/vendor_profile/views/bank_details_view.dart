@@ -2,7 +2,7 @@ import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/control
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_loader.dart';
-import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
+import 'package:expiry_deals/common/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -63,6 +63,31 @@ class BankDetailsView extends StatelessWidget {
                     ],
                   ),
                 ),
+
+                Obx(() {
+                  if (!controller.noBankDetailsYet.value) {
+                    return const SizedBox.shrink();
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green.shade200),
+                      ),
+                      child: const Text(
+                        'No bank details on file yet. Enter your information below and tap Save — this is normal for new vendors.',
+                        style: TextStyle(
+                          color: Color(0xFF2E7D32),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
 
                 const SizedBox(height: 28),
 

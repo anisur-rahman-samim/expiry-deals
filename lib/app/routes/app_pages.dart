@@ -21,6 +21,7 @@ import '../modules/forget/bindings/forget_binding.dart';
 import '../modules/forget/views/forget_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/home/views/near_me_stores_map_view.dart';
 import '../modules/my_orders/bindings/my_orders_binding.dart';
 import '../modules/my_orders/views/my_orders_view.dart';
 import '../modules/notifications/bindings/notifications_binding.dart';
@@ -163,6 +164,10 @@ class AppPages {
       name: _Paths.CATEGORY,
       page: () =>  CategoryView(categoryList: [],),
       binding: CategoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.NEAR_ME_MAP,
+      page: () => const NearMeStoresMapView(),
     ),
     GetPage(
       name: _Paths.VENDOR_DASHBOARD,

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -16,6 +15,12 @@ class VendorRequestController extends GetxController {
   var longitude = 0.0.obs; // longitude (x in GeoJSON)
   var latitude = 0.0.obs;  // latitude (y in GeoJSON)
 
+  /// Shown after search / map pin; optional for API if backend adds `address`.
+  var shopAddressDisplay = ''.obs;
+
+  /// Must be true to submit (links to CMS terms from [Api.contents]).
+  var acceptedTerms = false.obs;
+
   var documentFile = Rx<File?>(null);
 
   Future<void> pickDocument() async {
@@ -32,10 +37,18 @@ class VendorRequestController extends GetxController {
     }
   }
 
-  void selectLocation(LatLng position) {
+  void selectLocation(
+    LatLng position, {
+    String? formattedAddress,
+  }) {
     longitude.value = position.longitude;
-    latitude.value  = position.latitude;
-    debugPrint("Location selected → Lat: ${latitude.value}, Lng: ${longitude.value}");
+    latitude.value = position.latitude;
+    if (formattedAddress != null && formattedAddress.trim().isNotEmpty) {
+      shopAddressDisplay.value = formattedAddress.trim();
+    }
+    debugPrint(
+      'Location selected → Lat: ${latitude.value}, Lng: ${longitude.value}',
+    );
   }
 
   Future<void> submitVendorRequest({

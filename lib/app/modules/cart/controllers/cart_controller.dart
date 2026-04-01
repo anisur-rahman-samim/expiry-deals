@@ -36,7 +36,9 @@ class CartController extends GetxController {
     double sum = 0;
     for (var item in cartItems) {
       if (item.isSelected) {
-        sum += item.product?.price ?? 0 * item.quantity!; // Updated price access
+        final price = item.product?.price ?? 0;
+        final qty = item.quantity ?? 1;
+        sum += price * qty;
       }
     }
     subtotal.value = sum;
@@ -51,10 +53,13 @@ class CartController extends GetxController {
     return cartItems.first.product?.author?.id;
   }
 
-  // Fetch products from the server
-  Future<void> fetchAddToCart() async {
+  /// Fetches cart from API. Use [silent]=true during add-to-cart so the full
+  /// cart screen does not show a global loading flicker.
+  Future<void> fetchAddToCart({bool silent = false}) async {
     try {
-      isLoading(true);
+      if (!silent) {
+        isLoading(true);
+      }
 
       var token = LocalStorage.getData(key: AppConstant.token);
       if (token == null || token.isEmpty) {
@@ -76,13 +81,16 @@ class CartController extends GetxController {
       if (response != null && response['success'] == true) {
         // Map the API response to the ProductModel and assign it to the product list
         cartItems.assignAll(AddToCartModel.fromJson(response).data?.data ?? []);
+        calculateTotal();
       } else {
-        Get.snackbar('Error', 'Failed to fetch addToCart.');
+        Get.snackbar('Error', 'Failed to load cart.');
       }
     } catch (e) {
       Get.snackbar('Error', e.toString());
     } finally {
-      isLoading(false);
+      if (!silent) {
+        isLoading(false);
+      }
     }
   }
 
@@ -96,10 +104,6 @@ class CartController extends GetxController {
         return;
       }
 
-      var headers = {
-        'Authorization': 'Bearer $token',
-      };
-
       dynamic response = await BaseClient.handleResponse(
         await BaseClient.deleteRequest(
           api: Api.deleteCart(cartId: cartId),
@@ -110,7 +114,7 @@ class CartController extends GetxController {
       if (response != null && response['success'] == true) {
         await fetchAddToCart();
       } else {
-        Get.snackbar('Error', 'Failed to fetch addToCart.');
+        Get.snackbar('Error', 'Failed to remove item from cart.');
       }
     } catch (e) {
       Get.snackbar('Error', e.toString());
@@ -118,7 +122,10 @@ class CartController extends GetxController {
       isLoading(false);
     }
   }
-  Future<void> cartEmpty() async {
+  /// Clears the server cart. If [refreshCartAfter] is false, only local state is
+  /// cleared after success (avoids an extra GET — use when you will refetch once
+  /// after adding a new item).
+  Future<void> cartEmpty({bool refreshCartAfter = true}) async {
     try {
       isLoading(true);
 
@@ -128,10 +135,6 @@ class CartController extends GetxController {
         return;
       }
 
-      var headers = {
-        'Authorization': 'Bearer $token',
-      };
-
       dynamic response = await BaseClient.handleResponse(
         await BaseClient.deleteRequest(
           api: Api.cartEmpty
@@ -140,9 +143,14 @@ class CartController extends GetxController {
       );
 
       if (response != null && response['success'] == true) {
-        await fetchAddToCart();
+        if (refreshCartAfter) {
+          await fetchAddToCart();
+        } else {
+          cartItems.clear();
+          calculateTotal();
+        }
       } else {
-        Get.snackbar('Error', 'Failed to fetch addToCart.');
+        Get.snackbar('Error', 'Failed to empty cart.');
       }
     } catch (e) {
       Get.snackbar('Error', e.toString());

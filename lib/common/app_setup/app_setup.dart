@@ -7,5 +7,5 @@ class AppSetup{
 
 
   //app name
-  static const String appName = 'Gaming Shop';
+  static const String appName = 'Expiry Deals';
 }

@@ -9,7 +9,7 @@ import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_loader.dart';
 import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
-import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
+import 'package:expiry_deals/common/widgets/custom_textfield.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
