@@ -1,4 +1,6 @@
 import 'package:expiry_deals/app/modules/cart/views/cart_view.dart';
+import 'package:expiry_deals/app/modules/favorites/controllers/favorites_controller.dart';
+import 'package:expiry_deals/app/modules/home/model/search_product_model.dart' as sp;
 import 'package:expiry_deals/app/modules/product_details/controllers/add_to_cart_controller.dart';
 import 'package:expiry_deals/app/modules/product_details/controllers/product_details_controller.dart';
 import 'package:expiry_deals/app/modules/store/views/store_view.dart';
@@ -10,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ProductDetailsView extends StatefulWidget {
   final String productId;
@@ -21,17 +24,33 @@ class ProductDetailsView extends StatefulWidget {
 }
 
 class _ProductDetailsViewState extends State<ProductDetailsView> {
-  final ProductDetailsController productDetailsController = Get.put(ProductDetailsController());
+  late final ProductDetailsController productDetailsController;
   final AddToCartController addToCartController = Get.put(AddToCartController());
 
+  late final PageController _heroPageController;
+  int _heroPageIndex = 0;
 
   // State for managing the item quantity
   int quantity = 1;
 
   @override
   void initState() {
-    productDetailsController.fetchSingleProduct(productId: widget.productId);
     super.initState();
+    _heroPageController = PageController();
+    productDetailsController = Get.put(
+      ProductDetailsController(),
+      tag: widget.productId,
+    );
+    productDetailsController.fetchSingleProduct(productId: widget.productId);
+  }
+
+  @override
+  void dispose() {
+    _heroPageController.dispose();
+    if (Get.isRegistered<ProductDetailsController>(tag: widget.productId)) {
+      Get.delete<ProductDetailsController>(tag: widget.productId);
+    }
+    super.dispose();
   }
 
   // Method to increase the quantity with stock limit
@@ -103,6 +122,49 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
         ),
         actions: [
           Obx(() {
+            final fav = Get.find<FavoritesController>();
+            final id = widget.productId;
+            final saved = fav.ids.contains(id);
+            return Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: _heroChromeButton(
+                tooltip: saved ? 'Remove from saved' : 'Save',
+                onPressed: () => fav.toggle(id),
+                child: Icon(
+                  saved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                  color: saved ? const Color(0xFFFF6B6B) : Colors.white,
+                  size: 22,
+                ),
+              ),
+            );
+          }),
+          Obx(() {
+            final d = productDetailsController.singleProduct.value.data;
+            if (d == null) {
+              return const SizedBox(width: 44);
+            }
+            return Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: _heroChromeButton(
+                tooltip: 'Share',
+                onPressed: () {
+                  final name = d.name ?? 'Product';
+                  final raw = d.discount;
+                  final disc = raw is num ? raw.toDouble() : 0.0;
+                  final line = disc > 0
+                      ? '$name — ${disc.round()}% off on Expiry Deals'
+                      : '$name on Expiry Deals';
+                  Share.share(line, subject: name);
+                },
+                child: const Icon(
+                  Icons.share_outlined,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+            );
+          }),
+          Obx(() {
             final cart = addToCartController.cartController;
             final totalQty = cart.cartItems.fold<int>(
               0,
@@ -159,6 +221,12 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
 
         int stock = productDetails?.stock ?? 0; // Get the available stock
 
+        final imgs = productDetails?.images ?? [];
+        final imageUrls = imgs
+            .map((e) => e.url ?? '')
+            .where((u) => u.isNotEmpty)
+            .toList();
+
         return productDetailsController.isLoading.value ? Center(child: SpinKitDualRing(
           color: AppColors.mainColor,
           size: 30.0,
@@ -168,20 +236,69 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Main Product Image (Single Large Image)
+                  // Product images — swipe when multiple; safe when none
                   Stack(
                     children: [
-                      Container(
+                      SizedBox(
                         height: 420,
                         width: double.infinity,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(productDetails?.images[0].url ?? ""),
-                            fit: BoxFit.cover,
+                        child: imageUrls.isEmpty
+                            ? ColoredBox(
+                                color: AppColors.grayLight,
+                                child: Center(
+                                  child: Image.network(
+                                    AppImages.noImage,
+                                    fit: BoxFit.contain,
+                                    height: 120,
+                                  ),
+                                ),
+                              )
+                            : PageView.builder(
+                                controller: _heroPageController,
+                                onPageChanged: (i) =>
+                                    setState(() => _heroPageIndex = i),
+                                itemCount: imageUrls.length,
+                                itemBuilder: (context, i) => Image.network(
+                                  imageUrls[i],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  errorBuilder: (_, __, ___) => ColoredBox(
+                                    color: AppColors.grayLight,
+                                    child: Icon(
+                                      Icons.broken_image_outlined,
+                                      size: 48,
+                                      color: AppColors.hintColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                      ),
+                      if (imageUrls.length > 1)
+                        Positioned(
+                          bottom: 20,
+                          left: 0,
+                          right: 0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              imageUrls.length,
+                              (i) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 3),
+                                child: Container(
+                                  width: 7,
+                                  height: 7,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: _heroPageIndex == i
+                                        ? Colors.white
+                                        : Colors.white.withValues(alpha: 0.45),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-
                       Positioned(
                         top: 100, right: 30,
                         child: Container(
@@ -211,7 +328,12 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                             color: AppColors.white,
                             borderRadius: BorderRadius.circular(18),
                             border: Border.all(color: AppColors.grayLight),
-                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10)],
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 10,
+                              ),
+                            ],
                           ),
                           child: Row(
                             children: [
@@ -282,8 +404,76 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                         const SizedBox(height: 12),
                         Text(
                           productDetails?.details ?? "No Description Available",
-                          style: h4.copyWith(height: 1.8, color: AppColors.textColor.withOpacity(0.9)),
+                          style: h4.copyWith(
+                            height: 1.8,
+                            color: AppColors.textColor.withValues(alpha: 0.9),
+                          ),
                         ),
+
+                        const SizedBox(height: 28),
+                        Obx(() {
+                          final loading = productDetailsController
+                              .similarLoading.value;
+                          final list =
+                              productDetailsController.similarProducts;
+                          if (loading && list.isEmpty) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 20),
+                              child: Center(
+                                child: SizedBox(
+                                  width: 26,
+                                  height: 26,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: AppColors.mainColor,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                          if (list.isEmpty) return const SizedBox.shrink();
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 4,
+                                    height: 22,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.mainColor,
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'You may also like',
+                                    style: h2.copyWith(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              SizedBox(
+                                // Card: 148/1.05 image + padding + 2-line title + price (~218px); leave headroom for font metrics
+                                height: 228,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: list.length,
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(width: 12),
+                                  itemBuilder: (context, i) {
+                                    return _SimilarProductCard(
+                                      product: list[i],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
 
                         const SizedBox(height: 120), // Space for bottom bar
                       ],
@@ -307,7 +497,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.12),
+                      color: Colors.black.withValues(alpha: 0.12),
                       blurRadius: 20,
                       offset: const Offset(0, -5),
                     ),
@@ -499,6 +689,106 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
           ],
         );
       }),
+    );
+  }
+}
+
+class _SimilarProductCard extends StatelessWidget {
+  const _SimilarProductCard({required this.product});
+
+  final sp.SearchProduct product;
+
+  @override
+  Widget build(BuildContext context) {
+    final imgUrl = product.images.isNotEmpty
+        ? (product.images.first.url ?? '')
+        : '';
+    final price = product.price is num
+        ? (product.price as num).toDouble()
+        : double.tryParse('${product.price}') ?? 0;
+    final disc = product.discount is num
+        ? (product.discount as num).toDouble()
+        : double.tryParse('${product.discount}') ?? 0;
+    final sale = price * (1 - disc / 100);
+
+    return SizedBox(
+      width: 148,
+      child: Material(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => Get.to(
+            () => ProductDetailsView(productId: product.id ?? ''),
+          ),
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppColors.grayLight.withValues(alpha: 0.75),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(15)),
+                  child: AspectRatio(
+                    aspectRatio: 1.05,
+                    child: imgUrl.isEmpty
+                        ? ColoredBox(
+                            color: AppColors.grayLight,
+                            child: Icon(
+                              Icons.image_outlined,
+                              color: AppColors.hintColor,
+                            ),
+                          )
+                        : Image.network(
+                            imgUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => ColoredBox(
+                              color: AppColors.grayLight,
+                              child: Icon(
+                                Icons.broken_image_outlined,
+                                color: AppColors.hintColor,
+                              ),
+                            ),
+                          ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.name ?? '',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.dmSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          height: 1.25,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '\$${sale.toStringAsFixed(2)}',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.mainColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

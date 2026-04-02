@@ -17,5 +17,13 @@ class AppConstant {
   static const fcmToken = 'fcmToken';
   static const onboarding = 'onboarding';
 
+  /// Local list of favorited product ids (GetStorage).
+  static const favoriteProductIds = 'favoriteProductIds';
+
+  /// Miles — shop search radius (Near me, Browse, map). Synced with API `radiusMiles`.
+  static const searchRadiusMiles = 'searchRadiusMiles';
+
+  /// Browse tab: when true, list stores from all locations (no radius). When false, nearby only.
+  static const browseEverywhereMode = 'browseEverywhereMode';
 
 }

@@ -17,6 +17,7 @@ import '../modules/dashboard/bindings/dashboard_binding.dart';
 import '../modules/dashboard/views/dashboard_view.dart';
 import '../modules/edit_profile/bindings/edit_profile_binding.dart';
 import '../modules/edit_profile/views/edit_profile_view.dart';
+import '../modules/favorites/views/favorites_view.dart';
 import '../modules/forget/bindings/forget_binding.dart';
 import '../modules/forget/views/forget_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -168,6 +169,10 @@ class AppPages {
     GetPage(
       name: _Paths.NEAR_ME_MAP,
       page: () => const NearMeStoresMapView(),
+    ),
+    GetPage(
+      name: _Paths.FAVORITES,
+      page: () => const FavoritesView(),
     ),
     GetPage(
       name: _Paths.VENDOR_DASHBOARD,

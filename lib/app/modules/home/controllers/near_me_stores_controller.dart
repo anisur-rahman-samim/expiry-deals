@@ -5,6 +5,7 @@ import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/app/data/base_client.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
+import 'package:expiry_deals/common/helper/search_radius_miles.dart';
 
 import '../../../../common/helper/current_location.dart';
 
@@ -20,10 +21,6 @@ enum NearMeDisplayStatus {
 
 class NearMeStoresController extends GetxController {
   static const int _shopLimit = 50;
-
-  /// Client-side cap so the home “near me” list is not dominated by the whole catalog
-  /// when the API returns unfiltered results. Adjust if your backend adds a radius filter.
-  static const double _nearbyRadiusKm = 50.0;
 
   /// Loading state for the home Near Me section only (true until first fetch finishes).
   var isHomeNearMeLoading = true.obs;
@@ -41,10 +38,41 @@ class NearMeStoresController extends GetxController {
   var userLongitude = Rxn<double>();
   var lastErrorMessage = ''.obs;
 
+  /// Current search radius (miles) — Home, Browse, map. Synced with storage.
+  final searchRadiusMiles = SearchRadiusMiles.get().obs;
+
+  /// Browse tab: list all stores (no geo), like TGTG “everywhere”. Nearby uses radius + location.
+  final browseEverywhere = false.obs;
+
+  static bool _readBrowseEverywhereFromStorage() {
+    final v = LocalStorage.getData(key: AppConstant.browseEverywhereMode);
+    if (v is bool) return v;
+    if (v is String) return v == 'true';
+    return false;
+  }
+
   @override
   void onInit() {
     super.onInit();
+    searchRadiusMiles.value = SearchRadiusMiles.get();
+    browseEverywhere.value = _readBrowseEverywhereFromStorage();
     fetchNearMeStores();
+  }
+
+  Future<void> setBrowseEverywhere(bool value) async {
+    browseEverywhere.value = value;
+    await LocalStorage.saveData(
+      key: AppConstant.browseEverywhereMode,
+      data: value,
+    );
+    await fetchBrowseAllStores();
+  }
+
+  Future<void> applySearchRadiusMiles(double miles) async {
+    await SearchRadiusMiles.set(miles);
+    searchRadiusMiles.value = SearchRadiusMiles.get();
+    await fetchNearMeStores();
+    await fetchBrowseAllStores();
   }
 
   Future<void> fetchNearMeStores() async {
@@ -68,10 +96,11 @@ class NearMeStoresController extends GetxController {
       userLongitude.value = position.longitude;
 
       final headers = {'Authorization': 'Bearer $token'};
+      final r = SearchRadiusMiles.get();
       dynamic response = await BaseClient.handleResponse(
         await BaseClient.getRequest(
           api:
-              "${Api.allShop}?latitude=${position.latitude}&longitude=${position.longitude}&limit=$_shopLimit",
+              "${Api.allShop}?latitude=${position.latitude}&longitude=${position.longitude}&radiusMiles=$r&limit=$_shopLimit",
           headers: headers,
         ),
       );
@@ -79,7 +108,6 @@ class NearMeStoresController extends GetxController {
       if (response != null && response['success'] == true) {
         final list = NearMeStoresModel.fromJson(response).data?.data ?? [];
         nearMeStores.assignAll(list);
-        _keepOnlyNearby(nearMeStores);
         _sortByDistance(nearMeStores);
         homeNearMeStatus.value = nearMeStores.isEmpty
             ? NearMeDisplayStatus.noShopsNearby
@@ -107,9 +135,10 @@ class NearMeStoresController extends GetxController {
     }
   }
 
-  /// Load up to [_shopLimit] shops without geo filter (browse all).
+  /// Browse tab: either all stores (no geo) or nearby within [SearchRadiusMiles].
   Future<void> fetchBrowseAllStores() async {
     mapUsesBrowseAll.value = true;
+    lastErrorMessage.value = '';
     try {
       isBrowseLoading(true);
 
@@ -119,18 +148,53 @@ class NearMeStoresController extends GetxController {
         return;
       }
 
-      try {
-        final p = await getCurrentLocation();
-        userLatitude.value = p.latitude;
-        userLongitude.value = p.longitude;
-      } catch (_) {
-        // Optional: distances may be unavailable
+      final headers = {'Authorization': 'Bearer $token'};
+
+      if (browseEverywhere.value) {
+        dynamic response = await BaseClient.handleResponse(
+          await BaseClient.getRequest(
+            api: '${Api.allShop}?limit=$_shopLimit',
+            headers: headers,
+          ),
+        );
+
+        if (response != null && response['success'] == true) {
+          final list = NearMeStoresModel.fromJson(response).data?.data ?? [];
+          browseAllStores.assignAll(list);
+          _sortByName(browseAllStores);
+        } else {
+          browseAllStores.clear();
+          lastErrorMessage.value = 'Failed to fetch shops.';
+        }
+        return;
       }
 
-      final headers = {'Authorization': 'Bearer $token'};
+      double? lat;
+      double? lng;
+      try {
+        final p = await getCurrentLocation();
+        lat = p.latitude;
+        lng = p.longitude;
+      } catch (_) {
+        lat = userLatitude.value;
+        lng = userLongitude.value;
+      }
+
+      if (lat == null || lng == null) {
+        browseAllStores.clear();
+        lastErrorMessage.value =
+            'Location is required to browse nearby stores. Turn on Everywhere to see all locations.';
+        return;
+      }
+
+      userLatitude.value = lat;
+      userLongitude.value = lng;
+
+      final r = SearchRadiusMiles.get();
       dynamic response = await BaseClient.handleResponse(
         await BaseClient.getRequest(
-          api: "${Api.allShop}?limit=$_shopLimit",
+          api:
+              "${Api.allShop}?latitude=$lat&longitude=$lng&radiusMiles=$r&limit=$_shopLimit",
           headers: headers,
         ),
       );
@@ -151,17 +215,14 @@ class NearMeStoresController extends GetxController {
     }
   }
 
-  /// Drops shops farther than [_nearbyRadiusKm] or without coordinates.
-  void _keepOnlyNearby(RxList<NearMeStores> list) {
-    final ulat = userLatitude.value;
-    final ulng = userLongitude.value;
-    if (ulat == null || ulng == null) return;
-    final maxM = _nearbyRadiusKm * 1000;
-    final filtered = list.where((s) {
-      final m = distanceMeters(s);
-      return m != null && m <= maxM;
-    }).toList();
-    list.assignAll(filtered);
+  void _sortByName(RxList<NearMeStores> list) {
+    final sorted = List<NearMeStores>.from(list);
+    sorted.sort(
+      (a, b) => (a.name ?? '').toLowerCase().compareTo(
+            (b.name ?? '').toLowerCase(),
+          ),
+    );
+    list.assignAll(sorted);
   }
 
   void _sortByDistance(RxList<NearMeStores> list) {
@@ -192,7 +253,8 @@ class NearMeStoresController extends GetxController {
   String distanceLabel(NearMeStores store) {
     final m = distanceMeters(store);
     if (m == null) return '';
-    if (m < 1000) return '${m.round()} m away';
-    return '${(m / 1000).toStringAsFixed(1)} km away';
+    final mi = m / 1609.34;
+    if (mi < 0.25) return '${m.round()} m away';
+    return '${mi.toStringAsFixed(1)} mi away';
   }
 }

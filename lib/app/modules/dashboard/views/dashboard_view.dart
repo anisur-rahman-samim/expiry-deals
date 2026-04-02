@@ -1,6 +1,6 @@
+import 'package:expiry_deals/app/modules/browse/views/browse_view.dart';
 import 'package:expiry_deals/app/modules/cart/views/cart_view.dart';
 import 'package:expiry_deals/app/modules/home/views/home_view.dart';
-import 'package:expiry_deals/app/modules/notifications/views/notifications_view.dart';
 import 'package:expiry_deals/app/modules/profile/views/profile_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -14,10 +14,10 @@ class DashboardView extends GetView<DashboardController> {
 
   // List of pages
   static final List<Widget> _pages = [
-     HomeView(),
-     CartView(),
-     NotificationsView(),
-     ProfileView(),
+    HomeView(),
+    const BrowseView(),
+    CartView(),
+    ProfileView(),
   ];
 
   // Icons for the bar
@@ -28,12 +28,12 @@ class DashboardView extends GetView<DashboardController> {
 
     ),
     CrystalNavigationBarItem(
-      unselectedIcon: Icons.shopping_cart_outlined,
-      icon: Icons.shopping_cart,
+      unselectedIcon: Icons.storefront_outlined,
+      icon: Icons.storefront,
     ),
     CrystalNavigationBarItem(
-      unselectedIcon: Icons.notifications_outlined,
-      icon: Icons.notifications,
+      unselectedIcon: Icons.shopping_cart_outlined,
+      icon: Icons.shopping_cart,
     ),
     CrystalNavigationBarItem(
       unselectedIcon: Icons.person_outline,

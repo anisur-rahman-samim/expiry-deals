@@ -26,6 +26,7 @@ abstract class Routes {
   static const SEARCH_PAGE = _Paths.SEARCH_PAGE;
   static const CATEGORY = _Paths.CATEGORY;
   static const NEAR_ME_MAP = _Paths.NEAR_ME_MAP;
+  static const FAVORITES = _Paths.FAVORITES;
   static const VENDOR_DASHBOARD = _Paths.VENDOR_DASHBOARD;
   static const VENDOR_HOME = _Paths.VENDOR_DASHBOARD + _Paths.VENDOR_HOME;
   static const VENDOR_PRODUCT = _Paths.VENDOR_DASHBOARD + _Paths.VENDOR_PRODUCT;
@@ -58,6 +59,7 @@ abstract class _Paths {
   static const SEARCH_PAGE = '/search-page';
   static const CATEGORY = '/category';
   static const NEAR_ME_MAP = '/near-me-map';
+  static const FAVORITES = '/favorites';
   static const VENDOR_DASHBOARD = '/vendor-dashboard';
   static const VENDOR_HOME = '/vendor-home';
   static const VENDOR_PRODUCT = '/vendor-product';

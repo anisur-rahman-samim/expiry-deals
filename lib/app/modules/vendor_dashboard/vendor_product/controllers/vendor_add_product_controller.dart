@@ -7,15 +7,22 @@ import 'package:get/get.dart';
 import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
+import 'package:expiry_deals/common/app_color/app_colors.dart';
+import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
+/// Backend accepts up to 10 files under field name `images` (see products.route.ts).
 class VendorAddProductController extends GetxController {
   var isLoading = false.obs;
   final VendorProductController vendorProductController = Get.put(
     VendorProductController(),
   );
-  final selectedImage = Rxn<File>(); // ← Only one image (Rxn = nullable observable)
+
+  static const int maxImages = 10;
+
+  /// One or more photos — marketplace listings look better with several angles.
+  final selectedImages = <File>[].obs;
 
   final itemName = ''.obs;
   final itemDetails = ''.obs;
@@ -35,7 +42,6 @@ class VendorAddProductController extends GetxController {
     super.onInit();
     categoryController = Get.put(CategoryDataController());
 
-    // Auto select first category if none selected
     ever(categoryController.categories, (_) {
       if (categoryController.categories.isNotEmpty && selectedCategoryId.value.isEmpty) {
         final first = categoryController.categories.first;
@@ -45,15 +51,94 @@ class VendorAddProductController extends GetxController {
     });
   }
 
-  /// Pick only ONE image
-  Future<void> pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+  /// Bottom sheet: camera vs gallery (multi-select on gallery).
+  void showImageSourcePicker() {
+    Get.bottomSheet<void>(
+      SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('Add photos', style: h2.copyWith(fontSize: 18)),
+              const SizedBox(height: 8),
+              Text(
+                'Up to $maxImages images. More photos help buyers trust your listing.',
+                style: h4.copyWith(color: AppColors.hintColor, fontSize: 13),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.photo_camera_outlined, color: AppColors.mainColor),
+                title: const Text('Take photo'),
+                subtitle: const Text('Use camera'),
+                onTap: () {
+                  Get.back<void>();
+                  pickFromCamera();
+                },
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.photo_library_outlined, color: AppColors.mainColor),
+                title: const Text('Choose from gallery'),
+                subtitle: const Text('Select one or more'),
+                onTap: () {
+                  Get.back<void>();
+                  pickFromGallery();
+                },
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => Get.back<void>(),
+                child: Text('Cancel', style: h4.copyWith(color: AppColors.hintColor)),
+              ),
+            ],
+          ),
+        ),
+      ),
+      backgroundColor: AppColors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+    );
+  }
 
-    if (pickedFile != null) {
-      selectedImage.value = File(pickedFile.path);
-      Get.snackbar('Success', 'Image selected', duration: const Duration(seconds: 2));
+  Future<void> pickFromCamera() async {
+    if (selectedImages.length >= maxImages) {
+      Get.snackbar('Limit', 'You can add up to $maxImages images.');
+      return;
     }
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 85,
+    );
+    if (picked != null) {
+      selectedImages.add(File(picked.path));
+      Get.snackbar('Added', 'Photo added (${selectedImages.length}/$maxImages)');
+    }
+  }
+
+  Future<void> pickFromGallery() async {
+    final picker = ImagePicker();
+    final remaining = maxImages - selectedImages.length;
+    if (remaining <= 0) {
+      Get.snackbar('Limit', 'You can add up to $maxImages images.');
+      return;
+    }
+    final batch = await picker.pickMultiImage(imageQuality: 85, limit: remaining);
+    if (batch.isEmpty) return;
+    for (final x in batch) {
+      if (selectedImages.length >= maxImages) break;
+      selectedImages.add(File(x.path));
+    }
+    Get.snackbar('Added', '${batch.length} photo(s) added (${selectedImages.length}/$maxImages)');
+  }
+
+  void removeImageAt(int index) {
+    if (index < 0 || index >= selectedImages.length) return;
+    selectedImages.removeAt(index);
   }
 
   Future<void> addProduct() async {
@@ -69,27 +154,20 @@ class VendorAddProductController extends GetxController {
       }
 
       var uri = Uri.parse(Api.addProduct);
-
       var request = http.MultipartRequest('POST', uri);
-
-      // Headers — Do NOT set 'Content-Type' manually for MultipartRequest
       request.headers['Authorization'] = 'Bearer $token';
-
-      // Add product data as JSON string in 'data' field
       request.fields['data'] = _getProductDataJson();
 
-      // Add single image (most APIs expect 'image' for single file)
-      if (selectedImage.value != null) {
+      for (final file in selectedImages) {
         request.files.add(
           await http.MultipartFile.fromPath(
-            'images', // ← try 'image' or 'images' — depends on backend
-            selectedImage.value!.path,
-            filename: selectedImage.value!.path.split('/').last,
+            'images',
+            file.path,
+            filename: file.path.split('/').last,
           ),
         );
       }
 
-      // Send request
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
 
@@ -100,7 +178,6 @@ class VendorAddProductController extends GetxController {
         clearFields();
         Get.back();
         Get.snackbar('Success', 'Product added successfully!', backgroundColor: Colors.green[100]);
-
       } else {
         try {
           final errorBody = jsonDecode(response.body);
@@ -110,14 +187,15 @@ class VendorAddProductController extends GetxController {
             backgroundColor: Colors.red[100],
           );
         } catch (_) {
-          Get.snackbar('Error ${response.statusCode}', response.body.isNotEmpty ? response.body : 'No response body');
+          Get.snackbar(
+            'Error ${response.statusCode}',
+            response.body.isNotEmpty ? response.body : 'No response body',
+          );
         }
-        print("Server response: ${response.statusCode} - ${response.body}");
       }
     } catch (e) {
       isLoading.value = false;
       Get.snackbar('Exception', e.toString());
-      print("Exception during add product: $e");
     }
   }
 
@@ -146,8 +224,8 @@ class VendorAddProductController extends GetxController {
       Get.snackbar('Error', 'Please select expiry date');
       return false;
     }
-    if (selectedImage.value == null) {
-      Get.snackbar('Error', 'Product image is required');
+    if (selectedImages.isEmpty) {
+      Get.snackbar('Error', 'Add at least one product photo');
       return false;
     }
     return true;
@@ -177,6 +255,6 @@ class VendorAddProductController extends GetxController {
     expiryDays.value = '';
     discountPercent.value = '';
     expiryDate.value = null;
-    selectedImage.value = null;
+    selectedImages.clear();
   }
 }

@@ -1,6 +1,6 @@
-import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/app/modules/choose_role/views/choose_role_view.dart';
 import 'package:expiry_deals/app/modules/edit_profile/views/edit_profile_view.dart';
+import 'package:expiry_deals/app/modules/favorites/views/favorites_view.dart';
 import 'package:expiry_deals/app/modules/my_orders/views/my_orders_view.dart';
 import 'package:expiry_deals/app/modules/change_password/views/change_password_view.dart';
 import 'package:expiry_deals/app/modules/terms_conditions/views/terms_conditions_view.dart';
@@ -11,7 +11,6 @@ import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
-import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
@@ -89,6 +88,12 @@ class ProfileView extends GetView<ProfileController> {
                       subtitle: "View your order history",
                       icon: AppImages.order,
                       onTap: () => Get.to(() => MyOrdersView()),
+                    ),
+                    _buildListTile(
+                      title: "Saved",
+                      subtitle: "Products you liked",
+                      leadingIcon: Icons.favorite_outline_rounded,
+                      onTap: () => Get.to(() => const FavoritesView()),
                     ),
                     _buildListTile(
                       title: "Change Password",
@@ -304,9 +309,11 @@ class ProfileView extends GetView<ProfileController> {
   Widget _buildListTile({
     required String title,
     required String subtitle,
-    required String icon,
+    String? icon,
+    IconData? leadingIcon,
     required Function onTap,
   }) {
+    assert(leadingIcon != null || icon != null);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Container(
@@ -316,7 +323,9 @@ class ProfileView extends GetView<ProfileController> {
         ),
         child: ListTile(
           onTap: () => onTap(),
-          leading: Image.asset(icon, scale: 4, color: AppColors.mainColor),
+          leading: leadingIcon != null
+              ? Icon(leadingIcon, color: AppColors.mainColor, size: 26)
+              : Image.asset(icon!, scale: 4, color: AppColors.mainColor),
           trailing: Icon(Icons.arrow_forward_ios),
           title: Text(title, style: h2),
           subtitle: Text(subtitle, style: h3.copyWith(color: AppColors.gray, fontSize: 12)),
