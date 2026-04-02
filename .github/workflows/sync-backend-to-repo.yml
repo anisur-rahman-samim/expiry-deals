@@ -1,0 +1,54 @@
+# Pushes expriy-deals-backend/ to https://github.com/expirydeals7/Expirydealsbackend
+# on branch sync/from-monorepo. Merge that branch to main via PR, then deploy from main.
+#
+# Required repo secret (Expirydeals repo → Settings → Secrets → Actions):
+#   BACKEND_SYNC_TOKEN — fine-grained or classic PAT with Contents: Read and write
+#   on expirydeals7/Expirydealsbackend only (minimum scope).
+#
+# Optional: disable auto sync by removing the secret; use scripts/push-backend-to-github.sh locally.
+
+name: Sync backend subtree
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "expriy-deals-backend/**"
+      - ".github/workflows/sync-backend-to-repo.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-backend-subtree
+  cancel-in-progress: true
+
+jobs:
+  push-subtree:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history (required for subtree split)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Push subtree to backend repo
+        env:
+          TOKEN: ${{ secrets.BACKEND_SYNC_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "BACKEND_SYNC_TOKEN is not set. Skipping push."
+            echo "Add the secret to enable automatic sync, or run scripts/push-backend-to-github.sh locally."
+            exit 0
+          fi
+          SYNC_BRANCH="sync/from-monorepo"
+          REMOTE_URL="https://x-access-token:${TOKEN}@github.com/expirydeals7/Expirydealsbackend.git"
+          git remote add backend-sync "$REMOTE_URL"
+          echo "Splitting subtree expriy-deals-backend from $GITHUB_SHA ..."
+          SPLIT=$(git subtree split --prefix=expriy-deals-backend "$GITHUB_SHA")
+          echo "Pushing to backend-sync/$SYNC_BRANCH ..."
+          git push backend-sync "$SPLIT:refs/heads/$SYNC_BRANCH" --force
+          echo "Open PR: https://github.com/expirydeals7/Expirydealsbackend/pull/new/$SYNC_BRANCH"
