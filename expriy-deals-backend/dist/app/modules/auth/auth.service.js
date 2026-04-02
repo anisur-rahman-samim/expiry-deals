@@ -170,7 +170,7 @@ const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
     };
 });
 const googleLogin = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d;
     try {
         const decodedToken = yield firebase_1.default
             .auth()
@@ -205,20 +205,21 @@ const googleLogin = (payload) => __awaiter(void 0, void 0, void 0, function* () 
                 refreshToken,
             };
         }
+        // Never trust client-supplied role on OAuth signup (prevents admin escalation).
         const user = yield user_models_1.User.create({
             name: decodedToken === null || decodedToken === void 0 ? void 0 : decodedToken.name,
             expireAt: null,
             email: decodedToken === null || decodedToken === void 0 ? void 0 : decodedToken.email,
             profile: decodedToken === null || decodedToken === void 0 ? void 0 : decodedToken.picture,
             phoneNumber: decodedToken === null || decodedToken === void 0 ? void 0 : decodedToken.phone_number,
-            role: (_c = payload === null || payload === void 0 ? void 0 : payload.role) !== null && _c !== void 0 ? _c : user_constants_1.USER_ROLE.user,
+            role: user_constants_1.USER_ROLE.user,
             loginWth: user_constants_1.Login_With.google,
             'verification.status': true,
         });
         if (!user)
             throw new AppError_1.default(http_status_1.default === null || http_status_1.default === void 0 ? void 0 : http_status_1.default.BAD_REQUEST, 'user account creation failed');
         const jwtPayload = {
-            userId: (_d = user === null || user === void 0 ? void 0 : user._id) === null || _d === void 0 ? void 0 : _d.toString(),
+            userId: (_c = user === null || user === void 0 ? void 0 : user._id) === null || _c === void 0 ? void 0 : _c.toString(),
             role: user === null || user === void 0 ? void 0 : user.role,
         };
         const accessToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
@@ -230,7 +231,7 @@ const googleLogin = (payload) => __awaiter(void 0, void 0, void 0, function* () 
         };
     }
     catch (error) {
-        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, (_e = error === null || error === void 0 ? void 0 : error.message) !== null && _e !== void 0 ? _e : 'Login failed Server Error');
+        throw new AppError_1.default(http_status_1.default.BAD_REQUEST, (_d = error === null || error === void 0 ? void 0 : error.message) !== null && _d !== void 0 ? _d : 'Login failed Server Error');
     }
 });
 exports.authServices = {

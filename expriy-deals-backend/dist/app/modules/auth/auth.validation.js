@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authValidation = void 0;
 const zod_1 = require("zod");
-const user_constants_1 = require("../user/user.constants");
 const loginZodValidationSchema = zod_1.z.object({
     body: zod_1.z.object({
         email: zod_1.z.string({
@@ -21,12 +20,13 @@ const refreshTokenValidationSchema = zod_1.z.object({
     }),
 });
 const googleLogin = zod_1.z.object({
-    body: zod_1.z.object({
+    body: zod_1.z
+        .object({
         token: zod_1.z.string({
             required_error: 'Token is Required',
         }),
-    }),
-    role: zod_1.z.enum([...user_constants_1.Role]).default(user_constants_1.USER_ROLE.user),
+    })
+        .strict(),
 });
 exports.authValidation = {
     refreshTokenValidationSchema,

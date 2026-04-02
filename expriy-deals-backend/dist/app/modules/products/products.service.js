@@ -43,13 +43,18 @@ const getAllProducts = (query) => __awaiter(void 0, void 0, void 0, function* ()
     const q = Object.assign({}, query);
     const rawMin = q.minDiscount;
     const rawMax = q.maxDiscount;
+    const rawExpiringH = q.expiringWithinHours;
     delete q.minDiscount;
     delete q.maxDiscount;
+    delete q.expiringWithinHours;
     const minDiscount = rawMin !== undefined && rawMin !== null && rawMin !== ''
         ? Number(rawMin)
         : undefined;
     const maxDiscount = rawMax !== undefined && rawMax !== null && rawMax !== ''
         ? Number(rawMax)
+        : undefined;
+    const expiringWithinHours = rawExpiringH !== undefined && rawExpiringH !== null && rawExpiringH !== ''
+        ? Number(rawExpiringH)
         : undefined;
     const discountRange = {};
     if (minDiscount !== undefined && !Number.isNaN(minDiscount)) {
@@ -61,6 +66,17 @@ const getAllProducts = (query) => __awaiter(void 0, void 0, void 0, function* ()
     const baseFilter = { isDeleted: false };
     if (Object.keys(discountRange).length > 0) {
         baseFilter.discount = discountRange;
+    }
+    /** ISO `expiredAt` between now and now + N hours (e.g. “ending in 24h” strip). */
+    if (expiringWithinHours !== undefined &&
+        !Number.isNaN(expiringWithinHours) &&
+        expiringWithinHours > 0) {
+        const from = new Date();
+        const to = new Date(from.getTime() + expiringWithinHours * 60 * 60 * 1000);
+        baseFilter.expiredAt = {
+            $gte: from.toISOString(),
+            $lte: to.toISOString(),
+        };
     }
     const productsModel = new QueryBuilder_1.default(products_models_1.default.find(baseFilter).populate([
         {

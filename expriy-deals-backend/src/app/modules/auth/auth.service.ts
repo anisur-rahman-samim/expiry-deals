@@ -300,13 +300,14 @@ const googleLogin = async (payload: any) => {
         refreshToken,
       };
     }
+    // Never trust client-supplied role on OAuth signup (prevents admin escalation).
     const user = await User.create({
       name: decodedToken?.name,
       expireAt: null,
       email: decodedToken?.email,
       profile: decodedToken?.picture,
       phoneNumber: decodedToken?.phone_number,
-      role: payload?.role ?? USER_ROLE.user,
+      role: USER_ROLE.user,
       loginWth: Login_With.google,
       'verification.status': true,
     });
