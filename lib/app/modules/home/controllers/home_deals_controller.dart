@@ -13,12 +13,84 @@ class HomeDealsController extends GetxController {
 
   var isLoading = true.obs;
 
-  static const int _stripLimit = 8;
+  /// Wider fetch so server-side strips are less likely to miss deals; [mergeRecommendedStripProducts] also fills gaps from the home grid.
+  static const int _stripLimit = 40;
+
+  Worker? _productsWorker;
 
   @override
   void onInit() {
     super.onInit();
+    final pc = Get.find<ProductController>();
+    _productsWorker = ever<List<Products>>(pc.products, (_) {
+      if (pc.products.isEmpty) return;
+      mergeRecommendedStripProducts();
+    });
     _loadStrips();
+  }
+
+  @override
+  void onClose() {
+    _productsWorker?.dispose();
+    super.onClose();
+  }
+
+  /// Adds any matching items from the main “Recommended” product list into 70%+ and Expiring Soon strips
+  /// so deals still appear if filtered API calls return empty or a different page order.
+  void mergeRecommendedStripProducts() {
+    if (!Get.isRegistered<ProductController>()) return;
+    final source = Get.find<ProductController>().products.toList();
+    if (source.isEmpty) return;
+
+    bool idIn(List<Products> xs, String? id) =>
+        id != null && id.isNotEmpty && xs.any((e) => e.id == id);
+
+    double dOf(Products p) {
+      final d = p.discount;
+      if (d is num) return d.toDouble();
+      return double.tryParse('$d') ?? 0;
+    }
+
+    DateTime? expOf(Products p) {
+      final v = p.expiredAt;
+      if (v == null) return null;
+      if (v is DateTime) return v;
+      if (v is String && v.isNotEmpty) return DateTime.tryParse(v);
+      return null;
+    }
+
+    final now = DateTime.now();
+    bool inExpiringSoonWindow(DateTime? t) {
+      if (t == null) return false;
+      if (!t.isAfter(now)) return false;
+      return t.difference(now) <= const Duration(hours: 24);
+    }
+
+    final mega = List<Products>.from(megaOff);
+    final exp = List<Products>.from(expiringSoon);
+
+    for (final p in source) {
+      final id = p.id;
+      if (id == null || id.isEmpty) continue;
+      if (dOf(p) >= 70 && !idIn(mega, id)) {
+        mega.add(p);
+      }
+      if (inExpiringSoonWindow(expOf(p)) && !idIn(exp, id)) {
+        exp.add(p);
+      }
+    }
+
+    mega.sort((a, b) => dOf(b).compareTo(dOf(a)));
+    exp.sort((a, b) {
+      final ta = expOf(a);
+      final tb = expOf(b);
+      if (ta == null) return 1;
+      if (tb == null) return -1;
+      return ta.compareTo(tb);
+    });
+
+    megaOff.assignAll(mega);
+    expiringSoon.assignAll(exp);
   }
 
   Future<void> _loadStrips() async {
@@ -72,6 +144,7 @@ class HomeDealsController extends GetxController {
       expiringSoon.clear();
     } finally {
       isLoading.value = false;
+      mergeRecommendedStripProducts();
     }
   }
 

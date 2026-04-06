@@ -43,10 +43,10 @@ const getAllShop = (query) => __awaiter(void 0, void 0, void 0, function* () {
     const { filters, pagination } = yield (0, pickQuery_1.default)(query);
     const { searchTerm, latitude, longitude, radiusMiles } = filters, filtersData = __rest(filters, ["searchTerm", "latitude", "longitude", "radiusMiles"]);
     console.log({ latitude, longitude, radiusMiles });
-    /** Search radius in miles for $geoNear (default 10, clamp 1–500). */
+    /** Search radius in miles for $geoNear (default 12, clamp 1–500). */
     let miles = Number(radiusMiles);
     if (!Number.isFinite(miles)) {
-        miles = 10;
+        miles = 12;
     }
     miles = Math.min(500, Math.max(1, miles));
     if (filtersData === null || filtersData === void 0 ? void 0 : filtersData.author) {

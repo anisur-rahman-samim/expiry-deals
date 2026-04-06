@@ -52,25 +52,22 @@ class VendorProfileView extends GetView {
                 return Column(
                   children: [
                     if (_vendorHasBannerStrip(bannerUrl, bannerColorHex))
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: _vendorBannerStrip(
-                            controller,
-                            user,
-                            bannerUrl,
-                            bannerColorHex,
-                          ),
+                      _vendorCoverWithOverlappingAvatar(
+                        controller: controller,
+                        user: user,
+                        bannerUrl: bannerUrl,
+                        bannerColorHex: bannerColorHex,
+                        avatarImageUrl:
+                            _vendorHeaderImageUrl(controller, user),
+                      )
+                    else
+                      // Prefer shop logo (Edit Shop); fallback to user profile photo.
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundImage: NetworkImage(
+                          _vendorHeaderImageUrl(controller, user),
                         ),
                       ),
-                    // Prefer shop logo (Edit Shop); fallback to user profile photo.
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundImage: NetworkImage(
-                        _vendorHeaderImageUrl(controller, user),
-                      ),
-                    ),
                     sw10,
 
                     // User Name & Email
@@ -499,32 +496,88 @@ bool _vendorHasBannerStrip(String? bannerUrl, String? bannerColorHex) {
   return u.isNotEmpty || c.isNotEmpty;
 }
 
-/// Wide banner from Edit Shop (`banner` / `bannerColor` on my-shop).
-Widget _vendorBannerStrip(
-  ProfileController c,
-  Data? user,
-  String? bannerUrl,
-  String? bannerColorHex,
-) {
-  final u = bannerUrl?.trim() ?? '';
-  if (u.isNotEmpty) {
-    final src = _vendorCacheBustedUrl(u, c.vendorShopLogoTimestamp ?? user?.updatedAt);
-    return AspectRatio(
-      aspectRatio: 16 / 9,
-      child: Image.network(
-        src,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _vendorBannerColorFallback(bannerColorHex),
-      ),
-    );
-  }
-  return _vendorBannerColorFallback(bannerColorHex);
+const double _kVendorCoverHeight = 168;
+const double _kVendorOverlapAvatarOuterR = 64;
+
+/// Shop cover with profile/shop logo centered on the bottom edge (Facebook-style).
+Widget _vendorCoverWithOverlappingAvatar({
+  required ProfileController controller,
+  required Data? user,
+  required String? bannerUrl,
+  required String? bannerColorHex,
+  required String avatarImageUrl,
+}) {
+  return SizedBox(
+    height: _kVendorCoverHeight + _kVendorOverlapAvatarOuterR,
+    width: double.infinity,
+    child: Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.topCenter,
+      children: [
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          height: _kVendorCoverHeight,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: _vendorBannerLayer(
+              height: _kVendorCoverHeight,
+              c: controller,
+              user: user,
+              bannerUrl: bannerUrl,
+              bannerColorHex: bannerColorHex,
+            ),
+          ),
+        ),
+        Positioned(
+          top: _kVendorCoverHeight - _kVendorOverlapAvatarOuterR,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: CircleAvatar(
+              radius: _kVendorOverlapAvatarOuterR,
+              backgroundColor: AppColors.white,
+              child: CircleAvatar(
+                radius: _kVendorOverlapAvatarOuterR - 4,
+                backgroundImage: NetworkImage(avatarImageUrl),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
-Widget _vendorBannerColorFallback(String? bannerColorHex) {
+/// Wide banner from Edit Shop (`banner` / `bannerColor` on my-shop).
+Widget _vendorBannerLayer({
+  required double height,
+  required ProfileController c,
+  required Data? user,
+  required String? bannerUrl,
+  required String? bannerColorHex,
+}) {
+  final u = bannerUrl?.trim() ?? '';
+  if (u.isNotEmpty) {
+    final src =
+        _vendorCacheBustedUrl(u, c.vendorShopLogoTimestamp ?? user?.updatedAt);
+    return Image.network(
+      src,
+      height: height,
+      width: double.infinity,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) =>
+          _vendorBannerColorFallback(height, bannerColorHex),
+    );
+  }
+  return _vendorBannerColorFallback(height, bannerColorHex);
+}
+
+Widget _vendorBannerColorFallback(double height, String? bannerColorHex) {
   final color = _parseBannerColorHex(bannerColorHex);
   return Container(
-    height: 100,
+    height: height,
     width: double.infinity,
     alignment: Alignment.center,
     color: color ?? AppColors.mainColor.withValues(alpha: 0.15),

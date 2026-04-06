@@ -4,12 +4,14 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import 'app/modules/favorites/controllers/favorites_controller.dart';
+import 'common/helper/search_radius_miles.dart';
 import 'app/routes/app_pages.dart';
 import 'common/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  await SearchRadiusMiles.migrateLegacyUnrealisticRadius();
   Get.put(FavoritesController(), permanent: true);
   runApp(
     GetMaterialApp(

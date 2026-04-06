@@ -47,7 +47,7 @@ class Data {
   final dynamic price;
   final int? totalSell;
   final int? stock;
-  final String? expiredAt;
+  final dynamic expiredAt;
   final dynamic discount;
   final bool? isDeleted;
   final DateTime? createdAt;
@@ -65,7 +65,7 @@ class Data {
       price: json["price"],
       totalSell: json["totalSell"],
       stock: json["stock"],
-      expiredAt: json["expiredAt"],
+      expiredAt: json["expiredAt"], // ISO string from API; may be null
       discount: json["discount"],
       isDeleted: json["isDeleted"],
       createdAt: DateTime.tryParse(json["createdAt"] ?? ""),

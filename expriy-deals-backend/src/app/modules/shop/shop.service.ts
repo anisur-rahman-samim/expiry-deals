@@ -23,10 +23,10 @@ const getAllShop = async (query: Record<string, any>) => {
     filters;
   console.log({ latitude, longitude, radiusMiles });
 
-  /** Search radius in miles for $geoNear (default 10, clamp 1–500). */
+  /** Search radius in miles for $geoNear (default 12, clamp 1–500). */
   let miles = Number(radiusMiles);
   if (!Number.isFinite(miles)) {
-    miles = 10;
+    miles = 12;
   }
   miles = Math.min(500, Math.max(1, miles));
 

@@ -291,6 +291,63 @@ class HomeView extends GetView<HomeController> {
     required List<allProduct.Products> value,
     required List<allProduct.Products> best,
   }) {
+    // Best sellers first so users see products immediately; omit empty tiers.
+    final bands = <({
+      String title,
+      List<allProduct.Products> items,
+      VoidCallback onSeeAll,
+    })>[
+      (
+        title: 'Best sellers',
+        items: best,
+        onSeeAll: () => Get.to(
+          () => const DealsListView(
+            title: 'Best selling',
+            sort: '-totalSell',
+          ),
+        ),
+      ),
+      (
+        title: '70%+ off',
+        items: mega,
+        onSeeAll: () => Get.to(
+          () => const DealsListView(
+            title: 'Mega deals (70%+ off)',
+            minDiscount: 70,
+            sort: '-discount',
+          ),
+        ),
+      ),
+      (
+        title: '50–69%',
+        items: hot,
+        onSeeAll: () => Get.to(
+          () => const DealsListView(
+            title: '50% – 69% off',
+            minDiscount: 50,
+            maxDiscount: 69.99,
+            sort: '-discount',
+          ),
+        ),
+      ),
+      (
+        title: '30–49%',
+        items: value,
+        onSeeAll: () => Get.to(
+          () => const DealsListView(
+            title: '30% – 49% off',
+            minDiscount: 30,
+            maxDiscount: 49.99,
+            sort: '-discount',
+          ),
+        ),
+      ),
+    ];
+    final visible = bands.where((b) => b.items.isNotEmpty).toList();
+    if (visible.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 4),
@@ -342,7 +399,7 @@ class HomeView extends GetView<HomeController> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Biggest savings first',
+                      'Bestsellers & top discounts',
                       style: h5.copyWith(
                         color: AppColors.hintColor,
                         fontSize: 12,
@@ -355,63 +412,23 @@ class HomeView extends GetView<HomeController> {
             ],
           ),
           const SizedBox(height: 16),
-          _dealBandBody(
-            shortTitle: '70%+ off',
-            products: mega,
-            onSeeAll: () => Get.to(
-              () => const DealsListView(
-                title: 'Mega deals (70%+ off)',
-                minDiscount: 70,
-                sort: '-discount',
-              ),
+          for (var i = 0; i < visible.length; i++) ...[
+            if (i > 0) _dealDivider(),
+            _dealBandBody(
+              shortTitle: visible[i].title,
+              products: visible[i].items,
+              onSeeAll: visible[i].onSeeAll,
             ),
-          ),
-          _dealDivider(),
-          _dealBandBody(
-            shortTitle: '50–69%',
-            products: hot,
-            onSeeAll: () => Get.to(
-              () => const DealsListView(
-                title: '50% – 69% off',
-                minDiscount: 50,
-                maxDiscount: 69.99,
-                sort: '-discount',
-              ),
-            ),
-          ),
-          _dealDivider(),
-          _dealBandBody(
-            shortTitle: '30–49%',
-            products: value,
-            onSeeAll: () => Get.to(
-              () => const DealsListView(
-                title: '30% – 49% off',
-                minDiscount: 30,
-                maxDiscount: 49.99,
-                sort: '-discount',
-              ),
-            ),
-          ),
-          _dealDivider(),
-          _dealBandBody(
-            shortTitle: 'Best sellers',
-            products: best,
-            onSeeAll: () => Get.to(
-              () => const DealsListView(
-                title: 'Best selling',
-                sort: '-totalSell',
-              ),
-            ),
-          ),
+          ],
         ],
       ),
     );
   }
 
-  /// Home strip: products with `expiredAt` in the next 24h (backend filter).
+  /// Home strip: `expiringWithinHours=24` & `sort=expiredAt` via [HomeDealsController].
+  /// Always visible; empty when no products have `expiredAt` in the next 24h (API).
   Widget _expiringSoonStripCard() {
     final list = homeDealsController.expiringSoon;
-    if (list.isEmpty) return const SizedBox.shrink();
 
     return Container(
       width: double.infinity,
@@ -440,13 +457,13 @@ class HomeView extends GetView<HomeController> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.14),
+                  color: AppColors.mainColor.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(
-                  Icons.timer_outlined,
+                child: const Icon(
+                  Icons.access_time_rounded,
                   size: 20,
-                  color: Colors.orange.shade800,
+                  color: AppColors.mainColor,
                 ),
               ),
               const SizedBox(width: 10),
@@ -455,7 +472,7 @@ class HomeView extends GetView<HomeController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Ending soon',
+                      'Expiring Soon',
                       style: GoogleFonts.dmSans(
                         fontSize: 17,
                         fontWeight: FontWeight.w800,
@@ -463,7 +480,7 @@ class HomeView extends GetView<HomeController> {
                       ),
                     ),
                     Text(
-                      'Within 24 hours · live countdown on tiles',
+                      'Deals ending within 24 hours · updates every second',
                       style: h5.copyWith(
                         color: AppColors.hintColor,
                         fontSize: 12,
@@ -476,7 +493,7 @@ class HomeView extends GetView<HomeController> {
               TextButton(
                 onPressed: () => Get.to(
                   () => const DealsListView(
-                    title: 'Ending soon',
+                    title: 'Expiring Soon',
                     expiringWithinHours: 24,
                     sort: 'expiredAt',
                   ),
@@ -505,24 +522,52 @@ class HomeView extends GetView<HomeController> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 212,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.only(right: 6),
-              itemCount: list.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, i) => SizedBox(
-                width: 156,
-                child: _stripProductCard(
-                  list[i],
-                  showExpiryCountdown: true,
+          if (list.isEmpty) ...[
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.inventory_2_outlined,
+                    size: 20,
+                    color: AppColors.hintColor.withValues(alpha: 0.85),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'No deals ending in the next 24 hours right now. Check back later or browse Deal picks below.',
+                      style: h5.copyWith(
+                        color: AppColors.hintColor,
+                        fontSize: 13,
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ] else ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 212,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(right: 6),
+                itemCount: list.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, i) => SizedBox(
+                  width: 156,
+                  child: _stripProductCard(
+                    list[i],
+                    showExpiryCountdown: true,
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -597,60 +642,31 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  Widget _dealEmptyHint() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.hourglass_empty_rounded,
-            size: 17,
-            color: AppColors.hintColor.withValues(alpha: 0.9),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Nothing here yet',
-              style: h5.copyWith(
-                color: AppColors.hintColor,
-                fontSize: 13,
-                height: 1.35,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _dealBandBody({
     required String shortTitle,
     required List<allProduct.Products> products,
     required VoidCallback onSeeAll,
   }) {
+    assert(products.isNotEmpty, 'Empty deal bands are hidden at the card level');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _dealSectionHeader(title: shortTitle, onSeeAll: onSeeAll),
         const SizedBox(height: 10),
-        if (products.isEmpty)
-          _dealEmptyHint()
-        else
-          SizedBox(
-            height: 212,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.only(right: 6),
-              itemCount: products.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, i) => SizedBox(
-                width: 156,
-                child: _stripProductCard(products[i]),
-              ),
+        SizedBox(
+          height: 212,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.only(right: 6),
+            itemCount: products.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (context, i) => SizedBox(
+              width: 156,
+              child: _stripProductCard(products[i]),
             ),
           ),
+        ),
       ],
     );
   }
@@ -723,9 +739,7 @@ class HomeView extends GetView<HomeController> {
                             ),
                           ),
                         ),
-                        if (showExpiryCountdown &&
-                            expiryAt != null &&
-                            expiryAt.isAfter(DateTime.now()))
+                        if (showExpiryCountdown && expiryAt != null)
                           Positioned(
                             left: 0,
                             right: 0,
@@ -824,7 +838,7 @@ class HomeView extends GetView<HomeController> {
         ),
         child: Column(
           children: [
-            Image.network(image,width: 30,height: 30,),
+            Image.network(image, width: 30, height: 30),
             sh5,
             Text(
               title,
@@ -1212,13 +1226,26 @@ class HomeView extends GetView<HomeController> {
                           children: [
                             Text(
                                 '\$${((productList[index].price ?? 0) * (1 - (productList[index].discount ?? 0) / 100)).toStringAsFixed(2)}',
-                                style: GoogleFonts.dmSans(color: AppColors.orange, fontWeight: FontWeight.bold, fontSize: 18)),
+                                style: GoogleFonts.dmSans(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 18,
+                                  height: 1.1,
+                                  shadows: const [
+                                    Shadow(
+                                      color: Colors.black54,
+                                      blurRadius: 6,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                              ),
                            sw5,
                             Text(
                               '\$${productList[index].price}',
                               style: GoogleFonts.dmSans(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                                color: Colors.white.withValues(alpha: 0.65),
+                                fontWeight: FontWeight.w600,
                                 fontSize: 12,
                                 decoration: TextDecoration.lineThrough,
                               ),
@@ -1330,7 +1357,7 @@ class HomeView extends GetView<HomeController> {
                             : Icons.favorite_border_rounded,
                         size: 18,
                         color: saved
-                            ? const Color(0xFFFF6B6B)
+                            ? AppColors.mainColor
                             : AppColors.black.withValues(alpha: 0.65),
                       ),
                     ),

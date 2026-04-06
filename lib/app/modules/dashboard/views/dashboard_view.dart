@@ -12,14 +12,6 @@ import '../controllers/dashboard_controller.dart';
 class DashboardView extends GetView<DashboardController> {
    DashboardView({super.key});
 
-  // List of pages
-  static final List<Widget> _pages = [
-    HomeView(),
-    const BrowseView(),
-    CartView(),
-    ProfileView(),
-  ];
-
   // Icons for the bar
   final List<CrystalNavigationBarItem> _items = [
     CrystalNavigationBarItem(
@@ -46,10 +38,19 @@ class DashboardView extends GetView<DashboardController> {
     Get.put(DashboardController());
     return Scaffold(
       extendBody: true, // Important: allows the body to go behind the nav bar
-      body: Obx(() => IndexedStack(
-        index: controller.currentIndex.value,
-        children: _pages,
-      )),
+      body: Obx(() {
+        final idx = controller.currentIndex.value;
+        final v = controller.visitedTabs;
+        return IndexedStack(
+          index: idx,
+          children: [
+            v.contains(0) ? HomeView() : const SizedBox.shrink(),
+            v.contains(1) ? const BrowseView() : const SizedBox.shrink(),
+            v.contains(2) ? CartView() : const SizedBox.shrink(),
+            v.contains(3) ? ProfileView() : const SizedBox.shrink(),
+          ],
+        );
+      }),
       bottomNavigationBar: Obx(() => CrystalNavigationBar(
         currentIndex: controller.currentIndex.value,
         onTap: controller.changePage,

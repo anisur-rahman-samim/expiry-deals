@@ -8,10 +8,12 @@ import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
+import 'package:expiry_deals/common/widgets/expiry_countdown_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ProductDetailsView extends StatefulWidget {
@@ -132,7 +134,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                 onPressed: () => fav.toggle(id),
                 child: Icon(
                   saved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                  color: saved ? const Color(0xFFFF6B6B) : Colors.white,
+                  color: saved ? AppColors.mainColor : Colors.white,
                   size: 22,
                 ),
               ),
@@ -220,6 +222,8 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
         var productDetails = productDetailsController.singleProduct.value.data;
 
         int stock = productDetails?.stock ?? 0; // Get the available stock
+
+        final expiryAt = _parseProductExpiry(productDetails?.expiredAt);
 
         final imgs = productDetails?.images ?? [];
         final imageUrls = imgs
@@ -394,6 +398,60 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                             const SizedBox(width: 16),
                           ],
                         ),
+                        if (expiryAt != null) ...[
+                          const SizedBox(height: 18),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: AppColors.grayLight),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.04),
+                                  blurRadius: 8,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.event_available_outlined,
+                                      color: AppColors.mainColor,
+                                      size: 22,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Deal expiry',
+                                      style: h2.copyWith(fontSize: 17),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: ExpiryCountdownBar(
+                                    expiresAt: expiryAt,
+                                    dense: false,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Ends ${DateFormat.yMMMEd().add_jm().format(expiryAt.toLocal())}',
+                                  style: h5.copyWith(
+                                    color: AppColors.hintColor,
+                                    fontSize: 13,
+                                    height: 1.35,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 28),
 
                         // Product Description
@@ -485,12 +543,23 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
               ),
             ),
 
-            // Sticky Bottom Action Bar
+            // Sticky bottom bar — ticks every second when there is an expiry so it can disable at zero.
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
-              child: Container(
+              child: StreamBuilder<int>(
+                stream: expiryAt != null
+                    ? Stream.periodic(
+                        const Duration(seconds: 1),
+                        (x) => x,
+                      )
+                    : Stream<int>.fromIterable(const [0]),
+                initialData: 0,
+                builder: (context, _) {
+                  final dealExpired = expiryAt != null &&
+                      !expiryAt.isAfter(DateTime.now());
+                  return Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: AppColors.white,
@@ -506,184 +575,240 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Quantity Selector
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.grayLight, width: 1.5),
-                        borderRadius: BorderRadius.circular(50),
+                    if (dealExpired) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 22,
+                          horizontal: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.grayLight.withValues(alpha: 0.55),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: AppColors.hintColor.withValues(alpha: 0.25),
+                          ),
+                        ),
+                        child: Text(
+                          'This deal has expired.',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.dmSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.hintColor,
+                          ),
+                        ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          InkWell(
-                            onTap: () => decreaseQuantity(),
-                            borderRadius: BorderRadius.circular(50),
-                            child: const Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Icon(Icons.remove, size: 26, color: AppColors.black),
-                            ),
+                    ] else ...[
+                      // Quantity Selector
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: AppColors.grayLight,
+                            width: 1.5,
                           ),
-                          Text(
-                            '$quantity Item${quantity > 1 ? 's' : ''}', // Dynamically showing item(s)
-                            style: GoogleFonts.dmSans(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.black,
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () => increaseQuantity(stock),
-                            borderRadius: BorderRadius.circular(50),
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: const BoxDecoration(
-                                color: AppColors.mainColor,
-                                shape: BoxShape.circle,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: () => decreaseQuantity(),
+                              borderRadius: BorderRadius.circular(50),
+                              child: const Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Icon(
+                                  Icons.remove,
+                                  size: 26,
+                                  color: AppColors.black,
+                                ),
                               ),
-                              child: const Icon(Icons.add, size: 26, color: Colors.white),
                             ),
-                          ),
-                        ],
+                            Text(
+                              '$quantity Item${quantity > 1 ? 's' : ''}',
+                              style: GoogleFonts.dmSans(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.black,
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () => increaseQuantity(stock),
+                              borderRadius: BorderRadius.circular(50),
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: const BoxDecoration(
+                                  color: AppColors.mainColor,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.add,
+                                  size: 26,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                    // Buttons + inline loading (never use GetX overlay for "adding" — it can stick)
-                    Obx(() {
-                      final busy = addToCartController.isLoading.value;
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: busy
-                                            ? null
-                                            : () {
-                                                addToCartController.addToCart(
-                                                  productId: productDetails?.id ?? "",
-                                                  quantity: quantity,
-                                                  isBuyNow: false,
-                                                  authorId: productDetails?.author?.id ?? "",
-                                                );
-                                              },
-                                        borderRadius: BorderRadius.circular(18),
-                                        child: Ink(
-                                          padding: const EdgeInsets.symmetric(vertical: 20),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.mainColor,
-                                            borderRadius: BorderRadius.circular(18),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              'Add to cart',
-                                              style: GoogleFonts.dmSans(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.white,
+                      Obx(() {
+                        final busy = addToCartController.isLoading.value;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          onTap: busy
+                                              ? null
+                                              : () {
+                                                  addToCartController.addToCart(
+                                                    productId:
+                                                        productDetails?.id ?? "",
+                                                    quantity: quantity,
+                                                    isBuyNow: false,
+                                                    authorId: productDetails
+                                                            ?.author?.id ??
+                                                        "",
+                                                  );
+                                                },
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                          child: Ink(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 20,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.mainColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(18),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                'Add to cart',
+                                                style: GoogleFonts.dmSans(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.white,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: busy
-                                            ? null
-                                            : () {
-                                                addToCartController.addToCart(
-                                                  productId: productDetails?.id ?? "",
-                                                  quantity: quantity,
-                                                  isBuyNow: true,
-                                                  authorId: productDetails?.author?.id ?? "",
-                                                );
-                                              },
-                                        borderRadius: BorderRadius.circular(18),
-                                        child: Ink(
-                                          padding: const EdgeInsets.symmetric(vertical: 20),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.black,
-                                            borderRadius: BorderRadius.circular(18),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              'Buy now',
-                                              style: GoogleFonts.dmSans(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.white,
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          onTap: busy
+                                              ? null
+                                              : () {
+                                                  addToCartController.addToCart(
+                                                    productId:
+                                                        productDetails?.id ?? "",
+                                                    quantity: quantity,
+                                                    isBuyNow: true,
+                                                    authorId: productDetails
+                                                            ?.author?.id ??
+                                                        "",
+                                                  );
+                                                },
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                          child: Ink(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 20,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.black,
+                                              borderRadius:
+                                                  BorderRadius.circular(18),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                'Buy now',
+                                                style: GoogleFonts.dmSans(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.white,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
+                                    ),
+                                  ],
+                                ),
+                                if (busy)
+                                  Positioned.fill(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black
+                                            .withValues(alpha: 0.25),
+                                        borderRadius: BorderRadius.circular(18),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: SizedBox(
+                                        width: 28,
+                                        height: 28,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.5,
+                                          color: AppColors.mainColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            if (busy) ...[
+                              const SizedBox(height: 14),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: AppColors.mainColor,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'Adding to cart…',
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.mainColor,
                                     ),
                                   ),
                                 ],
                               ),
-                              if (busy)
-                                Positioned.fill(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withValues(alpha: 0.25),
-                                      borderRadius: BorderRadius.circular(18),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: SizedBox(
-                                      width: 28,
-                                      height: 28,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        color: AppColors.mainColor,
-                                      ),
-                                    ),
-                                  ),
-                                ),
                             ],
-                          ),
-                          if (busy) ...[
-                            const SizedBox(height: 14),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppColors.mainColor,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  'Adding to cart…',
-                                  style: GoogleFonts.dmSans(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.mainColor,
-                                  ),
-                                ),
-                              ],
-                            ),
                           ],
-                        ],
-                      );
-                    }),
+                        );
+                      }),
+                    ],
                   ],
                 ),
+                  );
+                },
               ),
             ),
           ],
@@ -691,6 +816,14 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
       }),
     );
   }
+}
+
+DateTime? _parseProductExpiry(dynamic v) {
+  if (v == null) return null;
+  if (v is DateTime) return v;
+  final s = v.toString().trim();
+  if (s.isEmpty || s == 'null') return null;
+  return DateTime.tryParse(s);
 }
 
 class _SimilarProductCard extends StatelessWidget {
@@ -718,9 +851,17 @@ class _SimilarProductCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () => Get.to(
-            () => ProductDetailsView(productId: product.id ?? ''),
-          ),
+          onTap: () {
+            final id = product.id?.trim() ?? '';
+            if (id.isEmpty) return;
+            // GetX uses route name "/ProductDetailsView" for all instances; without this,
+            // opening another product from this screen is blocked as a "duplicate" route.
+            Get.to(
+              () => ProductDetailsView(productId: id),
+              preventDuplicates: false,
+              routeName: '/ProductDetailsView/$id',
+            );
+          },
           child: Ink(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class AppColors{
 
-  static const mainColor = Color(0xffFB6000);
-  static const secColor = Color(0xffFF904B);
+  static const mainColor = Color(0xffE63946);
+  static const secColor = Color(0xffEF5350);
   static const bgColor = Color(0xffF5F6FA);
   static const circleColor = Color(0xff33363F);
   static const highlightTextColor = Color(0xffD3D9FF);
@@ -27,7 +27,7 @@ class AppColors{
   static const greenLight = Color(0xffEDF8F7);
   static const whiteDark = Color(0xffBEBEBE);
   static const primary = Color(0xff4DB5AD);
-  static const orange = Color(0xffff6200);
+  static const orange = Color(0xffC62828);
   static const yellow = Color(0xffEAB308);
   static const red = Color(0xffFE3A30);
   static const failedColor = Color(0xffff3c00);

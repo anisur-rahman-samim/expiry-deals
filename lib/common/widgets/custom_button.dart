@@ -34,11 +34,11 @@ class CustomCenterButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
           gradient: isWhite
               ? null
-              : const LinearGradient(
-            colors: [AppColors.mainColor, AppColors.secColor],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
+              : LinearGradient(
+                  colors: [AppColors.mainColor, AppColors.secColor],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
           color: isWhite ? Colors.white : null,
           border: isWhite ? Border.all(color: AppColors.mainColor, width: 2) : null,
           boxShadow: isWhite

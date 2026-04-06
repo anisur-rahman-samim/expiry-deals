@@ -88,7 +88,7 @@ class CategoryView extends StatelessWidget {
                 color: color.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: Image.network(icon,scale: 1,)
+              child: Image.network(icon, scale: 1),
             ),
             const SizedBox(height: 12),
 

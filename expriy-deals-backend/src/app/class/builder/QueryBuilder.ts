@@ -116,7 +116,10 @@ class QueryBuilder<T> {
 
     excludeFields.forEach(el => delete queryObj[el]);
 
-    this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
+    // Avoid chaining `.find({})`, which can interfere with filters already set on the query (e.g. `discount`, `expiredAt`).
+    if (Object.keys(queryObj).length > 0) {
+      this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
+    }
 
     return this;
   }

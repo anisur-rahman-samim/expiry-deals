@@ -183,8 +183,8 @@ class WithdrawalView extends StatelessWidget {
         break;
       case "pending":
       case "processing":
-        statusColor = Colors.orange.shade800;
-        statusBg = Colors.orange.shade50;
+        statusColor = AppColors.mainColor;
+        statusBg = AppColors.secColor.withValues(alpha: 0.14);
         break;
       case "rejected":
       case "failed":

@@ -6,7 +6,26 @@ import 'package:expiry_deals/common/helper/local_store.dart';
 class SearchRadiusMiles {
   SearchRadiusMiles._();
 
-  static const double defaultMiles = 10;
+  /// Local marketplace default (~10–15 mi); users can raise in settings.
+  static const double defaultMiles = 12;
+
+  /// One-time cap: stored radii above this (e.g. accidental 300+ mi) reset to [defaultMiles].
+  static const double _legacyAbsurdMilesThreshold = 100;
+
+  /// Call after storage init (e.g. from `main`). Safe to call every launch.
+  static Future<void> migrateLegacyUnrealisticRadius() async {
+    final v = LocalStorage.getData(key: AppConstant.searchRadiusMiles);
+    double? parsed;
+    if (v is num) {
+      parsed = v.toDouble();
+    } else if (v is String) {
+      parsed = double.tryParse(v);
+    }
+    if (parsed == null) return;
+    if (parsed > _legacyAbsurdMilesThreshold) {
+      await set(defaultMiles);
+    }
+  }
   static const double minMiles = 1;
   /// Upper bound for search radius (miles). Kept in sync with API clamp.
   static const double maxMiles = 500;

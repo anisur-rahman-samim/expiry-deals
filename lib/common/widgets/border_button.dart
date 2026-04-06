@@ -21,10 +21,10 @@ class BorderButton extends StatelessWidget {
         painter: GradientBorderPainter(
           borderRadius: 10,
           strokeWidth: 2,
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             colors: [
-              Color(0xFFF3DFC2), // Start of the border gradient
-              Color(0xFF8B6E62), // End of the border gradient
+              AppColors.secColor.withValues(alpha: 0.75),
+              AppColors.mainColor,
             ],
           ),
         ),
@@ -37,10 +37,10 @@ class BorderButton extends StatelessWidget {
           ),
           child: ShaderMask(
             shaderCallback: (bounds) {
-              return const LinearGradient(
+              return LinearGradient(
                 colors: [
-                  Color(0xFFEBD6BA), // Gradient text start color
-                  Color(0xFFA58A7A), // Gradient text end color
+                  AppColors.secColor,
+                  AppColors.orange,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

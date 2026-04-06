@@ -103,7 +103,8 @@ class LoginView extends StatelessWidget {
                         ),
                         sh10,
                         Text(
-                          "Sign in to continue your journey with Trusten.",
+                          "Sign in to browse nearby deals and manage your account.",
+                          textAlign: TextAlign.center,
                           style: h2.copyWith(color: AppColors.white, fontSize: 14),
                         ),
                       ],

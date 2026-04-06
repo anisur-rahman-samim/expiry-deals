@@ -152,7 +152,7 @@ class VendorProductView extends GetView<VendorProductController> {
                 Positioned(
                   top: 8,
                   right: 8,
-                  child: Image.Column(
+                  child: Column(
                     children: [
                       GestureDetector(
                         onTap: () {
