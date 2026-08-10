@@ -15,7 +15,8 @@ import 'package:pinput/pinput.dart';
 
 class VerifyView extends StatefulWidget {
   final bool? isSignUp;
-  const VerifyView({super.key, required this.isSignUp});
+  final String? email;
+  const VerifyView({super.key, required this.isSignUp, this.email});
 
   @override
   State<VerifyView> createState() => _VerifyViewState();
@@ -52,7 +53,7 @@ class _VerifyViewState extends State<VerifyView> {
     });
     startTimer();
     // TODO: Call your resend API here
-    Get.find<AuthController>().resendOtp();
+    Get.find<AuthController>().resendOtp(email: widget.email!);
     kSnackBar(message: "Verification code sent!", bgColor: AppColors.failedColor);
   }
 
