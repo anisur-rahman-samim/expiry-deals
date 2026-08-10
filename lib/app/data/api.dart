@@ -1,7 +1,7 @@
 class Api {
   /// base url
  // static const baseUrl = "http://10.10.10.27:7000/api/v1";
-  static const baseUrl = "https://api.expirydeals.online/api/v1";
+  static const baseUrl = "http://localhost:7007/api/v1";
 
   ///auth
   static const login = "$baseUrl/auth/login"; //done

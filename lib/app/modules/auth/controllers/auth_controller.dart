@@ -121,7 +121,7 @@ class AuthController extends GetxController {
         LocalStorage.saveData(key: AppConstant.otpToken, data: otpToken);
 
         // Redirect to OTP verification screen
-        Get.to(() => VerifyView(isSignUp: true));
+        Get.to(() => VerifyView(isSignUp: true,email: emailController.text.trim(),));
       }
     } catch (e) {
       debugPrint("Registration Error: $e");
@@ -189,7 +189,7 @@ class AuthController extends GetxController {
   }
 
   // Resend OTP function
-  Future<void> resendOtp() async {
+  Future<void> resendOtp({required String email}) async {
     try {
       isLoading(true);
 
@@ -208,7 +208,9 @@ class AuthController extends GetxController {
         await BaseClient.postRequest(
           api: Api.resendOtp,
           headers: headers,
-          body: jsonEncode({}),
+          body: jsonEncode({
+            "email":email.trim()
+          }),
         ),
       );
 
