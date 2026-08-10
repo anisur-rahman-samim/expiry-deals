@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_product/controllers/vendor_add_product_controller.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
@@ -33,61 +32,112 @@ class VendorAddProductView extends GetView<VendorAddProductController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Product Image',
+              'Product photos',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textColor,
               ),
             ),
+            const SizedBox(height: 6),
+            Text(
+              'Add up to ${VendorAddProductController.maxImages} images. '
+              'Several angles usually sell better than one.',
+              style: TextStyle(
+                fontSize: 13,
+                height: 1.35,
+                color: AppColors.hintColor,
+              ),
+            ),
             sh10,
 
-            /// Single Image Picker
-            Obx(() => GestureDetector(
-              onTap: controller.pickImage,
-              child: Container(
-                height: 180,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.grayLight,
-                    width: 2,
-                  ),
-                  image: controller.selectedImage.value != null
-                      ? DecorationImage(
-                    image: FileImage(controller.selectedImage.value!),
-                    fit: BoxFit.cover,
-                  )
-                      : null,
-                ),
-                child: controller.selectedImage.value == null
-                    ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+            Obx(() {
+              final files = controller.selectedImages;
+              return SizedBox(
+                height: 118,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
                   children: [
-                    Icon(
-                      Icons.add_a_photo_outlined,
-                      size: 48,
-                      color: AppColors.mainColor.withOpacity(0.6),
-                    ),
-                    sh10,
-                    Text(
-                      'Upload Product Image',
-                      style: TextStyle(
-                        color: AppColors.mainColor,
-                        fontWeight: FontWeight.w600,
+                    ...files.asMap().entries.map((e) {
+                      final i = e.key;
+                      final f = e.value;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(14),
+                              child: Image.file(
+                                f,
+                                width: 112,
+                                height: 112,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Positioned(
+                              top: -6,
+                              right: -6,
+                              child: Material(
+                                color: Colors.black.withValues(alpha: 0.55),
+                                shape: const CircleBorder(),
+                                child: InkWell(
+                                  customBorder: const CircleBorder(),
+                                  onTap: () => controller.removeImageAt(i),
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(6),
+                                    child: Icon(
+                                      Icons.close_rounded,
+                                      size: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                    if (files.length < VendorAddProductController.maxImages)
+                      GestureDetector(
+                        onTap: controller.showImageSourcePicker,
+                        child: Container(
+                          width: 112,
+                          height: 112,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: AppColors.grayLight,
+                              width: 2,
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.add_photo_alternate_outlined,
+                                size: 32,
+                                color: AppColors.mainColor.withValues(alpha: 0.85),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Add',
+                                style: TextStyle(
+                                  color: AppColors.mainColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                    Text(
-                      'Tap to select one image',
-                      style: TextStyle(color: AppColors.hintColor),
-                    ),
                   ],
-                )
-                    : null,
-              ),
-            )),
+                ),
+              );
+            }),
 
             sh20,
 

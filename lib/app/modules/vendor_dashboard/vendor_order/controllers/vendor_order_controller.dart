@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
@@ -20,6 +21,36 @@ class VendorOrderController extends GetxController {
     fetchOrders();
   }
 
+  /// [userId] in storage is set on login; older sessions only had it after opening Profile.
+  Future<String?> _resolveAuthorId() async {
+    String? userId = LocalStorage.getData(key: AppConstant.userId);
+    if (userId != null && userId.isNotEmpty) return userId;
+
+    final token = LocalStorage.getData(key: AppConstant.token);
+    if (token == null || token.isEmpty) return null;
+
+    try {
+      final response = await http.get(
+        Uri.parse(Api.profile),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      if (response.statusCode != 200) return null;
+      final decoded = jsonDecode(response.body) as Map<String, dynamic>?;
+      if (decoded?['success'] != true || decoded?['data'] == null) return null;
+      final data = decoded!['data'] as Map<String, dynamic>?;
+      final id = data?['_id'] ?? data?['id'];
+      if (id == null) return null;
+      final sid = id.toString();
+      await LocalStorage.saveData(key: AppConstant.userId, data: sid);
+      return sid;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Fetch all vendor orders
   Future<void> fetchOrders() async {
     try {
@@ -32,7 +63,7 @@ class VendorOrderController extends GetxController {
         return;
       }
 
-      String? userId = LocalStorage.getData(key: AppConstant.userId);
+      final userId = await _resolveAuthorId();
       if (userId == null || userId.isEmpty) {
         errorMessage.value = "User ID is missing.";
         return;

@@ -1,11 +1,10 @@
 import 'package:expiry_deals/app/modules/cart/controllers/order_place_controller.dart';
 import 'package:expiry_deals/app/modules/edit_profile/controllers/edit_profile_controller.dart';
-import 'package:expiry_deals/app/modules/order_success/views/order_success_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_loader.dart';
-import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
+import 'package:expiry_deals/common/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -34,7 +33,6 @@ class _BillingDetailsViewState extends State<BillingDetailsView> {
  final EditProfileController controller = Get.put(EditProfileController());
 
   final OrderPlaceController orderPlaceController = Get.put(OrderPlaceController());
-  int _paymentMethod = 1; // Default to Cash on Delivery
 
   @override
   Widget build(BuildContext context) {
@@ -82,29 +80,29 @@ class _BillingDetailsViewState extends State<BillingDetailsView> {
             // ),
             // const SizedBox(height: 16),
 
-            // Payment Method Selection
-            RadioListTile<int>(
-              value: 1,
-              groupValue: _paymentMethod,
-              onChanged: (int? value) {
-                setState(() {
-                  if (value != null) _paymentMethod = value;
-                });
-              },
-              title: const Text('Cash on Delivery'),
-              activeColor: AppColors.mainColor,
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.bgColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.grayLight),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.lock_outline_rounded, color: AppColors.mainColor, size: 22),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Payment is online only. After you place the order, you’ll complete checkout securely in the next step.',
+                      style: h4.copyWith(color: AppColors.hintColor, height: 1.35),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            RadioListTile<int>(
-              value: 2,
-              groupValue: _paymentMethod,
-              onChanged: (int? value) {
-                setState(() {
-                  if (value != null) _paymentMethod = value;
-                });
-              },
-              title: const Text('Online Payment'),
-              activeColor: AppColors.mainColor,
-            ),
+            const SizedBox(height: 16),
 
             // Place Order Button
             Obx(() => orderPlaceController.isLoading.value
@@ -121,7 +119,7 @@ class _BillingDetailsViewState extends State<BillingDetailsView> {
                   state: addressController.text,
                   zipCode: addressController.text,
                   country: addressController.text,
-                  paymentMethod: _paymentMethod.toString(),
+                  paymentMethod: '2',
                 );
               },
               title: "Place Order",

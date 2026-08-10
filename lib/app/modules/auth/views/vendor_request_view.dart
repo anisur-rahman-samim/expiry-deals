@@ -6,8 +6,8 @@ import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
 import 'package:expiry_deals/common/widgets/custom_loader.dart';
-import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
-import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
+import 'package:expiry_deals/common/widgets/custom_textfield.dart';
+import 'package:expiry_deals/app/routes/app_pages.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -57,6 +57,27 @@ class VendorRequestView extends StatelessWidget {
                     decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Material(
+                        color: Colors.black.withValues(alpha: 0.18),
+                        shape: const CircleBorder(),
+                        clipBehavior: Clip.antiAlias,
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back_rounded),
+                          color: Colors.white,
+                          tooltip: 'Back',
+                          onPressed: () => Get.back(),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -125,7 +146,25 @@ class VendorRequestView extends StatelessWidget {
                   // Location section – FIXED logic & LatLng order
                   // ──────────────────────────────────────────────
                   Text("Shop Location", style: h4.copyWith(fontWeight: FontWeight.w600)),
+                  sh5,
+                  Text(
+                    "Search an address or tap the map to place the pin.",
+                    style: h2.copyWith(fontSize: 12, color: Colors.grey[600]),
+                  ),
                   sh8,
+                  Obx(() {
+                    final addr = controller.shopAddressDisplay.value;
+                    if (addr.isEmpty) return const SizedBox.shrink();
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        addr,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: h2.copyWith(fontSize: 13),
+                      ),
+                    );
+                  }),
                   GestureDetector(
                     onTap: () async {
                       LatLng? initialPos;
@@ -138,12 +177,21 @@ class VendorRequestView extends StatelessWidget {
                         );
                       }
 
-                      final LatLng? picked = await Get.to(
-                            () => LocationPickerPage(initialPosition: initialPos),
+                      final picked = await Get.to<LocationPickResult?>(
+                        () => LocationPickerPage(
+                          initialPosition: initialPos,
+                          initialAddress:
+                              controller.shopAddressDisplay.value.isEmpty
+                                  ? null
+                                  : controller.shopAddressDisplay.value,
+                        ),
                       );
 
                       if (picked != null) {
-                        controller.selectLocation(picked);
+                        controller.selectLocation(
+                          picked.latLng,
+                          formattedAddress: picked.formattedAddress,
+                        );
                       }
                     },
                     child: Container(
@@ -275,7 +323,51 @@ class VendorRequestView extends StatelessWidget {
                     return const SizedBox.shrink();
                   }),
 
-                  sh30,
+                  sh20,
+
+                  Obx(
+                    () => Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: controller.acceptedTerms.value,
+                          onChanged: (v) =>
+                              controller.acceptedTerms.value = v ?? false,
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 4,
+                              children: [
+                                Text(
+                                  'I have read and agree to the',
+                                  style: h2.copyWith(fontSize: 13, height: 1.35),
+                                ),
+                                GestureDetector(
+                                  onTap: () =>
+                                      Get.toNamed(Routes.TERMS_CONDITIONS),
+                                  child: Text(
+                                    'Terms & Conditions',
+                                    style: h2.copyWith(
+                                      fontSize: 13,
+                                      color: AppColors.mainColor,
+                                      fontWeight: FontWeight.w700,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: AppColors.mainColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  sh20,
 
                   // Submit Button
                   Obx(
@@ -306,6 +398,14 @@ class VendorRequestView extends StatelessWidget {
 
                         if (controller.documentFile.value == null) {
                           Get.snackbar("Error", "Please upload a document");
+                          return;
+                        }
+
+                        if (!controller.acceptedTerms.value) {
+                          Get.snackbar(
+                            'Required',
+                            'Please accept the Terms & Conditions to continue.',
+                          );
                           return;
                         }
 

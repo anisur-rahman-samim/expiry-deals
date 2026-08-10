@@ -1,7 +1,8 @@
 import 'package:expiry_deals/app/modules/cart/controllers/cart_controller.dart';
 import 'package:expiry_deals/app/modules/cart/model/add_to_cart_model.dart';
 import 'package:expiry_deals/app/modules/cart/views/billing_details_view.dart';
-import 'package:expiry_deals/app/modules/dashboard/views/dashboard_view.dart';
+import 'package:expiry_deals/app/modules/dashboard/controllers/dashboard_controller.dart';
+import 'package:expiry_deals/app/routes/app_pages.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
@@ -23,7 +24,12 @@ class _CartViewState extends State<CartView> {
   @override
   void initState() {
     super.initState();
-    controller.fetchAddToCart(); // Safe to call here
+    // Skip redundant GET if cart was just refreshed (e.g. Buy now from product).
+    if (controller.cartItems.isEmpty) {
+      controller.fetchAddToCart();
+    } else {
+      controller.calculateTotal();
+    }
   }
 
   @override
@@ -109,7 +115,13 @@ class _CartViewState extends State<CartView> {
                 ),
                 const SizedBox(height: 32),
                 ElevatedButton(
-                  onPressed: () => Get.to(() =>  DashboardView()),
+                  onPressed: () {
+                    if (Get.isRegistered<DashboardController>()) {
+                      Get.find<DashboardController>().changePage(0);
+                    } else {
+                      Get.offAllNamed(Routes.DASHBOARD);
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.mainColor,
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),

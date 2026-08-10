@@ -1,5 +1,3 @@
-
-import 'package:expiry_deals/app/modules/auth/views/login_view.dart';
 import 'package:expiry_deals/app/modules/change_password/views/change_password_view.dart';
 import 'package:expiry_deals/app/modules/choose_role/views/choose_role_view.dart';
 import 'package:expiry_deals/app/modules/edit_profile/views/edit_profile_view.dart';
@@ -13,6 +11,7 @@ import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
+import 'package:expiry_deals/app/modules/profile/model/profile_model.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:flutter/material.dart';
@@ -47,15 +46,28 @@ class VendorProfileView extends GetView {
                 }
 
                 final user = controller.profileData.value.data;
+                // Observe shop banner fields so header updates after fetchProfile / Edit Shop.
+                final bannerUrl = controller.vendorShopBannerUrl.value;
+                final bannerColorHex = controller.vendorShopBannerColor.value;
                 return Column(
                   children: [
-                    // Profile Image
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundImage: NetworkImage(
-                          user?.profile ?? AppImages.noImage
+                    if (_vendorHasBannerStrip(bannerUrl, bannerColorHex))
+                      _vendorCoverWithOverlappingAvatar(
+                        controller: controller,
+                        user: user,
+                        bannerUrl: bannerUrl,
+                        bannerColorHex: bannerColorHex,
+                        avatarImageUrl:
+                            _vendorHeaderImageUrl(controller, user),
+                      )
+                    else
+                      // Prefer shop logo (Edit Shop); fallback to user profile photo.
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundImage: NetworkImage(
+                          _vendorHeaderImageUrl(controller, user),
+                        ),
                       ),
-                    ),
                     sw10,
 
                     // User Name & Email
@@ -119,7 +131,9 @@ class VendorProfileView extends GetView {
                     ),
                     child: ListTile(
                       onTap: () {
-                        Get.to(() => EditShopView());
+                        Get.to(() => EditShopView())?.then((_) {
+                          controller.fetchProfile();
+                        });
                       },
                       leading: Image.asset(AppImages.profile, scale: 4,color: AppColors.mainColor,),
                       trailing: Icon(Icons.arrow_forward_ios),
@@ -464,4 +478,131 @@ class VendorProfileView extends GetView {
       ),
     );
   }
+}
+
+/// Vendor profile header: show **shop logo** when loaded; else user profile photo. Cache-bust so new uploads show after Edit Shop.
+String _vendorHeaderImageUrl(ProfileController c, Data? user) {
+  final shopLogo = c.vendorShopLogoUrl.value;
+  final profilePic = user?.profile;
+  final base = (shopLogo != null && shopLogo.isNotEmpty)
+      ? shopLogo
+      : (profilePic ?? AppImages.noImage);
+  return _vendorCacheBustedUrl(base, c.vendorShopLogoTimestamp ?? user?.updatedAt);
+}
+
+bool _vendorHasBannerStrip(String? bannerUrl, String? bannerColorHex) {
+  final u = bannerUrl?.trim() ?? '';
+  final c = bannerColorHex?.trim() ?? '';
+  return u.isNotEmpty || c.isNotEmpty;
+}
+
+const double _kVendorCoverHeight = 168;
+const double _kVendorOverlapAvatarOuterR = 64;
+
+/// Shop cover with profile/shop logo centered on the bottom edge (Facebook-style).
+Widget _vendorCoverWithOverlappingAvatar({
+  required ProfileController controller,
+  required Data? user,
+  required String? bannerUrl,
+  required String? bannerColorHex,
+  required String avatarImageUrl,
+}) {
+  return SizedBox(
+    height: _kVendorCoverHeight + _kVendorOverlapAvatarOuterR,
+    width: double.infinity,
+    child: Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.topCenter,
+      children: [
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          height: _kVendorCoverHeight,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: _vendorBannerLayer(
+              height: _kVendorCoverHeight,
+              c: controller,
+              user: user,
+              bannerUrl: bannerUrl,
+              bannerColorHex: bannerColorHex,
+            ),
+          ),
+        ),
+        Positioned(
+          top: _kVendorCoverHeight - _kVendorOverlapAvatarOuterR,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: CircleAvatar(
+              radius: _kVendorOverlapAvatarOuterR,
+              backgroundColor: AppColors.white,
+              child: CircleAvatar(
+                radius: _kVendorOverlapAvatarOuterR - 4,
+                backgroundImage: NetworkImage(avatarImageUrl),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Wide banner from Edit Shop (`banner` / `bannerColor` on my-shop).
+Widget _vendorBannerLayer({
+  required double height,
+  required ProfileController c,
+  required Data? user,
+  required String? bannerUrl,
+  required String? bannerColorHex,
+}) {
+  final u = bannerUrl?.trim() ?? '';
+  if (u.isNotEmpty) {
+    final src =
+        _vendorCacheBustedUrl(u, c.vendorShopLogoTimestamp ?? user?.updatedAt);
+    return Image.network(
+      src,
+      height: height,
+      width: double.infinity,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) =>
+          _vendorBannerColorFallback(height, bannerColorHex),
+    );
+  }
+  return _vendorBannerColorFallback(height, bannerColorHex);
+}
+
+Widget _vendorBannerColorFallback(double height, String? bannerColorHex) {
+  final color = _parseBannerColorHex(bannerColorHex);
+  return Container(
+    height: height,
+    width: double.infinity,
+    alignment: Alignment.center,
+    color: color ?? AppColors.mainColor.withValues(alpha: 0.15),
+    child: color == null
+        ? Icon(Icons.storefront_outlined, size: 40, color: Colors.grey.shade600)
+        : null,
+  );
+}
+
+Color? _parseBannerColorHex(String? raw) {
+  if (raw == null) return null;
+  var hex = raw.trim();
+  if (hex.isEmpty) return null;
+  if (hex.startsWith('#')) hex = hex.substring(1);
+  if (hex.length == 6) {
+    return Color(int.parse('FF$hex', radix: 16));
+  }
+  if (hex.length == 8) {
+    return Color(int.parse(hex, radix: 16));
+  }
+  return null;
+}
+
+String _vendorCacheBustedUrl(String base, DateTime? updatedAt) {
+  if (!base.startsWith('http')) return base;
+  final ms = updatedAt?.millisecondsSinceEpoch ?? 0;
+  return base.contains('?') ? '$base&cb=$ms' : '$base?cb=$ms';
 }

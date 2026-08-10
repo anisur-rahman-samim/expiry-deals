@@ -1,3 +1,21 @@
+num? _parseAmount(dynamic v) {
+  if (v == null) return null;
+  if (v is num) return v;
+  return num.tryParse(v.toString());
+}
+
+/// Set `true` if your API stores withdrawal amounts in **cents** (e.g. `1045` → \$10.45).
+const bool kWithdrawAmountInCents = false;
+
+String formatWithdrawAmount(num? amount) {
+  if (amount == null) return '0.00';
+  var n = amount.toDouble();
+  if (kWithdrawAmountInCents && n % 1 == 0) {
+    n = n / 100.0;
+  }
+  return n.toStringAsFixed(2);
+}
+
 class WithdrawRequestModel {
   WithdrawRequestModel({
      this.success,
@@ -51,7 +69,8 @@ class WithdrawRequest {
 
   final String? id;
   final Vendor? vendor;
-  final int? amount;
+  /// API may send dollars (10.45) or cents (1045) as int — use [formatWithdrawAmount] when displaying.
+  final num? amount;
   final String? status;
   final bool? isDeleted;
   final BankDetails? bankDetails;
@@ -62,7 +81,7 @@ class WithdrawRequest {
     return WithdrawRequest(
       id: json["_id"],
       vendor: json["vendor"] == null ? null : Vendor.fromJson(json["vendor"]),
-      amount: json["amount"],
+      amount: _parseAmount(json["amount"]),
       status: json["status"],
       isDeleted: json["isDeleted"],
       bankDetails: json["bankDetails"] == null ? null : BankDetails.fromJson(json["bankDetails"]),

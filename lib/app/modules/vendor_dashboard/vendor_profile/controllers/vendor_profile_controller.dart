@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:expiry_deals/app/data/api.dart';
 import 'package:expiry_deals/app/data/base_client.dart';
+import 'package:expiry_deals/app/modules/profile/controllers/profile_controller.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/model/my_shop_model.dart';
 import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_profile/views/full_screen_map_view.dart';
 import 'package:expiry_deals/common/app_constant/app_constant.dart';
@@ -141,6 +142,9 @@ class EditShopController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         await fetchMyShop();
+        if (Get.isRegistered<ProfileController>()) {
+          await Get.find<ProfileController>().fetchProfile();
+        }
         Get.back();
         Get.snackbar("Success", "Shop updated successfully",
             backgroundColor: Colors.green.shade700, colorText: Colors.white);

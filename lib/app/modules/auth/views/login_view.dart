@@ -1,20 +1,18 @@
 import 'package:expiry_deals/app/modules/auth/controllers/auth_controller.dart';
 import 'package:expiry_deals/app/modules/auth/views/vendor_request_view.dart';
+import 'package:expiry_deals/app/routes/app_pages.dart';
 import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:expiry_deals/app/modules/auth/views/signup_view.dart';
 import 'package:expiry_deals/app/modules/forget/views/forget_view.dart';
-import 'package:expiry_deals/app/modules/dashboard/views/dashboard_view.dart';
-import 'package:expiry_deals/app/modules/vendor_dashboard/views/vendor_dashboard_view.dart';
 import 'package:expiry_deals/common/app_color/app_colors.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/app_text_style/styles.dart';
-import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:expiry_deals/common/size_box/custom_sizebox.dart';
 import 'package:expiry_deals/common/widgets/custom_button.dart';
-import 'package:expiry_deals/common/widgets/custom_textfelid.dart';
+import 'package:expiry_deals/common/widgets/custom_textfield.dart';
 
 class LoginView extends StatelessWidget {
   final bool? isVendor;
@@ -62,6 +60,33 @@ class LoginView extends StatelessWidget {
                     ),
                   ),
                 ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Material(
+                        color: Colors.black.withValues(alpha: 0.18),
+                        shape: const CircleBorder(),
+                        clipBehavior: Clip.antiAlias,
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back_rounded),
+                          color: Colors.white,
+                          tooltip: 'Back',
+                          onPressed: () {
+                            if (Navigator.of(context).canPop()) {
+                              Get.back();
+                            } else {
+                              Get.offNamed(Routes.CHOOSE_ROLE);
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: EdgeInsets.all(50),
                   child: Center(
@@ -78,7 +103,8 @@ class LoginView extends StatelessWidget {
                         ),
                         sh10,
                         Text(
-                          "Sign in to continue your journey with Trusten.",
+                          "Sign in to browse nearby deals and manage your account.",
+                          textAlign: TextAlign.center,
                           style: h2.copyWith(color: AppColors.white, fontSize: 14),
                         ),
                       ],
@@ -118,7 +144,7 @@ class LoginView extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () => Get.to(() => ForgetView()),
                       child: Text(
-                        "Forget Password?",
+                        "Forgot Password?",
                         style: h3.copyWith(color: AppColors.gray),
                       ),
                     ),

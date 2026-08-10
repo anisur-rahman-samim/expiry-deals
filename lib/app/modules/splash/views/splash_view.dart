@@ -6,6 +6,7 @@ import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/app_images/app_images.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../onboarding/views/onboarding_view.dart';
 import '../controllers/splash_controller.dart';
@@ -91,9 +92,14 @@ class _AnimatedLogoState extends State<AnimatedLogo>
       opacity: _opacityAnimation,
       child: ScaleTransition(
         scale: _scaleAnimation,
-        child: Image.asset(
-          AppImages.logoWhite,
-          scale: 2,
+        child: SvgPicture.asset(
+          AppImages.logoWordmarkWhiteSvg,
+          height: 140,
+          fit: BoxFit.contain,
+          colorFilter: const ColorFilter.mode(
+            Colors.white,
+            BlendMode.srcIn,
+          ),
         ),
       ),
     );

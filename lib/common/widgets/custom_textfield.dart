@@ -13,8 +13,8 @@ class CustomTextField extends StatefulWidget {
   final String? hintText;
   final Widget? preIcon;
   final int? maxLines;
-  final bool obscureText; 
-    final bool enabled; 
+  final bool obscureText;
+  final bool enabled;
 
   const CustomTextField({
     super.key,

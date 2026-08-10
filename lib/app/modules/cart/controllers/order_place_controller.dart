@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:expiry_deals/app/modules/cart/controllers/cart_controller.dart';
-import 'package:expiry_deals/app/modules/cart/views/cart_view.dart';
 import 'package:expiry_deals/app/modules/cart/views/payment_web_view.dart';
 import 'package:expiry_deals/app/modules/order_success/views/order_success_view.dart';
 import 'package:expiry_deals/common/widgets/custom_snackbar.dart';
@@ -73,12 +72,14 @@ class OrderPlaceController extends GetxController {
         if (response["success"] == true) {
 
           debugPrint("orderID:   ${response["data"]["_id"]}");
-          cartController.cartEmpty();
-          if(paymentMethod == "1"){
+          // Online payment: do not clear cart until payment succeeds (see [PaymentController.paymentDone]).
+          // Otherwise abandoning the webview would leave an order but an empty cart.
+          if (paymentMethod == "1") {
+            await cartController.cartEmpty();
             Get.offAll(() => OrderSuccessView());
             kSnackBar(message: 'Order placed successfully', bgColor: AppColors.green);
-          }else{
-         await   orderCheckout(orderId: response["data"]["_id"]);
+          } else {
+            await orderCheckout(orderId: response["data"]["_id"]);
           }
 
         } else {

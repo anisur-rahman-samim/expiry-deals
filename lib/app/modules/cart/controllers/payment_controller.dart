@@ -1,9 +1,7 @@
-
-import 'dart:convert';
-
+import 'package:expiry_deals/app/modules/cart/controllers/cart_controller.dart';
 import 'package:expiry_deals/app/modules/order_success/views/order_success_view.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 import '../../../../common/app_color/app_colors.dart';
@@ -36,10 +34,12 @@ class PaymentController extends GetxController {
       print('Status code: ${response.statusCode}');
       print('Response body: ${response.body}');
 
-      // First priority: check HTTP status filagal955@newtrea.com
       if (response.statusCode == 200) {
-        Get.to(() => OrderSuccessView()); // #O34KW6KCRC
-
+        final cart = Get.isRegistered<CartController>()
+            ? Get.find<CartController>()
+            : Get.put(CartController());
+        await cart.cartEmpty();
+        Get.to(() => OrderSuccessView());
       } else {
         Get.back();
         kSnackBar(message: "Payment verified but status not success", bgColor: AppColors.orange);

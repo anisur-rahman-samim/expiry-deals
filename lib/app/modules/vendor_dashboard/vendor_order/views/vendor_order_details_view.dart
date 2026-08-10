@@ -1,5 +1,5 @@
-import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_order/model/my_vendor_order_model.dart';
-import 'package:flutter/material.dart' as material;
+import 'package:expiry_deals/app/modules/vendor_dashboard/vendor_order/model/my_vendor_order_model.dart'
+    hide Image;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -301,11 +301,11 @@ class VendorOrderDetailsView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: product?.images.isNotEmpty == true
-                  ? material.Image.network(
-                product!.images.first.url ?? '',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported),
-              )
+                  ? Image.network(
+                      product!.images.first.url ?? '',
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported),
+                    )
                   : const Icon(Icons.image_outlined, color: AppColors.gray, size: 36),
             ),
             sw14,

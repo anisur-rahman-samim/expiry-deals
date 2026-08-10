@@ -35,10 +35,9 @@ class VendorHomeView extends GetView<VendorHomeController> {
       ),
       body: SafeArea(
         child: RefreshIndicator(
-          // Refresh both controllers if needed
           onRefresh: () async {
             await orderController.refreshOrders();
-         //   await controller.refreshDashboard(); // if home controller has own data
+            await controller.fetchVendorDashboard();
           },
           color: AppColors.mainColor,
           child: Obx(() {
@@ -120,10 +119,11 @@ class VendorHomeView extends GetView<VendorHomeController> {
           children: [
             Expanded(
               child: _statCard(
-                "Total Revenue",
+                "Total revenue",
                 controller.totalRevenue.value,
                 Icons.account_balance_wallet_rounded,
                 AppColors.mainColor,
+                caption: "All-time sales (not your wallet balance)",
               ),
             ),
             sw10,
@@ -142,7 +142,13 @@ class VendorHomeView extends GetView<VendorHomeController> {
     );
   }
 
-  Widget _statCard(String title, String value, IconData icon, Color color) {
+  Widget _statCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color, {
+    String? caption,
+  }) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -177,6 +183,17 @@ class VendorHomeView extends GetView<VendorHomeController> {
               color: AppColors.hintColor,
             ),
           ),
+          if (caption != null) ...[
+            sh8,
+            Text(
+              caption,
+              style: GoogleFonts.dmSans(
+                fontSize: 11,
+                color: AppColors.hintColor,
+                height: 1.3,
+              ),
+            ),
+          ],
         ],
       ),
     );

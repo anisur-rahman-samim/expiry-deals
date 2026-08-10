@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Intermediate PNG when regenerating app icon from assets/icon/logo_05_app_icon.svg
+assets/images/logo05_raster_temp.png

@@ -7,6 +7,7 @@ import 'package:expiry_deals/common/app_constant/app_constant.dart';
 import 'package:expiry_deals/common/helper/local_store.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 
 class BankDetailsController extends GetxController {
   final accountNumberCtrl = TextEditingController();
@@ -17,6 +18,9 @@ class BankDetailsController extends GetxController {
 
   var isLoading = false.obs;
   var bankDetails = MyBankDetailsModel().obs;
+
+  /// True when API returned 404 (no saved bank info yet) — not an error.
+  var noBankDetailsYet = false.obs;
 
   @override
   void onInit() {
@@ -55,36 +59,48 @@ class BankDetailsController extends GetxController {
   }
 
 
+  /// Loads saved bank info. **404 = no record yet** (normal for new vendors) — do not treat as error.
   Future<void> fetchMyBankDetails() async {
     try {
-      String? token = LocalStorage.getData(key: AppConstant.token);
+      isLoading.value = true;
+      final token = LocalStorage.getData(key: AppConstant.token);
       if (token == null || token.isEmpty) {
         throw "Authentication token is missing.";
       }
 
-      var headers = {
+      final headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       };
 
-      var response = await BaseClient.handleResponse(
-        await BaseClient.getRequest(api: Api.myBankDetails, headers: headers),
-      );
+      final raw = await http.get(Uri.parse(Api.myBankDetails), headers: headers);
 
-      if (response != null && response['success'] == true) {
-        bankDetails.value = MyBankDetailsModel.fromJson(response);
-        var data = bankDetails.value.data;
-
-        accountNumberCtrl.text = data?.accountNumber ?? "";
-        routingNumberCtrl.text = data?.routingNumber ?? "";
-        bankNameCtrl.text = data?.bankName ?? "";
-        holderNameCtrl.text = data?.bankHolderName ?? "";
-        bankAddressCtrl.text = data?.bankAddress ?? "";
+      if (raw.statusCode == 200) {
+        final decoded = jsonDecode(raw.body) as Map<String, dynamic>;
+        if (decoded['success'] == true) {
+          bankDetails.value = MyBankDetailsModel.fromJson(decoded);
+          final data = bankDetails.value.data;
+          noBankDetailsYet.value = data == null;
+          accountNumberCtrl.text = data?.accountNumber ?? "";
+          routingNumberCtrl.text = data?.routingNumber ?? "";
+          bankNameCtrl.text = data?.bankName ?? "";
+          holderNameCtrl.text = data?.bankHolderName ?? "";
+          bankAddressCtrl.text = data?.bankAddress ?? "";
+        }
+      } else if (raw.statusCode == 404) {
+        // Backend: "Bank details not found" — expected until first save.
+        noBankDetailsYet.value = true;
+        bankDetails.value = MyBankDetailsModel();
       } else {
-        Get.snackbar("Error", "Failed to fetch bank data.");
+        String msg = 'Failed to load bank details';
+        try {
+          final decoded = jsonDecode(raw.body) as Map<String, dynamic>?;
+          msg = decoded?['message']?.toString() ?? msg;
+        } catch (_) {}
+        Get.snackbar('Error', msg);
       }
     } catch (e) {
-     // Get.snackbar("Error", e.toString());
+      debugPrint('fetchMyBankDetails: $e');
     } finally {
       isLoading.value = false;
     }
@@ -113,10 +129,10 @@ class BankDetailsController extends GetxController {
       );
 
       if (response != null && response['success'] == true) {
-
-      await fetchMyBankDetails();
-      isLoading(false);
-      Get.back();
+        noBankDetailsYet.value = false;
+        await fetchMyBankDetails();
+        isLoading(false);
+        Get.back();
       } else {
         Get.snackbar("Error", "Failed to fetch bank data.");
         isLoading(false);
